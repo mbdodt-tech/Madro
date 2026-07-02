@@ -1,0 +1,118 @@
+# Fase 0-1 tjekliste — prompts til Claude Code
+
+*Gem denne fil som `docs/fase-tjekliste.md` i dit repo (sammen med `CLAUDE.md` i roden og byggeplanen som `docs/byggeplan.md`).*
+
+**Sådan bruger du den:** Tag ét trin ad gangen. Start Claude Code i **Plan mode**, indsæt promptet, læs planen igennem, kommentér/justér, godkend — og commit, når trinnet er grønt. Kør `pnpm lint && pnpm typecheck && pnpm test` før hvert commit. Spring ikke trin over: rækkefølgen er bygget, så intet skal laves om senere.
+
+Hvert trin har **acceptkriterier** — trinnet er først færdigt, når de alle er opfyldt.
+
+---
+
+## FASE 0 — Fundament
+
+### 0.1 Monorepo-skelet
+
+> Opret monorepo-strukturen beskrevet i CLAUDE.md: pnpm workspaces med `app/` (Vite + React 18 + TypeScript strict), `packages/ui`, `packages/core`, `supabase/`, `scripts/` og `docs/`. Opsæt ESLint + Prettier + Vitest på tværs af workspaces, med root-scripts `dev`, `build`, `test`, `lint`, `typecheck`. Tilføj `.gitignore` og en kort `README.md`. Opret ingen features endnu — kun skelettet, og en "hello world"-side i `app/`, der importerer en dummy-funktion fra `packages/core` og en dummy-komponent fra `packages/ui`, så workspace-linkingen er bevist.
+
+**Accept:** `pnpm dev` viser siden; `pnpm lint`, `pnpm typecheck` og `pnpm test` kører grønt; import på tværs af packages virker.
+
+### 0.2 Designtokens og Tailwind-tema
+
+> Implementér designsystemets fundament i `packages/ui` ud fra `docs/byggeplan.md` afsnit 3: alle farver (lys + mørk, inkl. verdikt-skalaen), radius-skala, 4-pt spacing og typografiskala som Tailwind-tema/CSS-variabler. Indlæs Geist Sans og Geist Mono (self-host via fontsource eller lokale filer — ingen runtime-CDN-afhængighed), med `tabular-nums` som standard for mono. Opsæt mørk tilstand via `class`-strategi med en `ThemeProvider` (system/lys/mørk). Byg en midlertidig `/design`-side i appen, der viser hele paletten, typeskalaen og begge tilstande side om side.
+
+**Accept:** `/design`-siden matcher byggeplanens afsnit 3 i begge tilstande; ingen hex-værdier i komponentkode; tema kan skiftes live.
+
+### 0.3 Kernekomponenter
+
+> Byg første bølge af komponenter i `packages/ui` oven på tokens: Button (primær/sekundær/ghost), Card, Sheet (bund-ark med spring-animation), Badge/Chip (inkl. VerdiktBadge med de fem niveauer), Input, PortionsStepper, Tabs, Toast, Skeleton, AppShell med BottomTabBar og central hævet ScanFAB. Al bevægelse via Framer Motion med spring-præsetet fra CLAUDE.md; respekter `prefers-reduced-motion`. Radix-primitiver som grundlag, hvor det er relevant. Udvid `/design`-siden med et komponentgalleri i begge tilstande.
+
+**Accept:** alle komponenter fungerer med tastatur og skærmlæser; galleri ser rigtigt ud i lys og mørk; ingen hardcodede strenge (brug i18n-nøgler, jf. 0.5).
+
+### 0.4 Supabase-projekt, skema og RLS
+
+> Initialisér Supabase i `supabase/` og skriv første migration med kerneskemaet fra `docs/byggeplan.md` afsnit 5.2: `profiles`, `foods`, `log_entries`, `scans`, `daily_summaries`, `insights`, `recommendations` samt `nutrient_references`. RLS aktiveres på alle tabeller i samme migration: brugertabeller låst til `auth.uid()`, referencetabeller read-only for authenticated. Opret storage-buckets i seed/migration: `meal-photos` (privat, signerede URL'er) og `product-images` (offentlig). Generér TypeScript-typer til `packages/core`. Dokumentér skemaet kort i `docs/schema.md`.
+
+**Accept:** migrationer kører rent på et frisk projekt; en test beviser, at bruger A ikke kan læse bruger B's rækker; buckets eksisterer efter seed; typer importeres i `packages/core`.
+
+### 0.5 Auth og i18n-stillads
+
+> Implementér Supabase Auth i appen (e-mail + magic link som minimum) med sessionshåndtering via TanStack Query, beskyttede ruter og en minimal profil-oprettelse (`profiles`-række ved første login, inkl. `locale` og `hide_calories`-felt). Opsæt react-i18next med `en` som kilde-locale og `da` som fuld oversættelse; alle strenge fra 0.3-galleriet og auth-flowet flyttes til nøgler. Sprogvalg gemmes på profilen og i localStorage før login.
+
+**Accept:** login/logout virker; ny bruger får en profiles-række; hele UI'et kan skiftes mellem en/da uden hardcodede strenge tilbage.
+
+### 0.6 AI-gateway (skelet)
+
+> Opret Edge Function `supabase/functions/ai` som eneste indgang til Anthropic API: tager `{ task, payload }`, router til navngivne prompts (foreløbig kun en `ping`-task), kalder API'et server-side, og returnerer valideret JSON (zod). Inkludér CORS-headers med OPTIONS-preflight fra en delt template, auth-tjek (kun indloggede brugere), basal rate-begrænsning pr. bruger og fejllogning uden brugerdata i logs. Tilføj en lille klient-wrapper i `packages/core` (`callAi(task, payload)`).
+
+**Accept:** `ping`-task returnerer gyldigt JSON fra appen; kald uden session afvises; CORS virker fra localhost og Vercel-preview.
+
+### 0.7 Deploy, CI og observability
+
+> Opsæt Vercel-deploy af `app/` med preview-deploys pr. PR, GitHub Actions der kører lint/typecheck/test, Sentry i appen (uden at logge kostdata), og miljøvariabel-håndtering dokumenteret i `docs/env.md`. Tilføj PWA-grundlag: manifest, ikoner og en simpel service worker (app-shell-caching; ingen offline-data endnu).
+
+**Accept:** push til main deployer; PR'er får preview-URL; CI blokerer røde builds; appen kan installeres som PWA på telefon.
+
+**⛳ Fase 0 færdig:** et tomt men lækkert, deploybart skal med designsystem, auth, database, AI-gateway og CI.
+
+---
+
+## FASE 1 — Kerneløkken
+
+### 1.1 OFF-ingestion
+
+> Byg `scripts/ingest-off.ts`: hent Open Food Facts' natlige dump, filtrér til felterne beskrevet i `docs/byggeplan.md` afsnit 5.1 (barcode, navn, brand, kategorier, nutriments, nova_group, nutriscore_grade, additives_tags, ingredienser, allergener, billed-URL), transformér og upsert i `foods` med `source='off'`, `data_quality='crowdsourced'` og indeks på barcode. Start med et dansk/nordisk udsnit (lande-filter) for at holde beta-datasættet håndterbart; gør fuldt globalt load til et flag. Dokumentér kørsel og opdateringskadence i `docs/data.md`, inkl. ODbL-attribution.
+
+**Accept:** et opslag på en kendt dansk stregkode (test med fx en Arla- eller Kims-vare) returnerer korrekt NOVA/Nutri-Score/additiver fra egen DB på <100 ms.
+
+### 1.2 USDA- og Frida-ingestion
+
+> Udvid ingestion med `scripts/ingest-usda.ts` (FoodData Central, `data_quality='verified'`) og `scripts/ingest-frida.ts` (DTU Frida — tjek og notér licensvilkår i `docs/data.md` før brug). Normalisér næringsstofnavne/enheder til ét fælles nutriment-skema i `packages/core` (mapping-tabel), så alle tre kilder kan lægges sammen i én profil. Udfyld `nutrient_references` med EU/DK RDA-NRV-sæt fordelt på køn/alder.
+
+**Accept:** en rå fødevare (fx "havregryn") findes fra både USDA og Frida med sammenlignelige, normaliserede mikronæringsfelter; referencetabellen kan slå dagsbehov op for en given profil.
+
+### 1.3 Stregkodescanning (web)
+
+> Implementér scan-flowet i appen: ScanFAB åbner kameraet, stregkode aflæses i browseren (BarcodeDetector API med ZXing-fallback, struktureret bag et `Scanner`-interface så Capacitor/MLKit kan erstatte implementationen i Fase 5 uden API-ændringer). Ved hit: slå op i `foods`; ved miss: pæn tom-tilstand med mulighed for at søge manuelt. Registrér hændelsen i `scans` med `outcome='checked'`.
+
+**Accept:** en fysisk vare kan scannes på telefon via PWA'en og rammer den rigtige `foods`-række; misses håndteres pænt; scanningen ligger i `scans`.
+
+### 1.4 Scanresultat-arket (verdikt)
+
+> Byg resultat-arket fra byggeplanens afsnit 2.3 og det visuelle oplæg: produktnavn/brand, VerdiktBadge med samlet score, chips for NOVA, additiver og Nutri-Score, additiv-detaljelinje, makrolinje i mono, og de to handlinger "Jeg spiste det" (åbner PortionsStepper → opretter `log_entries`-række og opdaterer `scans.outcome='logged'`) og "Vis bedre alternativ" (foreløbig deaktiveret med "kommer snart"-tilstand). Verdikt-scoren beregnes i `packages/core` (dokumentér formlen i `docs/scoring.md`: vægtning af Nutri-Score, NOVA og additiver — læn dig op ad de navngivne systemer). Delt-element-overgang til en produktdetaljeside.
+
+**Accept:** scan → verdikt → "Jeg spiste det" → posten står i dagbogen; formel + tests i `packages/core`; arket matcher designoplægget i begge tilstande.
+
+### 1.5 Dagbog og manuel logning
+
+> Byg Dagbog-fanen: dagens `log_entries` grupperet i måltider (morgenmad/frokost/aftensmad/snacks) med verdikt-prik, portion og kcal (respektér `hide_calories`), redigér/slet, og en "+"-flow til manuel søgning i `foods` (tekstsøgning på tværs af kilder med kilde-badge) + portionsvalg. Dato-navigation mellem dage.
+
+**Accept:** en hel dags kost kan logges uden scanner; redigering og sletning virker; `hide_calories` skjuler alle kalorietal i fanen.
+
+### 1.6 "I dag"-skærmen (signatur)
+
+> Byg hjem-skærmen præcis som det visuelle oplæg og byggeplanens afsnit 2.2: kvalitetsbue (andel ikke-ultraforarbejdet af dagens indtag), kcal-linje med "skjul"-toggle koblet til `hide_calories`, tre makroringe med animeret optælling (Framer Motion) mod mål fra profilen, mikronæringsstribe (8 nøglestoffer, farvet efter dækning mod `nutrient_references`, "Se alle" folder fuld liste ud sorteret efter laveste dækning), pladsholder-indsigtskort, og dagens måltidslog. Alle beregninger (NOVA-andel, rollups, dækningsgrader) i `packages/core` med tests.
+
+**Accept:** skærmen er en tro gengivelse af mockuppen i lys og mørk; ringene animerer ved ny logning; tallene stemmer med håndberegnede fixtures i tests.
+
+### 1.7 Dagsopsummeringer
+
+> Implementér `daily_summaries`: genberegn (via trigger eller ved skrivning gennem en Edge Function/klient-rutine) dagens makro-, mikro- og NOVA-tal, så "I dag" og senere Indsigt læser hurtigt uden at aggregere rå rækker hver gang. Backfill-script til eksisterende data.
+
+**Accept:** "I dag" læser fra summaries; en ændret log-post opdaterer summaryen; ydelse målbart bedre end rå aggregering ved 100+ poster.
+
+### 1.8 Kerneløkke-polering og e2e
+
+> Afrund Fase 1: Playwright-e2e af kerneløkken (login → scan/manuel logning → verdikt → dagbog → "I dag" opdateret), tomme tilstande og skeletons overalt, fejltilstande (offline, ukendt stregkode), og en gennemgang af alle skærme i begge tilstande mod designsystemet. Ret alt, der afviger fra tokens.
+
+**Accept:** e2e grøn i CI; ingen skærm bruger farver/spacing uden for tokens; appen føles færdig nok til at vise frem.
+
+**⛳ Fase 1 færdig:** produktets hjerte virker — scan og logning i én profil, med kvalitets- og næringsoverblik. Herfra fortsætter Fase 2 (AI: sprogparsing, måltidsscanning med rettetrin, indsigter, alternativer) efter byggeplanens afsnit 9.
+
+---
+
+## Faste vaner undervejs
+
+- Én gren/PR pr. trin; små commits med conventional commits.
+- Nye tabeller = RLS-politikker i samme migration. Nye Edge Functions = CORS-template. Nye strenge = i18n-nøgler i både en og da.
+- Tjek hvert nyt UI i mørk tilstand, med `hide_calories` slået til, og med reduceret bevægelse.
+- Er du i tvivl om et trin: bed Claude Code læse det relevante afsnit i `docs/byggeplan.md`, før den planlægger.

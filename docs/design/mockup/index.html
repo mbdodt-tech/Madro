@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="da" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Madro — designoplæg: I dag + scan</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="stage">
+  <header class="stage-bar">
+    <span class="stage-title">Madro · designoplæg</span>
+    <span class="stage-hint">I dag-skærmen og scan-flowet · tryk på scan-knappen</span>
+    <div class="theme-switch" role="group" aria-label="Farvetilstand">
+      <button type="button" data-mode="light" class="active" aria-label="Lys tilstand">Lys</button>
+      <button type="button" data-mode="dark" aria-label="Mørk tilstand">Mørk</button>
+      <button type="button" data-mode="system" aria-label="Følg systemet">System</button>
+    </div>
+  </header>
+
+  <div class="phone">
+    <div class="app" id="app">
+
+      <!-- ============ Skærm: I dag ============ -->
+      <main class="screen" id="screen-today" aria-label="I dag">
+        <header class="app-header">
+          <div>
+            <p class="app-date" id="today-date">onsdag 2. juli</p>
+            <h1 class="app-title">I dag</h1>
+          </div>
+          <div class="header-actions">
+            <button type="button" class="icon-btn" id="app-theme-btn" aria-label="Skift mellem lys og mørk tilstand">
+              <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+              <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+            </button>
+            <button type="button" class="avatar" aria-label="Profil">M</button>
+          </div>
+        </header>
+
+        <!-- Hero-kort -->
+        <section class="card hero" aria-label="Dagens overblik">
+
+          <!-- Kvalitetsbue -->
+          <div class="quality">
+            <svg class="quality-arc" viewBox="0 0 200 110" aria-hidden="true">
+              <path class="arc-track" d="M 16 104 A 84 84 0 0 1 184 104" />
+              <path class="arc-fill" id="arc-fill" d="M 16 104 A 84 84 0 0 1 184 104" />
+            </svg>
+            <div class="quality-center">
+              <span class="quality-value mono"><span id="quality-num">76</span><small>%</small></span>
+              <span class="quality-label">ikke-ultraforarbejdet</span>
+            </div>
+            <p class="quality-caption" id="quality-caption">En ren dag indtil videre</p>
+          </div>
+
+          <!-- Kalorielinje -->
+          <div class="kcal-line">
+            <span class="kcal-numbers cal mono" id="kcal-line"><strong id="kcal-now">1.280</strong> / 2.100 kcal</span>
+            <span class="kcal-hidden-label" id="kcal-hidden-label" hidden>kalorier skjult</span>
+            <button type="button" class="icon-btn small" id="hide-cal-btn" aria-pressed="false" aria-label="Skjul kalorietal">
+              <svg class="icon icon-eye" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="icon icon-eye-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.9 4.2A10.6 10.6 0 0 1 12 4c6.5 0 10 7 10 7a17 17 0 0 1-2.2 3.2M6.6 6.6C3.8 8.5 2 12 2 12s3.5 7 10 7a10 10 0 0 0 5.4-1.6M3 3l18 18"/><path d="M10 10a3 3 0 0 0 4.2 4.2"/></svg>
+            </button>
+          </div>
+
+          <!-- Makroringe -->
+          <div class="rings" role="group" aria-label="Makronæringsstoffer">
+            <div class="ring" data-macro="protein">
+              <svg viewBox="0 0 72 72" aria-hidden="true">
+                <circle class="ring-track" cx="36" cy="36" r="30"/>
+                <circle class="ring-fill" cx="36" cy="36" r="30" id="ring-protein"/>
+              </svg>
+              <div class="ring-text">
+                <span class="ring-value mono" id="val-protein">61</span>
+                <span class="ring-unit mono">/120 g</span>
+              </div>
+              <span class="ring-label">Protein</span>
+            </div>
+            <div class="ring" data-macro="carb">
+              <svg viewBox="0 0 72 72" aria-hidden="true">
+                <circle class="ring-track" cx="36" cy="36" r="30"/>
+                <circle class="ring-fill" cx="36" cy="36" r="30" id="ring-carb"/>
+              </svg>
+              <div class="ring-text">
+                <span class="ring-value mono" id="val-carb">138</span>
+                <span class="ring-unit mono">/250 g</span>
+              </div>
+              <span class="ring-label">Kulhydrat</span>
+            </div>
+            <div class="ring" data-macro="fat">
+              <svg viewBox="0 0 72 72" aria-hidden="true">
+                <circle class="ring-track" cx="36" cy="36" r="30"/>
+                <circle class="ring-fill" cx="36" cy="36" r="30" id="ring-fat"/>
+              </svg>
+              <div class="ring-text">
+                <span class="ring-value mono" id="val-fat">44</span>
+                <span class="ring-unit mono">/70 g</span>
+              </div>
+              <span class="ring-label">Fedt</span>
+            </div>
+          </div>
+
+          <!-- Mikronæringsstribe -->
+          <button type="button" class="micro-strip" id="micro-strip" aria-expanded="false" aria-controls="micro-list">
+            <div class="micro-bars" id="micro-bars" aria-hidden="true"></div>
+            <span class="micro-hint">
+              Mikronæring i dag
+              <svg class="icon chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+            </span>
+          </button>
+          <div class="micro-list" id="micro-list" hidden></div>
+        </section>
+
+        <!-- Indsigtsteaser -->
+        <section class="card insight" aria-label="Ugens indsigt">
+          <svg class="icon sparkle" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3Z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15Z"/></svg>
+          <p class="insight-text">Du ligger lavt på jern i denne uge. Forslag til fødevarer, der lukker hullet, er på vej.</p>
+          <span class="chip soon">kommer snart</span>
+        </section>
+
+        <!-- Dagens log -->
+        <section class="log" aria-label="Dagens måltider">
+          <div class="meal-group" data-meal="morgenmad">
+            <header class="meal-header">
+              <h2>Morgenmad</h2>
+              <span class="meal-total cal mono">362 kcal</span>
+            </header>
+            <ul class="meal-items">
+              <li class="meal-item">
+                <span class="verdict-dot v-good" aria-hidden="true"></span>
+                <div class="meal-item-text">
+                  <span class="meal-item-name">Havregryn med mælk og banan</span>
+                  <span class="meal-item-portion">1 portion · 260 g</span>
+                </div>
+                <span class="meal-item-kcal cal mono">322</span>
+              </li>
+              <li class="meal-item">
+                <span class="verdict-dot v-excellent" aria-hidden="true"></span>
+                <div class="meal-item-text">
+                  <span class="meal-item-name">Kaffe med mælk</span>
+                  <span class="meal-item-portion">1 kop · 200 ml</span>
+                </div>
+                <span class="meal-item-kcal cal mono">40</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="meal-group" data-meal="frokost">
+            <header class="meal-header">
+              <h2>Frokost</h2>
+              <span class="meal-total cal mono">492 kcal</span>
+            </header>
+            <ul class="meal-items">
+              <li class="meal-item">
+                <span class="verdict-dot v-good" aria-hidden="true"></span>
+                <div class="meal-item-text">
+                  <span class="meal-item-name">Rugbrød med hønsesalat</span>
+                  <span class="meal-item-portion">2 halve · 180 g</span>
+                </div>
+                <span class="meal-item-kcal cal mono">420</span>
+              </li>
+              <li class="meal-item">
+                <span class="verdict-dot v-excellent" aria-hidden="true"></span>
+                <div class="meal-item-text">
+                  <span class="meal-item-name">Æble</span>
+                  <span class="meal-item-portion">1 stk · 120 g</span>
+                </div>
+                <span class="meal-item-kcal cal mono">72</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="meal-group" data-meal="aftensmad">
+            <header class="meal-header">
+              <h2>Aftensmad</h2>
+              <span class="meal-total cal mono">426 kcal</span>
+            </header>
+            <ul class="meal-items">
+              <li class="meal-item">
+                <span class="verdict-dot v-good" aria-hidden="true"></span>
+                <div class="meal-item-text">
+                  <span class="meal-item-name">Laks med kartofler og broccoli</span>
+                  <span class="meal-item-portion">1 portion · 340 g</span>
+                </div>
+                <span class="meal-item-kcal cal mono">426</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="meal-group" data-meal="snacks" id="snacks-group" hidden>
+            <header class="meal-header">
+              <h2>Snacks</h2>
+              <span class="meal-total cal mono" id="snacks-total">159 kcal</span>
+            </header>
+            <ul class="meal-items" id="snacks-items"></ul>
+          </div>
+
+          <button type="button" class="add-btn" id="add-btn">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            Tilføj mad
+          </button>
+        </section>
+
+        <div class="tabbar-spacer" aria-hidden="true"></div>
+      </main>
+
+      <!-- ============ Kamera-overlay ============ -->
+      <div class="camera" id="camera" hidden aria-label="Scan stregkode" role="dialog" aria-modal="true">
+        <button type="button" class="icon-btn camera-close" id="camera-close" aria-label="Luk kamera">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+        <div class="viewfinder" aria-hidden="true">
+          <span class="vf-corner tl"></span><span class="vf-corner tr"></span>
+          <span class="vf-corner bl"></span><span class="vf-corner br"></span>
+          <div class="scanline"></div>
+          <div class="fake-barcode" aria-hidden="true"></div>
+        </div>
+        <p class="camera-hint" id="camera-hint">Ret kameraet mod stregkoden</p>
+        <div class="camera-modes" aria-hidden="true">
+          <span class="camera-mode active">Stregkode</span>
+          <span class="camera-mode">Måltidsfoto</span>
+        </div>
+      </div>
+
+      <!-- ============ Resultat-ark ============ -->
+      <div class="sheet-backdrop" id="sheet-backdrop" hidden></div>
+      <div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-label="Scanresultat">
+        <div class="sheet-handle" aria-hidden="true"></div>
+
+        <!-- Visning 1: verdikt -->
+        <div class="sheet-view" id="view-result">
+          <button type="button" class="product-head" id="product-head" aria-label="Åbn produktdetaljer">
+            <div class="product-img" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M6 3h12l-1.5 18h-9L6 3Z"/><path d="M6.6 8h10.8"/></svg>
+            </div>
+            <div class="product-text">
+              <h2 class="product-name">Snackchips sour cream &amp; onion</h2>
+              <p class="product-brand">Kims · 165 g</p>
+            </div>
+            <svg class="icon chevron-r" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+          </button>
+
+          <div class="verdict-row">
+            <span class="verdict-badge v-poor">
+              <span class="verdict-dot v-poor" aria-hidden="true"></span>
+              Ringe kvalitet
+              <span class="verdict-score mono">38/100</span>
+            </span>
+          </div>
+
+          <div class="chips-row" aria-label="Kvalitetsdetaljer">
+            <span class="chip">NOVA 4 · ultraforarbejdet</span>
+            <span class="chip">Nutri-Score D</span>
+            <span class="chip">3 additiver</span>
+          </div>
+
+          <p class="additive-line">E621 smagsforstærker · E262 surhedsregulator · aroma</p>
+
+          <div class="macro-line">
+            <span class="macro-line-label">Pr. 100 g</span>
+            <span class="mono"><span class="cal">530 kcal · </span>protein 6,2 g · kulhydrat 51 g · fedt 33 g</span>
+          </div>
+
+          <p class="source-line">Data: Open Food Facts · crowdsourcet</p>
+
+          <div class="sheet-actions">
+            <button type="button" class="btn primary" id="btn-ate">Jeg spiste det</button>
+            <button type="button" class="btn secondary" id="btn-alt">
+              Vis bedre alternativ
+              <span class="chip soon">kommer snart</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Visning 2: portion -->
+        <div class="sheet-view" id="view-portion" hidden>
+          <button type="button" class="back-btn" id="portion-back" aria-label="Tilbage til resultat">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </button>
+          <div class="portion-product">
+            <div class="product-img small" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M6 3h12l-1.5 18h-9L6 3Z"/><path d="M6.6 8h10.8"/></svg>
+            </div>
+            <div>
+              <h2 class="product-name">Snackchips sour cream &amp; onion</h2>
+              <p class="product-brand">Hvor meget spiste du?</p>
+            </div>
+          </div>
+          <div class="stepper" role="group" aria-label="Portionsvælger">
+            <button type="button" class="stepper-btn" id="step-minus" aria-label="Mindre portion">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg>
+            </button>
+            <div class="stepper-value">
+              <span class="stepper-amount mono" id="portion-amount">1 håndfuld</span>
+              <span class="stepper-grams mono" id="portion-grams">30 g<span class="cal"> · 159 kcal</span></span>
+            </div>
+            <button type="button" class="stepper-btn" id="step-plus" aria-label="Større portion">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </div>
+          <div class="meal-pick" role="group" aria-label="Måltid">
+            <button type="button" class="chip pick">Morgenmad</button>
+            <button type="button" class="chip pick">Frokost</button>
+            <button type="button" class="chip pick">Aftensmad</button>
+            <button type="button" class="chip pick active">Snacks</button>
+          </div>
+          <div class="sheet-actions">
+            <button type="button" class="btn primary" id="btn-log">Log måltid</button>
+          </div>
+        </div>
+
+        <!-- Visning 3: produktdetalje (delt element fra visning 1) -->
+        <div class="sheet-view" id="view-detail" hidden>
+          <button type="button" class="back-btn" id="detail-back" aria-label="Tilbage til resultat">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </button>
+          <div class="portion-product">
+            <div class="product-img" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M6 3h12l-1.5 18h-9L6 3Z"/><path d="M6.6 8h10.8"/></svg>
+            </div>
+            <div>
+              <h2 class="product-name">Snackchips sour cream &amp; onion</h2>
+              <p class="product-brand">Kims · 165 g</p>
+            </div>
+          </div>
+          <h3 class="detail-heading">Derfor er vurderingen ringe</h3>
+          <ul class="detail-list">
+            <li><span class="verdict-dot v-poor" aria-hidden="true"></span>NOVA-gruppe 4: ultraforarbejdet efter NOVA-systemet</li>
+            <li><span class="verdict-dot v-mid" aria-hidden="true"></span>Nutri-Score D: højt indhold af fedt og salt</li>
+            <li><span class="verdict-dot v-mid" aria-hidden="true"></span>3 additiver, heraf E621 (smagsforstærker)</li>
+          </ul>
+          <h3 class="detail-heading">Ingredienser</h3>
+          <p class="detail-body">Kartofler, solsikkeolie, sour cream &amp; onion-krydderi (mælkepulver, løgpulver, salt, smagsforstærker E621, surhedsregulator E262, aroma), salt.</p>
+          <h3 class="detail-heading">Næring pr. 100 g</h3>
+          <table class="detail-table mono">
+            <tr><td>Energi</td><td class="cal">530 kcal</td></tr>
+            <tr><td>Protein</td><td>6,2 g</td></tr>
+            <tr><td>Kulhydrat</td><td>51 g</td></tr>
+            <tr><td>— heraf sukker</td><td>2,8 g</td></tr>
+            <tr><td>Fedt</td><td>33 g</td></tr>
+            <tr><td>— heraf mættet</td><td>3,1 g</td></tr>
+            <tr><td>Fiber</td><td>4,0 g</td></tr>
+            <tr><td>Salt</td><td>1,5 g</td></tr>
+          </table>
+          <p class="source-line">Data: Open Food Facts · crowdsourcet</p>
+        </div>
+      </div>
+
+      <!-- ============ Fanebjælke ============ -->
+      <nav class="tabbar" aria-label="Hovednavigation">
+        <button type="button" class="tab active" aria-current="page">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
+          I dag
+        </button>
+        <button type="button" class="tab" data-soon>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h13a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3V4Z"/><path d="M8 8h8M8 12h6"/></svg>
+          Dagbog
+        </button>
+        <span class="tab-fab-slot">
+          <button type="button" class="scan-fab" id="scan-fab" aria-label="Scan stregkode eller måltid">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 8v8M11 8v8M15 8v8"/></svg>
+          </button>
+        </span>
+        <button type="button" class="tab" data-soon>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+          Indsigt
+        </button>
+        <button type="button" class="tab" data-soon>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>
+          Profil
+        </button>
+      </nav>
+
+      <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+    </div>
+  </div>
+
+  <p class="stage-note">Selvstændigt HTML-oplæg — ingen build. Tokens følger <code>docs/byggeplan.md</code> §3. Mikrostribens 8 stoffer er foreløbige, se <code>docs/open-questions.md</code>.</p>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

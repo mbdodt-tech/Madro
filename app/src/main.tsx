@@ -1,4 +1,4 @@
-import { ThemeProvider } from "@madro/ui";
+import { ThemeProvider, ToastProvider } from "@madro/ui";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
@@ -10,7 +10,9 @@ if (!root) throw new Error("Missing #root element");
 createRoot(root).render(
   <StrictMode>
     <ThemeProvider>
-      <App />
+      <ToastProvider>
+        <App />
+      </ToastProvider>
     </ThemeProvider>
   </StrictMode>,
 );

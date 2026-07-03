@@ -1,4 +1,28 @@
-import { useTheme, verdictLevels, type ThemeMode } from "@madro/ui";
+import {
+  AppShell,
+  BottomTabBar,
+  Button,
+  Card,
+  Chip,
+  Input,
+  PortionsStepper,
+  ScanFab,
+  Sheet,
+  Skeleton,
+  Tabs,
+  useTheme,
+  useToast,
+  VerdiktBadge,
+  verdictLevels,
+  type ThemeMode,
+} from "@madro/ui";
+import {
+  BarChart3,
+  BookOpen,
+  House,
+  ScanBarcode,
+  User,
+} from "lucide-react";
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 
 /**
@@ -162,6 +186,114 @@ function ThemeSwitch() {
   );
 }
 
+/* ---------- Komponent-demoer (kun til galleriet) ---------- */
+
+function StepperDemo() {
+  const [steps, setSteps] = useState(2);
+  const grams = steps * 15;
+  const kcal = Math.round(steps * 79.5);
+  const label =
+    steps === 1 ? "½ håndfuld" : steps === 2 ? "1 håndfuld" : `${steps / 2} håndfulde`;
+  return (
+    <PortionsStepper
+      valueLabel={label}
+      subLabel={`${grams} g · ${kcal} kcal`}
+      onDecrease={() => setSteps((s) => Math.max(1, s - 1))}
+      onIncrease={() => setSteps((s) => Math.min(12, s + 1))}
+      decreaseLabel="Mindre portion"
+      increaseLabel="Større portion"
+      decreaseDisabled={steps <= 1}
+      increaseDisabled={steps >= 12}
+    />
+  );
+}
+
+function ToastDemo() {
+  const { show } = useToast();
+  return (
+    <Button variant="secondary" onClick={() => show("Logget under snacks")}>
+      Vis toast
+    </Button>
+  );
+}
+
+function SheetDemo() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button id="sheet-trigger" onClick={() => setOpen(true)}>
+        Åbn resultat-ark
+      </Button>
+      <Sheet open={open} onOpenChange={setOpen} title="Scanresultat">
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-h2 text-ink">Snackchips sour cream &amp; onion</h3>
+            <p className="text-small text-secondary">Kims · 165 g</p>
+          </div>
+          <VerdiktBadge level="poor" label="Ringe kvalitet" score="38/100" />
+          <div className="flex flex-wrap gap-2">
+            <Chip>NOVA 4 · ultraforarbejdet</Chip>
+            <Chip>Nutri-Score D</Chip>
+            <Chip>3 additiver</Chip>
+          </div>
+          <div className="flex flex-col gap-2 pt-2">
+            <Button onClick={() => setOpen(false)}>Jeg spiste det</Button>
+            <Button variant="secondary" onClick={() => setOpen(false)}>
+              Vis bedre alternativ
+              <Chip tone="brand">kommer snart</Chip>
+            </Button>
+          </div>
+        </div>
+      </Sheet>
+    </>
+  );
+}
+
+function AppShellDemo() {
+  const [active, setActive] = useState("today");
+  const { show } = useToast();
+  const iconCls = "size-5";
+  return (
+    <div className="h-96 overflow-hidden rounded-xl border border-hairline">
+      <AppShell
+        bottomBar={
+          <BottomTabBar
+            navLabel="Hovednavigation"
+            activeId={active}
+            onSelect={setActive}
+            items={[
+              { id: "today", label: "I dag", icon: <House className={iconCls} /> },
+              { id: "diary", label: "Dagbog", icon: <BookOpen className={iconCls} /> },
+              { id: "insights", label: "Indsigt", icon: <BarChart3 className={iconCls} /> },
+              { id: "profile", label: "Profil", icon: <User className={iconCls} /> },
+            ]}
+            center={
+              <ScanFab
+                label="Scan stregkode eller måltid"
+                icon={<ScanBarcode className="size-6" />}
+                onClick={() => show("Scan-flowet kommer i Fase 1")}
+              />
+            }
+          />
+        }
+      >
+        <div className="space-y-3 p-4">
+          <Card>
+            <p className="text-small font-medium text-ink">I dag</p>
+            <p className="text-caption text-tertiary">
+              aktiv fane: {active}
+            </p>
+          </Card>
+          <Card>
+            <Skeleton className="mb-2 h-4 w-2/3" />
+            <Skeleton className="h-3 w-1/2" />
+          </Card>
+        </div>
+      </AppShell>
+    </div>
+  );
+}
+
 export function DesignPage() {
   return (
     <div className="min-h-screen bg-bg font-sans text-ink">
@@ -315,6 +447,134 @@ export function DesignPage() {
                 <p className="text-caption text-tertiary">ark</p>
               </div>
             </div>
+          </DualPanel>
+        </Section>
+        <Section
+          title="Knapper"
+          note="Primær, sekundær og ghost — spring ved tryk, ingen skalering ved reduceret bevægelse."
+        >
+          <DualPanel>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button>Jeg spiste det</Button>
+              <Button variant="secondary">Vis alternativ</Button>
+              <Button variant="ghost">Spring over</Button>
+              <Button disabled>Deaktiveret</Button>
+              <Button size="sm">Lille</Button>
+            </div>
+          </DualPanel>
+        </Section>
+
+        <Section
+          title="Chips & verdikt"
+          note="Neutral chip, brand-chip og VerdiktBadge i alle fem niveauer."
+        >
+          <DualPanel>
+            <div className="space-y-3">
+              <div className="flex flex-wrap gap-2">
+                <Chip>NOVA 4 · ultraforarbejdet</Chip>
+                <Chip>Nutri-Score D</Chip>
+                <Chip tone="brand">kommer snart</Chip>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {verdictLevels.map((level) => (
+                  <VerdiktBadge
+                    key={level}
+                    level={level}
+                    label={verdictLabels[level]}
+                  />
+                ))}
+              </div>
+              <VerdiktBadge level="poor" label="Ringe kvalitet" score="38/100" />
+            </div>
+          </DualPanel>
+        </Section>
+
+        <Section
+          title="Kort, input & skeleton"
+          note="Card på surface med shadow-1 · Input med synligt label · pulserende Skeleton."
+        >
+          <DualPanel>
+            <div className="space-y-4">
+              <Card>
+                <p className="text-body font-medium text-ink">
+                  Havregryn med mælk og banan
+                </p>
+                <p className="text-caption text-tertiary">1 portion · 260 g</p>
+              </Card>
+              <Input
+                id="demo-search"
+                label="Søg fødevare"
+                placeholder="fx havregryn"
+                hint="Søger på tværs af USDA, Frida og Open Food Facts"
+              />
+              <Card>
+                <Skeleton className="mb-2 h-4 w-2/3" />
+                <Skeleton className="mb-2 h-3 w-1/2" />
+                <Skeleton className="h-3 w-1/3" />
+              </Card>
+            </div>
+          </DualPanel>
+        </Section>
+
+        <Section
+          title="Portionsvælger & faner"
+          note="Stepper med aria-live på værdien · Radix Tabs med piletast-navigation."
+        >
+          <DualPanel>
+            <div className="space-y-6">
+              <StepperDemo />
+              <Tabs
+                listLabel="Periode"
+                items={[
+                  {
+                    value: "day",
+                    label: "Dag",
+                    content: (
+                      <p className="text-small text-secondary">
+                        Dagens overblik vises her.
+                      </p>
+                    ),
+                  },
+                  {
+                    value: "week",
+                    label: "Uge",
+                    content: (
+                      <p className="text-small text-secondary">
+                        Ugens tendenser vises her.
+                      </p>
+                    ),
+                  },
+                  {
+                    value: "month",
+                    label: "Måned",
+                    content: (
+                      <p className="text-small text-secondary">
+                        Månedens tendenser vises her.
+                      </p>
+                    ),
+                  },
+                ]}
+              />
+            </div>
+          </DualPanel>
+        </Section>
+
+        <Section
+          title="Ark & toast"
+          note="Bund-ark med spring-fysik (Radix Dialog: Esc lukker, fokus fanges) · toast over fanebjælken. Begge følger sidens aktive tema — brug kontakten øverst."
+        >
+          <div className="flex flex-wrap gap-3 rounded-xl border border-hairline bg-bg p-6">
+            <SheetDemo />
+            <ToastDemo />
+          </div>
+        </Section>
+
+        <Section
+          title="App-skal"
+          note="BottomTabBar med central hævet ScanFAB — rammen her er galleriets telefon-preview."
+        >
+          <DualPanel>
+            <AppShellDemo />
           </DualPanel>
         </Section>
       </main>

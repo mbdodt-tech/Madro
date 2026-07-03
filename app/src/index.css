@@ -1,0 +1,4 @@
+@import "tailwindcss";
+
+/* Designsystemets tokens — eneste kilde til farver/radius/type (CLAUDE.md) */
+@import "../../packages/ui/src/tokens/tokens.css";

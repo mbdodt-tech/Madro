@@ -1,0 +1,180 @@
+/* ============================================================
+   Madro designtokens — eneste kilde til farver, radius, type og
+   bevægelse. Værdierne er en 1:1-gengivelse af docs/byggeplan.md §3
+   (løftet fra det godkendte oplæg i docs/design/mockup/styles.css).
+
+   Regel (CLAUDE.md): ingen komponent må indeholde hex, px-spacing
+   eller font-familier — kun utilities/vars defineret her.
+   ============================================================ */
+
+/* Geist self-hostet via Fontsource — ingen runtime-CDN (fase-tjekliste 0.2) */
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
+
+/* Mørk tilstand via class-strategi (fase-tjekliste 0.2) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------- Rå tokens: lys tilstand (§3.2) ---------- */
+:root {
+  --bg: #fbfbf9;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --ink: #16201c;
+  --text-secondary: #5b665f;
+  --text-tertiary: #8a938c;
+  --brand: #0e7a5e;
+  --brand-hover: #0b6650;
+  --brand-tint: #e7f2ed;
+  --accent: #e8a13a;
+  --hairline: rgba(20, 30, 25, 0.08);
+  --on-brand: #ffffff;
+
+  /* Verdikt-skala (afdæmpet, ikke alarmerende) */
+  --v-excellent: #2fa36b;
+  --v-good: #7fb552;
+  --v-mid: #e0a63c;
+  --v-poor: #e27a54;
+  --v-bad: #c9503c;
+  --v-poor-tint: rgba(226, 122, 84, 0.14);
+
+  /* Makroringe (godkendt i designoplægget) */
+  --macro-protein: #0e7a5e;
+  --macro-carb: #e8a13a;
+  --macro-fat: #6e87a8;
+
+  /* Dybde (§3.4): subtile, lagdelte skygger i lys tilstand */
+  --shadow-card: 0 1px 3px rgba(20, 30, 25, 0.06);
+  --shadow-sheet: 0 -8px 32px rgba(20, 30, 25, 0.14);
+  --shadow-fab: 0 4px 14px rgba(14, 122, 94, 0.35);
+}
+
+/* ---------- Rå tokens: mørk tilstand (§3.2, førsteklasses) ---------- */
+.dark {
+  --bg: #0c1210;
+  --surface: #131b18;
+  --surface-raised: #1a2420;
+  --ink: #eaf0ec;
+  --text-secondary: #9aa6a0;
+  --text-tertiary: #6e7a74;
+  --brand: #35c495;
+  --brand-hover: #4ad0a4;
+  --brand-tint: #12241e;
+  --accent: #e8a13a;
+  --hairline: rgba(234, 240, 236, 0.09);
+  --on-brand: #0c1210;
+
+  /* Verdikt løftet ca. 8-10 % i lyshed */
+  --v-excellent: #3db97d;
+  --v-good: #91c566;
+  --v-mid: #e7b457;
+  --v-poor: #e88e6c;
+  --v-bad: #d66a55;
+  --v-poor-tint: rgba(232, 142, 108, 0.16);
+
+  --macro-protein: #35c495;
+  --macro-carb: #e8b05c;
+  --macro-fat: #8fa9c9;
+
+  /* Mørk: fladelyshed + hårlinjer frem for skygge (§3.4) */
+  --shadow-card: 0 0 0 0 transparent;
+  --shadow-sheet: 0 -8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-fab: 0 4px 14px rgba(53, 196, 149, 0.28);
+
+  color-scheme: dark;
+}
+
+/* ---------- Tailwind-tema ---------- */
+@theme {
+  /* Nulstil default-paletten og radius-skalaen:
+     kun Madros tokens eksisterer som utilities. */
+  --color-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+
+  /* Typografi (§3.3) */
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, monospace;
+  --font-mono--font-feature-settings: "tnum"; /* tabular-nums som standard */
+
+  /* Typeskala px/linjehøjde/vægt (§3.3) */
+  --text-display: 2rem;
+  --text-display--line-height: 2.5rem;
+  --text-display--font-weight: 600;
+  --text-display--letter-spacing: -0.02em;
+  --text-h1: 1.5rem;
+  --text-h1--line-height: 2rem;
+  --text-h1--font-weight: 600;
+  --text-h2: 1.25rem;
+  --text-h2--line-height: 1.75rem;
+  --text-h2--font-weight: 600;
+  --text-body: 1rem;
+  --text-body--line-height: 1.5rem;
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.25rem;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1rem;
+  --text-caption--font-weight: 500;
+
+  /* Radius-skala (§3.4): sm 10, md 14, lg 18, xl 24, pill */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+
+  /* Bevægelse (§3.5) — spring-præset til Framer Motion ligger i tokens/index.ts */
+  --ease-enter: cubic-bezier(0.2, 0, 0, 1);
+  --ease-spring: cubic-bezier(0.3, 1.25, 0.45, 1);
+}
+
+@theme inline {
+  /* Semantiske farver — flipper automatisk med .dark */
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-ink: var(--ink);
+  --color-secondary: var(--text-secondary);
+  --color-tertiary: var(--text-tertiary);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-tint: var(--brand-tint);
+  --color-accent: var(--accent);
+  --color-hairline: var(--hairline);
+  --color-on-brand: var(--on-brand);
+
+  --color-v-excellent: var(--v-excellent);
+  --color-v-good: var(--v-good);
+  --color-v-mid: var(--v-mid);
+  --color-v-poor: var(--v-poor);
+  --color-v-bad: var(--v-bad);
+  --color-v-poor-tint: var(--v-poor-tint);
+
+  --color-macro-protein: var(--macro-protein);
+  --color-macro-carb: var(--macro-carb);
+  --color-macro-fat: var(--macro-fat);
+
+  /* Dybde */
+  --shadow-1: var(--shadow-card);
+  --shadow-sheet: var(--shadow-sheet);
+  --shadow-fab: var(--shadow-fab);
+}
+
+/* Sørg for at Tailwind også scanner ui-pakkens komponenter for klasser */
+@source "../";
+
+/* ---------- Basis ---------- */
+@layer base {
+  body {
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    font-variant-numeric: tabular-nums;
+  }
+}

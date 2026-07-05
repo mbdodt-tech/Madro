@@ -14,7 +14,10 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "typecheck": "pnpm -r --if-present typecheck",
-    "ingest:off": "pnpm --filter @madro/scripts ingest:off"
+    "ingest:off": "pnpm --filter @madro/scripts ingest:off",
+    "ingest:usda": "pnpm --filter @madro/scripts ingest:usda",
+    "ingest:frida": "pnpm --filter @madro/scripts ingest:frida",
+    "ingest:references": "pnpm --filter @madro/scripts ingest:references"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.0",

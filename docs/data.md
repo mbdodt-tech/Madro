@@ -17,13 +17,45 @@ Kræver `scripts/.env` med `INGEST_DATABASE_URL` (se `.env.example`). Scriptet u
 
 **Kadence:** GitHub Action `.github/workflows/ingest-off.yml` kører natligt (03:15 UTC) + manuelt via workflow_dispatch. **Aktiveres manuelt:** sæt repo-secret `INGEST_DATABASE_URL` og repo-variablen `INGEST_ENABLED=true`.
 
-**DB-adgang:** dedikeret Postgres-rolle `ingest` (kun `foods` + `nutrient_references`, via RLS-politikker — bevidst ikke service role). Oprettet i migration `…_ingest_role.sql` uden password. **Password sættes manuelt** (Supabase dashboard → SQL editor):
+**DB-adgang:** dedikeret Postgres-rolle `ingest` (kun `foods` + `nutrient_references`, via RLS-politikker — bevidst ikke service role). Oprettet i migration `…_ingest_role.sql` uden password. **Password sættes manuelt** (Supabase dashboard → SQL editor) — indsæt passwordet mellem de enkelte anførselstegn (ingen vinkelparenteser):
 
 ```sql
-alter role ingest with password '<vælg-et-stærkt-password>';
+alter role ingest with password 'dit-password-her';
 ```
 
 …og indsættes i `scripts/.env` (format i `.env.example`; pooler-brugernavn er `ingest.rtkktiywjcwglwzebchx`). Rotation: kør samme statement igen.
+
+## Fælles nutrient-skema (trin 1.2)
+
+Alle kilder normaliseres til ét kanonisk nøglesæt i `@madro/core` (`src/nutrients/`): 26 nøgler (makro + 17 mikronæringsstoffer), værdier pr. 100 g i nøglens enhed. Mappere pr. kilde: `map-off`, `map-usda`, `map-frida`. `foods.nutriments` bruger disse nøgler for alle kilder — OFF-udsnittet er genkørt efter omlægningen.
+
+## USDA-ingestion (trin 1.2)
+
+```
+pnpm ingest:usda            # Foundation Foods + SR Legacy (~8.150 fødevarer)
+```
+
+Public domain. Zip-filer caches i `scripts/.cache/`. `source='usda'`, `data_quality='verified'`, `source_ref=fdcId`. Kredit i UI: "USDA FoodData Central".
+
+## Frida-ingestion (trin 1.2)
+
+**Bulk-adgang er en manuel formular:** Fridas API er antiforgery-låst (ikke tiltænkt masseudtræk), så regnearket hentes via formularen på https://frida.fooddata.dk/data (download-link sendes på mail — DTU's egen bulk-metode). Læg filen som `scripts/.cache/frida.xlsx` og kør:
+
+```
+pnpm ingest:frida
+```
+
+Scriptet inspicerer og logger header-rækken ved kørsel; bekræft at kolonnenavnene rammer `map-frida` (EuroFIR-kode i parentes eller dansk navn). `source='frida'`, `data_quality='verified'`. **Citation** (registreres ved kørsel, docs-format): *"Fødevaredata (frida.fooddata.dk), version X, år, Fødevareinstituttet, DTU"* — versionsnummeret aflæses på Fridas datasæt-side.
+
+## Referencer: NNR2023 (trin 1.2)
+
+```
+pnpm ingest:references      # seed nutrient_references fra scripts/data/nnr2023.json
+```
+
+Kilde: **Nordiske Næringsstofanbefalinger 2023 (NNR2023)** — grundlaget for de danske kostråd. Køns- og aldersopdelte referenceintag (RI) + øvre grænser (UL), region 'DK'. Jern har menopause-split for kvinder (18-50: 15 mg, 51+: 9 mg).
+
+> ⚠ **Værdierne i `scripts/data/nnr2023.json` skal granskes mod NNR2023-rapporten før launch** og udvides for øvrige aldersgrupper/graviditet. De nuværende tal er indtastet for voksne som fungerende udgangspunkt, ikke som endelig klinisk reference.
 
 ---
 

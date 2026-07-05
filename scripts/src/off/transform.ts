@@ -5,6 +5,8 @@
  * og normalisering — ingen sammenblanding med andre kilder.
  */
 
+import { mapOffNutriments } from "@madro/core";
+
 export interface OffLangText {
   lang: string;
   text: string;
@@ -70,31 +72,13 @@ export function pickLang(
   ).trim();
 }
 
-/** Udvalgte næringsfelter pr. 100 g (nøgleskema normaliseres videre i 1.2). */
-const NUTRIMENT_KEYS = new Set([
-  "energy-kcal",
-  "proteins",
-  "carbohydrates",
-  "sugars",
-  "fat",
-  "saturated-fat",
-  "fiber",
-  "salt",
-  "sodium",
-]);
-
+/** Kanoniske nutrient-nøgler via @madro/core (fase 1.2). */
 export function pickNutriments(
   nutriments: OffNutriment[] | null | undefined,
 ): Record<string, number> {
-  const out: Record<string, number> = {};
-  for (const n of nutriments ?? []) {
-    if (!NUTRIMENT_KEYS.has(n.name)) continue;
-    const value = n["100g"];
-    if (typeof value === "number" && Number.isFinite(value)) {
-      out[`${n.name}_100g`] = value;
-    }
-  }
-  return out;
+  return mapOffNutriments(
+    (nutriments ?? []).map((n) => ({ name: n.name, per100g: n["100g"] })),
+  );
 }
 
 /** OFF's billedsti: 13-cifret kode deles 3/3/3/rest; korte koder bruges råt. */

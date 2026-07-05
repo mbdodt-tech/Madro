@@ -14,7 +14,7 @@ Uafklarede beslutninger fra plan-gennemgangen 2026-07-02. Hvert punkt har en eje
 
 - [x] **Frida kommerciel licens** (researchet 2026-07-05, se `docs/data.md`): fri brug med tydelig kildeangivelse; ingen kommerciel begrænsning i DTU's egne vilkår. Anbefalet ikke-blokerende forsigtighedstrin: bekræftelsesmail til fvdb@food.dtu.dk (**venter på brugeren**). Trin 1.2 er ikke blokeret.
 - [x] **ODbL share-alike** (researchet 2026-07-05, se `docs/data.md`): vores OFF-udsnit er en derivative database; share-alike opfyldes via "Om data"-side med transformationsbeskrivelse + dump på forespørgsel; §4.5(a) holder USDA/Frida/custom fri af share-alike, når rækker aldrig blandes på tværs af kilder. Trin 1.1 er ikke blokeret.
-- [ ] **RDA/NRV-autoritet** til `nutrient_references` (trin 1.2): EFSA DRV vs. NNR2023 (som Danmark følger) vs. EU-mærknings-NRV — og hvor maskinlæsbare værdier hentes.
+- [x] **RDA/NRV-autoritet** (afgjort 2026-07-05): **NNR2023** (Nordiske Næringsstofanbefalinger — grundlaget for de danske kostråd), region 'DK'. Seedet i `nutrient_references` fra `scripts/data/nnr2023.json`. ⚠ **Udestående: værdierne skal granskes mod NNR2023-rapporten før launch** og udvides for øvrige aldersgrupper/graviditet (nu: voksne).
 - [ ] **OFF-ingestion runtime** (trin 1.1): hvor kører det natlige job? Anbefaling: GitHub Action på schedule. Tjek Supabase-tier mod forventet tabelstørrelse for det nordiske udsnit.
 
 ## Teknik (kan afgøres når trinnet nås)

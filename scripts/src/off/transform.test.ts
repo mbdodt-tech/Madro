@@ -26,6 +26,7 @@ const base: OffRow = {
     { name: "proteins", "100g": 3.5 },
     { name: "obscure-nutrient", "100g": 1 },
     { name: "fat", "100g": null },
+    { name: "iron", "100g": 0.0012 },
   ],
   images: [{ key: "front_da", rev: 7 }],
 };
@@ -60,8 +61,9 @@ describe("transformOffRow", () => {
     expect(row.nova_group).toBe(1);
     expect(row.nutriscore).toBe("b");
     expect(row.nutriments).toEqual({
-      "energy-kcal_100g": 46,
-      proteins_100g: 3.5,
+      energy_kcal: 46,
+      protein_g: 3.5,
+      iron_mg: 1.2,
     });
     expect(row.image_url).toBe(
       "https://images.openfoodfacts.org/images/products/571/195/306/8881/front_da.7.400.jpg",
@@ -99,10 +101,11 @@ describe("helpers", () => {
     expect(pickImageUrl([], "5711953068881")).toBeNull();
   });
 
-  it("keeps only whitelisted finite nutriments", () => {
+  it("maps to canonical keys and derives from grams", () => {
     expect(pickNutriments(base.nutriments)).toEqual({
-      "energy-kcal_100g": 46,
-      proteins_100g: 3.5,
+      energy_kcal: 46,
+      protein_g: 3.5,
+      iron_mg: 1.2,
     });
   });
 });

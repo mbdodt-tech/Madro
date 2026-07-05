@@ -5,12 +5,17 @@
   "type": "module",
   "scripts": {
     "ingest:off": "tsx src/ingest-off.ts",
+    "ingest:usda": "tsx src/ingest-usda.ts",
+    "ingest:frida": "tsx src/ingest-frida.ts",
+    "ingest:references": "tsx src/ingest-references.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@duckdb/node-api": "^1.2.1-alpha.17",
+    "@madro/core": "workspace:*",
     "dotenv": "^16.4.7",
+    "fflate": "^0.8.3",
     "pg": "^8.13.1",
     "zod": "^3.23.8"
   },

@@ -1,4 +1,32 @@
-# Datakilder: licenser og compliance
+# Datakilder: ingestion, licenser og compliance
+
+## OFF-ingestion: kørsel og kadence (trin 1.1)
+
+**Kilde:** OFF's officielle Parquet-eksport på Hugging Face (`openfoodfacts/product-database`, food-splittet, ODbL) — læses remote via DuckDB med filter-pushdown, så kun valgte lande/kolonner hentes. Fallback: det natlige JSONL-dump (`static.openfoodfacts.org/data`) kan streames, hvis parquet-eksporten svigter.
+
+**Kørsel:**
+
+```
+pnpm ingest:off                    # dansk udsnit (default)
+pnpm ingest:off -- --nordic        # DK/SE/NO/FI/IS
+pnpm ingest:off -- --full          # globalt load (stort — kun bevidst)
+pnpm ingest:off -- --limit=50      # prøvekørsel
+```
+
+Kræver `scripts/.env` med `INGEST_DATABASE_URL` (se `.env.example`). Scriptet upserter på `(source='off', source_ref=stregkode)` og rører aldrig rækker fra andre kilder. Genkørsel er idempotent.
+
+**Kadence:** GitHub Action `.github/workflows/ingest-off.yml` kører natligt (03:15 UTC) + manuelt via workflow_dispatch. **Aktiveres manuelt:** sæt repo-secret `INGEST_DATABASE_URL` og repo-variablen `INGEST_ENABLED=true`.
+
+**DB-adgang:** dedikeret Postgres-rolle `ingest` (kun `foods` + `nutrient_references`, via RLS-politikker — bevidst ikke service role). Oprettet i migration `…_ingest_role.sql` uden password. **Password sættes manuelt** (Supabase dashboard → SQL editor):
+
+```sql
+alter role ingest with password '<vælg-et-stærkt-password>';
+```
+
+…og indsættes i `scripts/.env` (format i `.env.example`; pooler-brugernavn er `ingest.rtkktiywjcwglwzebchx`). Rotation: kør samme statement igen.
+
+---
+
 
 Research udført 2026-07-05 (Fase 1-forberedelse). Kørsel/kadence for ingestion tilføjes i trin 1.1/1.2. **Ikke juridisk rådgivning** — vurderingen bygger på licensteksterne og kildernes egne vilkår; endelig accept er produktejerens.
 

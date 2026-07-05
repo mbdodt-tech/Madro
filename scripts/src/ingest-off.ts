@@ -18,24 +18,85 @@
 
 import { DuckDBInstance } from "@duckdb/node-api";
 import "dotenv/config";
+import { createWriteStream } from "node:fs";
+import { mkdir, rename, stat } from "node:fs/promises";
+import path from "node:path";
+import { Readable } from "node:stream";
+import { pipeline } from "node:stream/promises";
+import { fileURLToPath } from "node:url";
 import pg from "pg";
 import { transformOffRow, type FoodRow, type OffRow } from "./off/transform";
 
-const PARQUET = "hf://datasets/openfoodfacts/product-database/food.parquet";
+// Hentes som ÉN request (HF rate-limiter anonyme range-request-bursts,
+// så remote pushdown er ikke pålidelig). Caches lokalt i 7 dage.
+const PARQUET_URL =
+  "https://huggingface.co/datasets/openfoodfacts/product-database/resolve/main/food.parquet";
+const CACHE_DIR = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "..",
+  ".cache",
+);
+const CACHE_FILE = path.join(CACHE_DIR, "food.parquet");
+const CACHE_MAX_AGE_MS = 7 * 24 * 3600 * 1000;
 const NORDIC = ["en:denmark", "en:sweden", "en:norway", "en:finland", "en:iceland"];
 const BATCH_SIZE = 500;
+
+async function ensureParquet(refresh: boolean): Promise<string> {
+  try {
+    const info = await stat(CACHE_FILE);
+    const fresh = Date.now() - info.mtimeMs < CACHE_MAX_AGE_MS;
+    if (!refresh && fresh && info.size > 1_000_000_000) {
+      console.info(
+        `Bruger cachet dump (${(info.size / 1e9).toFixed(1)} GB, ${Math.round((Date.now() - info.mtimeMs) / 3600000)}t gammelt).`,
+      );
+      return CACHE_FILE;
+    }
+  } catch {
+    // ingen cache endnu
+  }
+
+  await mkdir(CACHE_DIR, { recursive: true });
+  console.info("Downloader OFF-parquet (~7,6 GB, én request)…");
+  const response = await fetch(PARQUET_URL, { redirect: "follow" });
+  if (!response.ok || !response.body) {
+    throw new Error(`Download fejlede: HTTP ${response.status}`);
+  }
+  const tmp = `${CACHE_FILE}.tmp`;
+  let bytes = 0;
+  let lastLog = 0;
+  const progress = new TransformStream<Uint8Array, Uint8Array>({
+    transform(chunk, controller) {
+      bytes += chunk.byteLength;
+      if (bytes - lastLog > 1_000_000_000) {
+        lastLog = bytes;
+        console.info(`  …${(bytes / 1e9).toFixed(1)} GB`);
+      }
+      controller.enqueue(chunk);
+    },
+  });
+  await pipeline(
+    Readable.fromWeb(response.body.pipeThrough(progress) as never),
+    createWriteStream(tmp),
+  );
+  await rename(tmp, CACHE_FILE);
+  console.info(`Download færdig (${(bytes / 1e9).toFixed(1)} GB).`);
+  return CACHE_FILE;
+}
 
 interface Options {
   countries: string[] | null; // null = fuldt globalt load
   limit: number | null;
+  refresh: boolean;
 }
 
 function parseArgs(argv: string[]): Options {
   let countries: string[] | null = ["en:denmark"];
   let limit: number | null = null;
+  let refresh = false;
   for (const arg of argv) {
     if (arg === "--nordic") countries = NORDIC;
     else if (arg === "--full") countries = null;
+    else if (arg === "--refresh") refresh = true;
     else if (arg.startsWith("--countries=")) {
       countries = arg
         .slice("--countries=".length)
@@ -46,13 +107,13 @@ function parseArgs(argv: string[]): Options {
       limit = Number(arg.slice("--limit=".length)) || null;
     }
   }
-  return { countries, limit };
+  return { countries, limit, refresh };
 }
 
 async function readOffRows(options: Options): Promise<OffRow[]> {
+  const parquetPath = await ensureParquet(options.refresh);
   const instance = await DuckDBInstance.create(":memory:");
   const connection = await instance.connect();
-  await connection.run("INSTALL httpfs; LOAD httpfs;");
 
   const where = options.countries
     ? `WHERE list_has_any(countries_tags, [${options.countries
@@ -76,7 +137,7 @@ async function readOffRows(options: Options): Promise<OffRow[]> {
       to_json(ingredients_text) AS ingredients_text,
       to_json(allergens_tags)   AS allergens_tags,
       to_json(images)           AS images
-    FROM '${PARQUET}'
+    FROM '${parquetPath.replace(/\\/g, "/")}'
     ${where}
     ${limit}
   `;

@@ -35,3 +35,6 @@ playwright-report/
 test-results/
 .gstack/
 .vercel
+
+# Ingestion-cache (store dumps)
+scripts/.cache/

@@ -25,7 +25,7 @@ const QUALITY_PRIORITY: Record<string, number> = {
 };
 
 /**
- * Slå en stregkode op i egen foods-tabel (aldrig live-OFF, jf. CLAUDE.md)
+ * Slå en stregkode op i egen foods-tabel (cache-først, jf. CLAUDE.md)
  * og registrér hændelsen i scans med outcome='checked'.
  * Verified-kilder foretrækkes over crowdsourced over brugeroprettede.
  */
@@ -42,6 +42,21 @@ export async function lookupBarcode(barcode: string): Promise<FoodHit | null> {
       (QUALITY_PRIORITY[a.data_quality] ?? 9) - (QUALITY_PRIORITY[b.data_quality] ?? 9),
   );
   return hits[0] ?? null;
+}
+
+/**
+ * Éngangs-fallback ved cache-miss (jf. CLAUDE.md-datareglen): Edge
+ * Functionen off-lookup henter varen server-side fra OFF's API, cacher
+ * den i foods og returnerer rækken. Null = findes heller ikke hos OFF
+ * (eller OFF er nede) → ægte miss-tilstand.
+ */
+export async function lookupViaOff(barcode: string): Promise<FoodHit | null> {
+  const { data, error } = await supabase.functions.invoke<{ data: FoodHit }>(
+    "off-lookup",
+    { body: { barcode } },
+  );
+  if (error || !data?.data) return null;
+  return data.data;
 }
 
 /** Registrér scanningen; returnerer scan-id'et til senere 'logged'-opdatering. */

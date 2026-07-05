@@ -69,7 +69,7 @@ React 18 + Vite + TypeScript (strict). Tailwind CSS. Radix UI primitives. Framer
 ## Data rules
 
 - `foods` rows always carry `source` (`off` | `usda` | `frida` | `custom`) and `data_quality` (`verified` | `crowdsourced` | `user`). UI shows this transparently.
-- OFF data is served from **our own cached table** (nightly dump ingestion), never live-fetched per scan. Attribute Open Food Facts in the UI (ODbL requirement).
+- OFF data is served **cache-first from our own table** (nightly dump ingestion, Nordic scope). On a barcode **miss only**, the `off-lookup` Edge Function may fetch that one product server-side from OFF's API and write it through to the cache — the client never calls OFF directly, and no per-scan live-fetching of cached products. Attribute Open Food Facts in the UI (ODbL requirement).
 - Prefer verified sources (USDA/Frida) for whole foods; OFF for barcoded packaged goods.
 - Calculations (macro/micro rollups, NOVA share, verdict score) live in `packages/core` with unit tests — never inline in components.
 

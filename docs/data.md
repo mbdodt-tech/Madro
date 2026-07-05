@@ -8,14 +8,24 @@
 
 ```
 pnpm ingest:off                    # dansk udsnit (default)
-pnpm ingest:off -- --nordic        # DK/SE/NO/FI/IS
+pnpm ingest:off -- --nordic        # DK/SE/NO/FI/IS ← natlig kørsel bruger denne
 pnpm ingest:off -- --full          # globalt load (stort — kun bevidst)
 pnpm ingest:off -- --limit=50      # prøvekørsel
 ```
 
 Kræver `scripts/.env` med `INGEST_DATABASE_URL` (se `.env.example`). Scriptet upserter på `(source='off', source_ref=stregkode)` og rører aldrig rækker fra andre kilder. Genkørsel er idempotent.
 
-**Kadence:** GitHub Action `.github/workflows/ingest-off.yml` kører natligt (03:15 UTC) + manuelt via workflow_dispatch. **Aktiveres manuelt:** sæt repo-secret `INGEST_DATABASE_URL` og repo-variablen `INGEST_ENABLED=true`.
+**Kadence:** GitHub Action `.github/workflows/ingest-off.yml` kører natligt (03:15 UTC, `--nordic`-scope) + manuelt via workflow_dispatch. **Aktiveres manuelt:** sæt repo-secret `INGEST_DATABASE_URL` og repo-variablen `INGEST_ENABLED=true`.
+
+### Miss-fallback: `off-lookup` Edge Function (godkendt 2026-07-05)
+
+Landefiltre giver blinde vinkler: internationale varer solgt i DK er ofte kun landetagget UK/DE/… i OFF (konkret eksempel: Monster-stregkode 5060751215042, kun `en:united-kingdom`). Derfor gælder reglen nu **cache-først + éngangs-fallback**:
+
+1. Klienten slår altid op i vores egen `foods`-tabel først.
+2. Kun ved miss kalder klienten Edge Functionen `off-lookup`, som server-side henter den ene vare fra OFF's API v2 (med `User-Agent` jf. OFF's API-regler), transformerer til det kanoniske skema og **skriver den ind i `foods`** (`source='off'`, `data_quality='crowdsourced'`). Næste scan af samme vare rammer cachen.
+3. Klienten kalder aldrig OFF direkte, og cachede varer live-fetches aldrig.
+
+Rate limit: 30 opslag/min pr. bruger (delt `ai_requests`-tabel, task `off_lookup`). ODbL: fallback-hentede rækker indgår i samme afledte OFF-database som dump-ingestionen — samme attribution og adskillelsesregler (én række pr. kilde; OFF-rækker merges aldrig med andre kilder).
 
 **DB-adgang:** dedikeret Postgres-rolle `ingest` (kun `foods` + `nutrient_references`, via RLS-politikker — bevidst ikke service role). Oprettet i migration `…_ingest_role.sql` uden password. **Password sættes manuelt** (Supabase dashboard → SQL editor) — indsæt passwordet mellem de enkelte anførselstegn (ingen vinkelparenteser):
 

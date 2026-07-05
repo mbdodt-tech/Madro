@@ -145,6 +145,8 @@
     "manualPlaceholder": "fx 5701979011107",
     "manualSubmit": "Slå op",
     "lookingUp": "Slår op…",
+    "lookingUpDeep": "Søger i Open Food Facts…",
+    "lookingUpDeepBody": "Varen er ikke i vores bibliotek endnu — vi tjekker Open Food Facts og gemmer den til næste gang.",
     "foundTitle": "Vare fundet",
     "verdictSoon": "verdikt kommer snart",
     "done": "Færdig",

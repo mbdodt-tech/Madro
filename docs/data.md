@@ -39,13 +39,15 @@ Public domain. Zip-filer caches i `scripts/.cache/`. `source='usda'`, `data_qual
 
 ## Frida-ingestion (trin 1.2)
 
-**Bulk-adgang er en manuel formular:** Fridas API er antiforgery-låst (ikke tiltænkt masseudtræk), så regnearket hentes via formularen på https://frida.fooddata.dk/data (download-link sendes på mail — DTU's egen bulk-metode). Læg filen som `scripts/.cache/frida.xlsx` og kør:
-
 ```
-pnpm ingest:frida
+pnpm ingest:frida           # ~1.390 fødevarer
 ```
 
-Scriptet inspicerer og logger header-rækken ved kørsel; bekræft at kolonnenavnene rammer `map-frida` (EuroFIR-kode i parentes eller dansk navn). `source='frida'`, `data_quality='verified'`. **Citation** (registreres ved kørsel, docs-format): *"Fødevaredata (frida.fooddata.dk), version X, år, Fødevareinstituttet, DTU"* — versionsnummeret aflæses på Fridas datasæt-side.
+Kilde: **den officielle FCDB-eksport på DTU Data** (figshare, DOI [10.11583/DTU.32312844](https://doi.org/10.11583/DTU.32312844), "The Danish Food Composition Database, version 6.1") — hentes programmatisk via figshare-API'et og caches i `scripts/.cache/frida.xlsx`. (Fridas SPA-API er antiforgery-låst og ikke tiltænkt masseudtræk; DOI-datasættet er den korrekte bulk-kilde.)
+
+Regnearket har flere ark: `Data_Table` (bred — FoodID + parametre pr. kolonne, 3 metadata-rækker øverst) og `Food` (FoodID → navn). `map-frida` i `@madro/core` vælger én kolonne pr. kanonisk nøgle (analyseret værdi, ikke deklaration/kJ) — enhederne matcher allerede, verificeret mod `Parameter`-arket. `source='frida'`, `data_quality='verified'`, `source_ref=FoodID`.
+
+**Citation** (UI + docs): *"Fødevaredata (FCDB v6.1, 2026), Fødevareinstituttet, DTU"*.
 
 ## Referencer: NNR2023 (trin 1.2)
 

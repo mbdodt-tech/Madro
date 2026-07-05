@@ -6,7 +6,7 @@ import {
 } from "./convert";
 import { mapOffNutriments } from "./map-off";
 import { mapUsdaNutrients, type UsdaFoodNutrient } from "./map-usda";
-import { mapFridaParameters } from "./map-frida";
+import { mapFridaColumns } from "./map-frida";
 import { dailyReference, coveragePct, type ReferenceRow } from "./reference";
 
 describe("convert", () => {
@@ -67,17 +67,20 @@ describe("mapUsdaNutrients", () => {
   });
 });
 
-describe("mapFridaParameters", () => {
-  it("maps by EuroFIR code with Danish fallback", () => {
-    const out = mapFridaParameters([
-      { eurofir: "ENERC", nameDa: "Energi, kcal", value: 370 },
-      { eurofir: "FE", nameDa: "Jern", value: 4.0 },
-      { eurofir: null, nameDa: "Magnesium", value: 130 },
-      { eurofir: "XYZ", nameDa: "Ukendt", value: 5 },
-    ]);
-    expect(out.energy_kcal).toBe(370);
+describe("mapFridaColumns", () => {
+  it("maps exact Danish column names, parses comma decimals, ignores unknowns", () => {
+    const out = mapFridaColumns({
+      "Energi (kcal)": "370,5",
+      Jern: "4,0",
+      Magnesium: 130,
+      "Sum mættede fedtsyrer": "1,2",
+      "Energi, deklaration (kcal)": "999", // ignoreres — ikke i mappen
+      Ukendt: "5",
+    });
+    expect(out.energy_kcal).toBeCloseTo(370.5, 3);
     expect(out.iron_mg).toBe(4);
     expect(out.magnesium_mg).toBe(130);
+    expect(out.saturated_fat_g).toBeCloseTo(1.2, 3);
     expect(Object.keys(out)).not.toContain("undefined");
   });
 });

@@ -23,7 +23,8 @@
     "hideCaloriesOn": "Calorie numbers are hidden",
     "hideCaloriesOff": "Calorie numbers are shown",
     "designLink": "Design system →",
-    "loadingProfile": "Setting up your profile…"
+    "loadingProfile": "Setting up your profile…",
+    "scanTeaser": "Tap the green button to scan your first product."
   },
   "design": {
     "title": "Madro design system",
@@ -123,6 +124,38 @@
       "scanToast": "The scan flow arrives in Phase 1",
       "activeTab": "active tab: {{tab}}",
       "monoIron": "iron"
+    }
+  },
+  "shell": {
+    "navLabel": "Main navigation",
+    "today": "Today",
+    "diary": "Diary",
+    "insights": "Insights",
+    "profile": "Profile",
+    "scan": "Scan barcode",
+    "comingSoon": "Coming soon"
+  },
+  "scan": {
+    "hint": "Point the camera at the barcode",
+    "cameraError": "Camera unavailable — enter the barcode below instead",
+    "close": "Close camera",
+    "manualLabel": "Enter barcode",
+    "manualPlaceholder": "e.g. 5701979011107",
+    "manualSubmit": "Look up",
+    "lookingUp": "Looking up…",
+    "foundTitle": "Product found",
+    "verdictSoon": "verdict coming soon",
+    "done": "Done",
+    "missTitle": "Not in our database yet",
+    "missBody": "We couldn't find the barcode {{barcode}}. Try searching by name instead.",
+    "searchLabel": "Search by name",
+    "searchPlaceholder": "e.g. oatmeal",
+    "noResults": "No results — try a different word.",
+    "source": {
+      "off": "Open Food Facts",
+      "usda": "USDA",
+      "frida": "Frida (DTU)",
+      "custom": "Own food"
     }
   }
 }

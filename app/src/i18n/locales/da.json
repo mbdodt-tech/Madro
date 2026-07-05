@@ -23,7 +23,8 @@
     "hideCaloriesOn": "Kalorietal er skjult",
     "hideCaloriesOff": "Kalorietal vises",
     "designLink": "Designsystem →",
-    "loadingProfile": "Gør din profil klar…"
+    "loadingProfile": "Gør din profil klar…",
+    "scanTeaser": "Tryk på den grønne knap for at scanne din første vare."
   },
   "design": {
     "title": "Madro designsystem",
@@ -123,6 +124,38 @@
       "scanToast": "Scan-flowet kommer i Fase 1",
       "activeTab": "aktiv fane: {{tab}}",
       "monoIron": "jern"
+    }
+  },
+  "shell": {
+    "navLabel": "Hovednavigation",
+    "today": "I dag",
+    "diary": "Dagbog",
+    "insights": "Indsigt",
+    "profile": "Profil",
+    "scan": "Scan stregkode",
+    "comingSoon": "Kommer snart"
+  },
+  "scan": {
+    "hint": "Ret kameraet mod stregkoden",
+    "cameraError": "Kameraet er ikke tilgængeligt — indtast stregkoden nedenfor i stedet",
+    "close": "Luk kamera",
+    "manualLabel": "Indtast stregkode",
+    "manualPlaceholder": "fx 5701979011107",
+    "manualSubmit": "Slå op",
+    "lookingUp": "Slår op…",
+    "foundTitle": "Vare fundet",
+    "verdictSoon": "verdikt kommer snart",
+    "done": "Færdig",
+    "missTitle": "Ikke i vores database endnu",
+    "missBody": "Vi kunne ikke finde stregkoden {{barcode}}. Prøv at søge på navn i stedet.",
+    "searchLabel": "Søg på navn",
+    "searchPlaceholder": "fx havregryn",
+    "noResults": "Ingen resultater — prøv et andet ord.",
+    "source": {
+      "off": "Open Food Facts",
+      "usda": "USDA",
+      "frida": "Frida (DTU)",
+      "custom": "Egen fødevare"
     }
   }
 }

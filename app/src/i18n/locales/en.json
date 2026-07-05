@@ -2,7 +2,8 @@
   "common": {
     "appName": "Madro",
     "logout": "Log out",
-    "language": "Language"
+    "language": "Language",
+    "loading": "Loading…"
   },
   "auth": {
     "title": "Welcome to Madro",
@@ -222,6 +223,30 @@
       "usda": "Data: USDA FoodData Central (public domain).",
       "frida": "Data: Fødevaredata (FCDB v6.1, 2026), National Food Institute, DTU.",
       "custom": "Your own entry."
+    }
+  },
+  "diary": {
+    "title": "Diary",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "prevDay": "Previous day",
+    "nextDay": "Next day",
+    "empty": "No meals logged this day.",
+    "emptyHint": "Scan a product or add a meal with the plus button.",
+    "updated": "Change saved",
+    "removed": "Entry removed",
+    "add": {
+      "button": "Add",
+      "title": "Add meal",
+      "hint": "Search the whole library — brands, whole foods and your own items."
+    },
+    "entry": {
+      "unknownFood": "Unknown food",
+      "save": "Save changes",
+      "remove": "Remove from diary",
+      "keep": "Keep",
+      "confirmRemove": "Yes, remove",
+      "error": "Couldn't save — try again."
     }
   }
 }

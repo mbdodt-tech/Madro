@@ -23,6 +23,15 @@ export function sodiumMgToSaltG(sodiumMg: number): number {
   return (sodiumMg * 2.5) / 1000;
 }
 
+/**
+ * Skalér en pr.-100 g-værdi til en portion. Bruges af alle portions-
+ * visninger (scan-flowets kcal-preview, dagbogsrækker) — aldrig inline
+ * i komponenter, jf. CLAUDE.md.
+ */
+export function scalePer100(valuePer100: number, grams: number): number {
+  return (valuePer100 * grams) / 100;
+}
+
 /** Afrund til 3 betydende decimaler — nok til alle nutrient-visninger. */
 export function roundNutrient(value: number): number {
   return Math.round(value * 1000) / 1000;

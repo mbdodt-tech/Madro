@@ -1,59 +1,19 @@
-import {
-  AppShell,
-  BottomTabBar,
-  Button,
-  Card,
-  Chip,
-  ScanFab,
-  Skeleton,
-  useToast,
-} from "@madro/ui";
-import { BarChart3, BookOpen, House, ScanBarcode, User } from "lucide-react";
-import { useState } from "react";
+import { Button, Card, Chip, Skeleton } from "@madro/ui";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useProfile } from "../auth/useProfile";
 import { useSession } from "../auth/useSession";
 import { LanguageSwitch } from "../components/LanguageSwitch";
+import { TabShell } from "../components/TabShell";
 import { supabase } from "../lib/supabase";
 
 export function HomePage() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const { show } = useToast();
   const { data: session } = useSession();
   const { data: profile, isLoading } = useProfile();
-  const [activeTab, setActiveTab] = useState("today");
-
-  const iconCls = "size-5";
-  const comingSoon = () => show(t("shell.comingSoon"));
 
   return (
-    <AppShell
-      bottomBar={
-        <BottomTabBar
-          navLabel={t("shell.navLabel")}
-          activeId={activeTab}
-          onSelect={(id) => {
-            if (id === "today") setActiveTab(id);
-            else comingSoon();
-          }}
-          items={[
-            { id: "today", label: t("shell.today"), icon: <House className={iconCls} /> },
-            { id: "diary", label: t("shell.diary"), icon: <BookOpen className={iconCls} /> },
-            { id: "insights", label: t("shell.insights"), icon: <BarChart3 className={iconCls} /> },
-            { id: "profile", label: t("shell.profile"), icon: <User className={iconCls} /> },
-          ]}
-          center={
-            <ScanFab
-              label={t("shell.scan")}
-              icon={<ScanBarcode className="size-6" />}
-              onClick={() => navigate("/scan")}
-            />
-          }
-        />
-      }
-    >
+    <TabShell>
       <main className="mx-auto flex max-w-md flex-col gap-6 px-6 py-10 font-sans">
         <div className="flex items-center justify-between">
           <h1 className="text-display text-ink">{t("home.greeting")}</h1>
@@ -103,6 +63,6 @@ export function HomePage() {
           </Button>
         </div>
       </main>
-    </AppShell>
+    </TabShell>
   );
 }

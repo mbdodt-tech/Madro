@@ -17,6 +17,8 @@ export interface LogMealInput {
   amountGrams: number;
   meal: Meal;
   scanId: string | null;
+  /** Sæt ved logning på en anden dag end i dag (dagbogens dato-navigation). */
+  consumedAt?: Date;
 }
 
 /** Opret dagbogspost og markér scanningen som logget. */
@@ -32,6 +34,7 @@ export async function logMeal(input: LogMealInput): Promise<void> {
     unit: "g",
     meal: input.meal,
     scan_id: input.scanId,
+    ...(input.consumedAt ? { consumed_at: input.consumedAt.toISOString() } : {}),
   });
   if (error) throw error;
 

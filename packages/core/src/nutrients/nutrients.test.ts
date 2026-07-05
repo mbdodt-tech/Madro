@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   finalizeNutrients,
   kjToKcal,
+  scalePer100,
   sodiumMgToSaltG,
 } from "./convert";
 import { mapOffNutriments } from "./map-off";
@@ -20,6 +21,13 @@ describe("convert", () => {
     expect(out.salt_g).toBeCloseTo(1, 3);
     expect(out.protein_g).toBeUndefined();
     expect(out.fat_g).toBeUndefined();
+  });
+
+  it("scales per-100g values to a portion", () => {
+    expect(scalePer100(46, 100)).toBe(46);
+    expect(scalePer100(46, 250)).toBeCloseTo(115, 5);
+    expect(scalePer100(3.5, 125)).toBeCloseTo(4.375, 5);
+    expect(scalePer100(46, 0)).toBe(0);
   });
 });
 

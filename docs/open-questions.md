@@ -7,7 +7,7 @@ Uafklarede beslutninger fra plan-gennemgangen 2026-07-02. Hvert punkt har en eje
 - [ ] **De 8 mikronæringsstoffer i mikrostriben** (trin 1.6). Mockuppen bruger et foreløbigt sæt: D-vitamin, jern, magnesium, calcium, kalium, B12, folat, zink. Skal godkendes eller justeres.
 - [ ] **Verdikt-score-formlen** (trin 1.4). Aftalt proces: Claude foreslår en konkret vægtning af Nutri-Score + NOVA + additiver i `docs/scoring.md`; brugeren godkender før den shippes.
 - [ ] **Aldersgate** (Fase 0.5/onboarding). Minimumsalder (13 er dansk GDPR-samtykkealder; apps i dette felt vælger ofte højere) og hvad der sker ved afvisning.
-- [ ] **Auth-omfang** (trin 0.5). Magic link alene, eller også Google/Apple fra start? OBS: enhver social login udløser krav om Apple Sign-In ved App Store-indsendelse i Fase 5.
+- [x] **Auth-omfang** (afgjort 2026-07-04): magic link (primær) + adgangskode (fallback). Ingen social login i beta — Google/Apple genovervejes før Fase 5 (App Store-kravet om Apple Sign-In gælder kun, hvis social login tilbydes).
 - [ ] **`hide_calories` default**: foreslået *fra* som standard, tilbydes som valg under onboarding.
 
 ## Data & jura

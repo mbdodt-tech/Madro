@@ -15,18 +15,14 @@ import {
   VerdiktBadge,
   verdictLevels,
   type ThemeMode,
+  type VerdictLevel,
 } from "@madro/ui";
-import {
-  BarChart3,
-  BookOpen,
-  House,
-  ScanBarcode,
-  User,
-} from "lucide-react";
+import { BarChart3, BookOpen, House, ScanBarcode, User } from "lucide-react";
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 
 /**
- * Midlertidig specimen-side for designsystemet (fase-tjekliste 0.2).
+ * Midlertidig specimen-side for designsystemet (fase-tjekliste 0.2 + 0.3).
  * Alle sektioner vises i lys og mørk side om side; farveværdier
  * aflæses live fra CSS-vars, så siden aldrig indeholder hex selv.
  */
@@ -120,15 +116,7 @@ const paletteEntries: Array<{ name: string; bgClass: string }> = [
   { name: "hairline", bgClass: "bg-hairline" },
 ];
 
-const verdictLabels: Record<(typeof verdictLevels)[number], string> = {
-  excellent: "Fremragende",
-  good: "God",
-  mid: "Middel",
-  poor: "Ringe",
-  bad: "Meget ringe",
-};
-
-const verdictBg: Record<(typeof verdictLevels)[number], string> = {
+const verdictBg: Record<VerdictLevel, string> = {
   excellent: "bg-v-excellent",
   good: "bg-v-good",
   mid: "bg-v-mid",
@@ -136,14 +124,14 @@ const verdictBg: Record<(typeof verdictLevels)[number], string> = {
   bad: "bg-v-bad",
 };
 
-const typeSpecimens = [
-  { label: "Display · 32/40/600", cls: "text-display" },
-  { label: "H1 · 24/32/600", cls: "text-h1" },
-  { label: "H2 · 20/28/600", cls: "text-h2" },
-  { label: "Body · 16/24/400", cls: "text-body" },
-  { label: "Small · 14/20/400", cls: "text-small" },
-  { label: "Caption · 12/16/500", cls: "text-caption" },
-];
+const typeSpecimenKeys = [
+  { key: "display", cls: "text-display" },
+  { key: "h1", cls: "text-h1" },
+  { key: "h2", cls: "text-h2" },
+  { key: "body", cls: "text-body" },
+  { key: "small", cls: "text-small" },
+  { key: "caption", cls: "text-caption" },
+] as const;
 
 const radii = [
   { name: "sm · 10", cls: "rounded-sm" },
@@ -156,17 +144,18 @@ const radii = [
 const spacingSteps = [1, 2, 3, 4, 5, 6, 8, 10, 12, 16];
 
 function ThemeSwitch() {
+  const { t } = useTranslation();
   const { mode, setMode } = useTheme();
   const modes: Array<{ value: ThemeMode; label: string }> = [
-    { value: "light", label: "Lys" },
-    { value: "dark", label: "Mørk" },
-    { value: "system", label: "System" },
+    { value: "light", label: t("design.theme.light") },
+    { value: "dark", label: t("design.theme.dark") },
+    { value: "system", label: t("design.theme.system") },
   ];
   return (
     <div
       className="flex gap-0.5 rounded-pill border border-hairline bg-surface p-0.5"
       role="group"
-      aria-label="Farvetilstand"
+      aria-label={t("design.theme.label")}
     >
       {modes.map((m) => (
         <button
@@ -189,19 +178,24 @@ function ThemeSwitch() {
 /* ---------- Komponent-demoer (kun til galleriet) ---------- */
 
 function StepperDemo() {
+  const { t } = useTranslation();
   const [steps, setSteps] = useState(2);
   const grams = steps * 15;
   const kcal = Math.round(steps * 79.5);
   const label =
-    steps === 1 ? "½ håndfuld" : steps === 2 ? "1 håndfuld" : `${steps / 2} håndfulde`;
+    steps === 1
+      ? t("design.demo.halfHandful")
+      : steps === 2
+        ? t("design.demo.oneHandful")
+        : t("design.demo.handfuls", { count: steps / 2 });
   return (
     <PortionsStepper
       valueLabel={label}
       subLabel={`${grams} g · ${kcal} kcal`}
       onDecrease={() => setSteps((s) => Math.max(1, s - 1))}
       onIncrease={() => setSteps((s) => Math.min(12, s + 1))}
-      decreaseLabel="Mindre portion"
-      increaseLabel="Større portion"
+      decreaseLabel={t("design.demo.smallerPortion")}
+      increaseLabel={t("design.demo.largerPortion")}
       decreaseDisabled={steps <= 1}
       increaseDisabled={steps >= 12}
     />
@@ -209,38 +203,51 @@ function StepperDemo() {
 }
 
 function ToastDemo() {
+  const { t } = useTranslation();
   const { show } = useToast();
   return (
-    <Button variant="secondary" onClick={() => show("Logget under snacks")}>
-      Vis toast
+    <Button
+      variant="secondary"
+      onClick={() => show(t("design.demo.toastMessage"))}
+    >
+      {t("design.demo.showToast")}
     </Button>
   );
 }
 
 function SheetDemo() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   return (
     <>
       <Button id="sheet-trigger" onClick={() => setOpen(true)}>
-        Åbn resultat-ark
+        {t("design.demo.openSheet")}
       </Button>
-      <Sheet open={open} onOpenChange={setOpen} title="Scanresultat">
+      <Sheet open={open} onOpenChange={setOpen} title={t("design.demo.scanResult")}>
         <div className="space-y-4">
           <div>
-            <h3 className="text-h2 text-ink">Snackchips sour cream &amp; onion</h3>
-            <p className="text-small text-secondary">Kims · 165 g</p>
+            <h3 className="text-h2 text-ink">{t("design.demo.productName")}</h3>
+            <p className="text-small text-secondary">
+              {t("design.demo.productBrand")}
+            </p>
           </div>
-          <VerdiktBadge level="poor" label="Ringe kvalitet" score="38/100" />
+          <VerdiktBadge
+            level="poor"
+            label={t("design.demo.poorQuality")}
+            score="38/100"
+          />
           <div className="flex flex-wrap gap-2">
-            <Chip>NOVA 4 · ultraforarbejdet</Chip>
-            <Chip>Nutri-Score D</Chip>
-            <Chip>3 additiver</Chip>
+            <Chip>{t("design.demo.novaChip")}</Chip>
+            <Chip>{t("design.demo.nutriChip")}</Chip>
+            <Chip>{t("design.demo.additivesChip")}</Chip>
           </div>
           <div className="flex flex-col gap-2 pt-2">
-            <Button onClick={() => setOpen(false)}>Jeg spiste det</Button>
+            <Button onClick={() => setOpen(false)}>
+              {t("design.demo.ateIt")}
+            </Button>
             <Button variant="secondary" onClick={() => setOpen(false)}>
-              Vis bedre alternativ
-              <Chip tone="brand">kommer snart</Chip>
+              {t("design.demo.showAlternative")}
+              <Chip tone="brand">{t("design.demo.comingSoon")}</Chip>
             </Button>
           </div>
         </div>
@@ -250,6 +257,7 @@ function SheetDemo() {
 }
 
 function AppShellDemo() {
+  const { t } = useTranslation();
   const [active, setActive] = useState("today");
   const { show } = useToast();
   const iconCls = "size-5";
@@ -258,20 +266,36 @@ function AppShellDemo() {
       <AppShell
         bottomBar={
           <BottomTabBar
-            navLabel="Hovednavigation"
+            navLabel={t("design.demo.navLabel")}
             activeId={active}
             onSelect={setActive}
             items={[
-              { id: "today", label: "I dag", icon: <House className={iconCls} /> },
-              { id: "diary", label: "Dagbog", icon: <BookOpen className={iconCls} /> },
-              { id: "insights", label: "Indsigt", icon: <BarChart3 className={iconCls} /> },
-              { id: "profile", label: "Profil", icon: <User className={iconCls} /> },
+              {
+                id: "today",
+                label: t("design.demo.tabToday"),
+                icon: <House className={iconCls} />,
+              },
+              {
+                id: "diary",
+                label: t("design.demo.tabDiary"),
+                icon: <BookOpen className={iconCls} />,
+              },
+              {
+                id: "insights",
+                label: t("design.demo.tabInsights"),
+                icon: <BarChart3 className={iconCls} />,
+              },
+              {
+                id: "profile",
+                label: t("design.demo.tabProfile"),
+                icon: <User className={iconCls} />,
+              },
             ]}
             center={
               <ScanFab
-                label="Scan stregkode eller måltid"
+                label={t("design.demo.scanLabel")}
                 icon={<ScanBarcode className="size-6" />}
-                onClick={() => show("Scan-flowet kommer i Fase 1")}
+                onClick={() => show(t("design.demo.scanToast"))}
               />
             }
           />
@@ -279,9 +303,11 @@ function AppShellDemo() {
       >
         <div className="space-y-3 p-4">
           <Card>
-            <p className="text-small font-medium text-ink">I dag</p>
+            <p className="text-small font-medium text-ink">
+              {t("design.demo.tabToday")}
+            </p>
             <p className="text-caption text-tertiary">
-              aktiv fane: {active}
+              {t("design.demo.activeTab", { tab: active })}
             </p>
           </Card>
           <Card>
@@ -295,15 +321,15 @@ function AppShellDemo() {
 }
 
 export function DesignPage() {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-bg font-sans text-ink">
       <header className="sticky top-0 z-10 border-b border-hairline bg-bg/85 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <div>
-            <h1 className="text-h1">Madro designsystem</h1>
-            <p className="text-caption text-tertiary">
-              byggeplan §3 · tokens er eneste kilde til styling
-            </p>
+            <h1 className="text-h1">{t("design.title")}</h1>
+            <p className="text-caption text-tertiary">{t("design.subtitle")}</p>
           </div>
           <ThemeSwitch />
         </div>
@@ -311,8 +337,8 @@ export function DesignPage() {
 
       <main className="mx-auto max-w-5xl space-y-16 px-6 py-12">
         <Section
-          title="Palet"
-          note="Semantiske farver — samme utility, automatisk lys/mørk. Hex-værdierne aflæses live fra CSS-variablerne."
+          title={t("design.sections.palette")}
+          note={t("design.sections.paletteNote")}
         >
           <DualPanel>
             <div className="grid grid-cols-3 gap-4 sm:grid-cols-4">
@@ -324,8 +350,8 @@ export function DesignPage() {
         </Section>
 
         <Section
-          title="Verdikt-skala"
-          note="Afdæmpet kvalitetsskala — aldrig alarmerende, ingen skyld."
+          title={t("design.sections.verdict")}
+          note={t("design.sections.verdictNote")}
         >
           <DualPanel>
             <div className="flex flex-wrap gap-2">
@@ -338,7 +364,7 @@ export function DesignPage() {
                     className={`size-2 rounded-pill ${verdictBg[level]}`}
                     aria-hidden="true"
                   />
-                  {verdictLabels[level]}
+                  {t(`design.verdictLevels.${level}`)}
                 </span>
               ))}
             </div>
@@ -346,8 +372,8 @@ export function DesignPage() {
         </Section>
 
         <Section
-          title="Makro-farver"
-          note="Protein, kulhydrat og fedt — godkendt i designoplægget."
+          title={t("design.sections.macro")}
+          note={t("design.sections.macroNote")}
         >
           <DualPanel>
             <div className="grid grid-cols-3 gap-4">
@@ -359,24 +385,24 @@ export function DesignPage() {
         </Section>
 
         <Section
-          title="Typografi"
-          note="Geist Sans til UI, Geist Mono med tabular-nums til alle tal."
+          title={t("design.sections.typography")}
+          note={t("design.sections.typographyNote")}
         >
           <DualPanel>
             <div className="space-y-5">
-              {typeSpecimens.map((t) => (
-                <div key={t.label}>
+              {typeSpecimenKeys.map((spec) => (
+                <div key={spec.key}>
                   <p className="font-mono text-caption text-tertiary">
-                    {t.label}
+                    {t(`design.typeSpecimens.${spec.key}`)}
                   </p>
-                  <p className={`${t.cls} text-ink`}>
-                    Forstå kvaliteten af det, du spiser
+                  <p className={`${spec.cls} text-ink`}>
+                    {t("design.specimen")}
                   </p>
                 </div>
               ))}
               <div>
                 <p className="font-mono text-caption text-tertiary">
-                  Geist Mono · tabular-nums
+                  {t("design.typeSpecimens.mono")}
                 </p>
                 <div className="mt-1 w-40 font-mono text-body text-ink">
                   <p className="flex justify-between">
@@ -388,7 +414,7 @@ export function DesignPage() {
                     <span>61,4</span>
                   </p>
                   <p className="flex justify-between">
-                    <span>jern</span>
+                    <span>{t("design.demo.monoIron")}</span>
                     <span>8,2</span>
                   </p>
                 </div>
@@ -398,8 +424,8 @@ export function DesignPage() {
         </Section>
 
         <Section
-          title="Radius & spacing"
-          note="Radius 10/14/18/24/pill · 4-pt spacing-grid."
+          title={t("design.sections.radius")}
+          note={t("design.sections.radiusNote")}
         >
           <DualPanel>
             <div className="space-y-6">
@@ -433,79 +459,92 @@ export function DesignPage() {
         </Section>
 
         <Section
-          title="Dybde"
-          note="Lys: subtile lagdelte skygger. Mørk: fladelyshed og hårlinjer i stedet for skygge."
+          title={t("design.sections.depth")}
+          note={t("design.sections.depthNote")}
         >
           <DualPanel>
             <div className="grid grid-cols-2 gap-4">
               <div className="rounded-lg bg-surface p-4 shadow-1">
                 <p className="text-small text-ink">surface + shadow-1</p>
-                <p className="text-caption text-tertiary">kort</p>
+                <p className="text-caption text-tertiary">
+                  {t("design.sections.depthCard")}
+                </p>
               </div>
               <div className="rounded-lg bg-surface-raised p-4 shadow-sheet">
                 <p className="text-small text-ink">surface-raised + sheet</p>
-                <p className="text-caption text-tertiary">ark</p>
+                <p className="text-caption text-tertiary">
+                  {t("design.sections.depthSheet")}
+                </p>
               </div>
-            </div>
-          </DualPanel>
-        </Section>
-        <Section
-          title="Knapper"
-          note="Primær, sekundær og ghost — spring ved tryk, ingen skalering ved reduceret bevægelse."
-        >
-          <DualPanel>
-            <div className="flex flex-wrap items-center gap-3">
-              <Button>Jeg spiste det</Button>
-              <Button variant="secondary">Vis alternativ</Button>
-              <Button variant="ghost">Spring over</Button>
-              <Button disabled>Deaktiveret</Button>
-              <Button size="sm">Lille</Button>
             </div>
           </DualPanel>
         </Section>
 
         <Section
-          title="Chips & verdikt"
-          note="Neutral chip, brand-chip og VerdiktBadge i alle fem niveauer."
+          title={t("design.sections.buttons")}
+          note={t("design.sections.buttonsNote")}
+        >
+          <DualPanel>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button>{t("design.demo.ateIt")}</Button>
+              <Button variant="secondary">
+                {t("design.demo.showAlternative")}
+              </Button>
+              <Button variant="ghost">{t("design.demo.skip")}</Button>
+              <Button disabled>{t("design.demo.disabled")}</Button>
+              <Button size="sm">{t("design.demo.small")}</Button>
+            </div>
+          </DualPanel>
+        </Section>
+
+        <Section
+          title={t("design.sections.chips")}
+          note={t("design.sections.chipsNote")}
         >
           <DualPanel>
             <div className="space-y-3">
               <div className="flex flex-wrap gap-2">
-                <Chip>NOVA 4 · ultraforarbejdet</Chip>
-                <Chip>Nutri-Score D</Chip>
-                <Chip tone="brand">kommer snart</Chip>
+                <Chip>{t("design.demo.novaChip")}</Chip>
+                <Chip>{t("design.demo.nutriChip")}</Chip>
+                <Chip tone="brand">{t("design.demo.comingSoon")}</Chip>
               </div>
               <div className="flex flex-wrap gap-2">
                 {verdictLevels.map((level) => (
                   <VerdiktBadge
                     key={level}
                     level={level}
-                    label={verdictLabels[level]}
+                    label={t(`design.verdictLevels.${level}`)}
                   />
                 ))}
               </div>
-              <VerdiktBadge level="poor" label="Ringe kvalitet" score="38/100" />
+              <VerdiktBadge
+                level="poor"
+                label={t("design.demo.poorQuality")}
+                score="38/100"
+              />
             </div>
           </DualPanel>
         </Section>
 
         <Section
-          title="Kort, input & skeleton"
-          note="Card på surface med shadow-1 · Input med synligt label · pulserende Skeleton."
+          title={t("design.sections.cards")}
+          note={t("design.sections.cardsNote")}
         >
           <DualPanel>
             <div className="space-y-4">
               <Card>
                 <p className="text-body font-medium text-ink">
-                  Havregryn med mælk og banan
+                  {t("design.demo.foodName")}
                 </p>
-                <p className="text-caption text-tertiary">1 portion · 260 g</p>
+                <p className="text-caption text-tertiary">
+                  {t("design.demo.foodPortion")}
+                </p>
               </Card>
               <Input
                 id="demo-search"
-                label="Søg fødevare"
-                placeholder="fx havregryn"
-                hint="Søger på tværs af USDA, Frida og Open Food Facts"
+                label={t("design.demo.searchLabel")}
+                placeholder={t("design.demo.searchPlaceholder")}
+                hint={t("design.demo.searchHint")}
               />
               <Card>
                 <Skeleton className="mb-2 h-4 w-2/3" />
@@ -517,39 +556,39 @@ export function DesignPage() {
         </Section>
 
         <Section
-          title="Portionsvælger & faner"
-          note="Stepper med aria-live på værdien · Radix Tabs med piletast-navigation."
+          title={t("design.sections.stepper")}
+          note={t("design.sections.stepperNote")}
         >
           <DualPanel>
             <div className="space-y-6">
               <StepperDemo />
               <Tabs
-                listLabel="Periode"
+                listLabel={t("design.demo.periodLabel")}
                 items={[
                   {
                     value: "day",
-                    label: "Dag",
+                    label: t("design.demo.day"),
                     content: (
                       <p className="text-small text-secondary">
-                        Dagens overblik vises her.
+                        {t("design.demo.dayContent")}
                       </p>
                     ),
                   },
                   {
                     value: "week",
-                    label: "Uge",
+                    label: t("design.demo.week"),
                     content: (
                       <p className="text-small text-secondary">
-                        Ugens tendenser vises her.
+                        {t("design.demo.weekContent")}
                       </p>
                     ),
                   },
                   {
                     value: "month",
-                    label: "Måned",
+                    label: t("design.demo.month"),
                     content: (
                       <p className="text-small text-secondary">
-                        Månedens tendenser vises her.
+                        {t("design.demo.monthContent")}
                       </p>
                     ),
                   },
@@ -560,8 +599,8 @@ export function DesignPage() {
         </Section>
 
         <Section
-          title="Ark & toast"
-          note="Bund-ark med spring-fysik (Radix Dialog: Esc lukker, fokus fanges) · toast over fanebjælken. Begge følger sidens aktive tema — brug kontakten øverst."
+          title={t("design.sections.sheet")}
+          note={t("design.sections.sheetNote")}
         >
           <div className="flex flex-wrap gap-3 rounded-xl border border-hairline bg-bg p-6">
             <SheetDemo />
@@ -570,8 +609,8 @@ export function DesignPage() {
         </Section>
 
         <Section
-          title="App-skal"
-          note="BottomTabBar med central hævet ScanFAB — rammen her er galleriets telefon-preview."
+          title={t("design.sections.appshell")}
+          note={t("design.sections.appshellNote")}
         >
           <DualPanel>
             <AppShellDemo />
@@ -581,7 +620,7 @@ export function DesignPage() {
 
       <footer className="border-t border-hairline">
         <p className="mx-auto max-w-5xl px-6 py-6 text-caption text-tertiary">
-          Midlertidig side — fjernes når komponentgalleriet (0.3) tager over.
+          {t("design.footer")}
         </p>
       </footer>
     </div>

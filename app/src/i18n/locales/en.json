@@ -20,14 +20,7 @@
     "tagline": "Understand your food — no guilt, no judgement."
   },
   "home": {
-    "greeting": "Hi there",
-    "signedInAs": "Signed in as {{email}}",
-    "localeFact": "Language on your profile: {{locale}}",
-    "hideCaloriesOn": "Calorie numbers are hidden",
-    "hideCaloriesOff": "Calorie numbers are shown",
-    "designLink": "Design system →",
-    "loadingProfile": "Setting up your profile…",
-    "scanTeaser": "Tap the green button to scan your first product."
+    "designLink": "Design system"
   },
   "design": {
     "title": "Madro design system",
@@ -248,5 +241,29 @@
       "confirmRemove": "Yes, remove",
       "error": "Couldn't save — try again."
     }
+  },
+  "today": {
+    "title": "Today",
+    "profileButton": "Profile and settings",
+    "quality": {
+      "label": "not ultra-processed",
+      "veryClean": "A very clean day",
+      "clean": "A clean day so far",
+      "mixed": "A mixed day — perfectly fine",
+      "processed": "Today leans processed",
+      "empty": "No quality data for today's meals yet"
+    },
+    "caloriesHidden": "calories hidden",
+    "hideCalories": "Hide calorie numbers",
+    "showCalories": "Show calorie numbers",
+    "macros": "Macronutrients",
+    "protein": "Protein",
+    "carbs": "Carbs",
+    "fat": "Fat",
+    "microHint": "Micronutrition today",
+    "insightTeaser": "Weekly insights about your patterns and micronutrition are on the way.",
+    "comingSoon": "coming soon",
+    "logTitle": "Today's meals",
+    "empty": "No meals logged yet today."
   }
 }

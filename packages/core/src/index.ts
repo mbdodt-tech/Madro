@@ -19,6 +19,18 @@ export {
 export * from "./nutrients";
 
 export {
+  sumNutrients,
+  novaShare,
+  resolveTargets,
+  micronutrientCoverage,
+  MICRO_STRIP_KEYS,
+  type RollupEntry,
+  type NovaShare,
+  type MacroTargets,
+  type MicroCoverage,
+} from "./rollup/rollup";
+
+export {
   computeVerdict,
   verdictLevelFor,
   type VerdictInput,

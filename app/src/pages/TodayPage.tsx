@@ -1,0 +1,311 @@
+import {
+  MICRO_STRIP_KEYS,
+  micronutrientCoverage,
+  novaShare,
+  NUTRIENT_INFO,
+  resolveTargets,
+  sumNutrients,
+  type NutrientKey,
+} from "@madro/core";
+import {
+  Button,
+  Card,
+  Chip,
+  MacroRing,
+  MicroStrip,
+  QualityArc,
+  Sheet,
+  Skeleton,
+  useToast,
+} from "@madro/ui";
+import { Eye, EyeOff, Plus, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
+import { persistHideCalories, useProfile } from "../auth/useProfile";
+import { useSession } from "../auth/useSession";
+import { LanguageSwitch } from "../components/LanguageSwitch";
+import { TabShell } from "../components/TabShell";
+import { queryClient } from "../lib/queryClient";
+import { supabase } from "../lib/supabase";
+import { useReferences } from "../lib/useReferences";
+import { AddFoodSheet } from "./diary/AddFoodSheet";
+import { EntrySheet } from "./diary/EntrySheet";
+import { MealSections } from "./diary/MealSections";
+import { DIARY_KEY, useDiaryEntries, type DiaryEntry } from "./diary/useDiary";
+
+/** Korte søjle-labels til striben (grundstof-/vitaminforkortelser). */
+const MICRO_LETTERS: Partial<Record<NutrientKey, string>> = {
+  vitamin_d_ug: "D",
+  iron_mg: "Fe",
+  magnesium_mg: "Mg",
+  calcium_mg: "Ca",
+  potassium_mg: "K",
+  vitamin_b12_ug: "B12",
+  folate_ug: "Fo",
+  zinc_mg: "Zn",
+};
+
+function qualityCaptionKey(pct: number | null): string {
+  if (pct == null) return "today.quality.empty";
+  if (pct >= 85) return "today.quality.veryClean";
+  if (pct >= 65) return "today.quality.clean";
+  if (pct >= 45) return "today.quality.mixed";
+  return "today.quality.processed";
+}
+
+export function TodayPage() {
+  const { t, i18n } = useTranslation();
+  const { show } = useToast();
+  const { data: session } = useSession();
+  const { data: profile, isLoading: profileLoading } = useProfile();
+  const today = new Date();
+
+  const { data: entries, isLoading: entriesLoading } = useDiaryEntries(today);
+  const { data: referenceRows } = useReferences(profile?.rda_region ?? undefined);
+
+  const [editing, setEditing] = useState<DiaryEntry | null>(null);
+  const [adding, setAdding] = useState(false);
+  const [profileSheet, setProfileSheet] = useState(false);
+
+  const hideCalories = profile?.hide_calories ?? false;
+  const isLoading = entriesLoading || profileLoading;
+
+  // ---- Beregninger (alt i @madro/core) ----
+  const rollupEntries = (entries ?? []).map((e) => ({
+    nutriments: e.foods?.nutriments as Record<string, number> | null,
+    grams: Number(e.amount),
+  }));
+  const totals = sumNutrients(rollupEntries);
+  const share = novaShare(
+    (entries ?? []).map((e) => ({
+      novaGroup: e.foods?.nova_group,
+      grams: Number(e.amount),
+    })),
+  );
+  const targets = resolveTargets(
+    (profile?.goals as Record<string, unknown> | null) ?? null,
+    { sex: profile?.sex },
+  );
+  // Ukendt køn/alder → kvinde/35 som konservativ reference (højere jern-RDA
+  // viser lavere dækning frem for at oversælge den). Justeres i Profil senere.
+  const referenceProfile = {
+    sex: profile?.sex === "male" ? ("male" as const) : ("female" as const),
+    age: profile?.birth_year ? today.getFullYear() - profile.birth_year : 35,
+    region: profile?.rda_region ?? "DK",
+  };
+  const coverage = micronutrientCoverage(
+    totals,
+    referenceRows ?? [],
+    referenceProfile,
+    MICRO_STRIP_KEYS,
+  );
+  const microItems = coverage.map((c) => ({
+    key: c.key,
+    letter: MICRO_LETTERS[c.key] ?? c.key,
+    name:
+      i18n.language === "da"
+        ? NUTRIENT_INFO[c.key].labelDa
+        : NUTRIENT_INFO[c.key].labelEn,
+    pct: c.pct,
+  }));
+
+  const kcalNow = Math.round(totals.energy_kcal ?? 0);
+  const nf = new Intl.NumberFormat(i18n.language === "da" ? "da-DK" : "en-GB");
+
+  const dateLabel = new Intl.DateTimeFormat(
+    i18n.language === "da" ? "da-DK" : "en-GB",
+    { weekday: "long", day: "numeric", month: "long" },
+  ).format(today);
+
+  const refresh = () => queryClient.invalidateQueries({ queryKey: [DIARY_KEY] });
+  const initial = (session?.user.email ?? "M")[0]!.toUpperCase();
+
+  return (
+    <TabShell>
+      <main className="mx-auto flex max-w-md flex-col gap-5 px-6 py-8 font-sans">
+        {/* Header som mockuppen */}
+        <header className="flex items-start justify-between">
+          <div>
+            <p className="text-small text-secondary first-letter:uppercase">{dateLabel}</p>
+            <h1 className="text-display text-ink">{t("today.title")}</h1>
+          </div>
+          <button
+            type="button"
+            onClick={() => setProfileSheet(true)}
+            aria-label={t("today.profileButton")}
+            className="grid size-10 place-items-center rounded-pill bg-brand-tint text-small font-semibold text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+          >
+            {initial}
+          </button>
+        </header>
+
+        {/* Hero-kort */}
+        <Card>
+          {isLoading ? (
+            <div className="space-y-4" aria-label={t("common.loading")}>
+              <Skeleton className="mx-auto h-24 w-40" />
+              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-16 w-full" />
+            </div>
+          ) : (
+            <div className="space-y-5">
+              <QualityArc
+                pct={share?.pct ?? null}
+                label={t("today.quality.label")}
+                caption={t(qualityCaptionKey(share?.pct ?? null))}
+              />
+
+              {/* Kalorielinje m. øje-toggle (persisterer hide_calories) */}
+              <div className="flex items-center justify-center gap-2">
+                {hideCalories ? (
+                  <span className="text-small text-tertiary">
+                    {t("today.caloriesHidden")}
+                  </span>
+                ) : (
+                  <span className="font-mono text-body tabular-nums text-ink">
+                    <strong>{nf.format(kcalNow)}</strong> / {nf.format(targets.kcal)} kcal
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => void persistHideCalories(!hideCalories)}
+                  aria-pressed={hideCalories}
+                  aria-label={
+                    hideCalories ? t("today.showCalories") : t("today.hideCalories")
+                  }
+                  className="grid size-8 place-items-center rounded-pill text-tertiary hover:bg-brand-tint hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
+                >
+                  {hideCalories ? (
+                    <EyeOff className="size-4" aria-hidden="true" />
+                  ) : (
+                    <Eye className="size-4" aria-hidden="true" />
+                  )}
+                </button>
+              </div>
+
+              {/* Makroringe */}
+              <div
+                className="flex items-start justify-around"
+                role="group"
+                aria-label={t("today.macros")}
+              >
+                <MacroRing
+                  macro="protein"
+                  value={totals.protein_g ?? 0}
+                  target={targets.protein_g}
+                  label={t("today.protein")}
+                />
+                <MacroRing
+                  macro="carb"
+                  value={totals.carbohydrate_g ?? 0}
+                  target={targets.carbohydrate_g}
+                  label={t("today.carbs")}
+                />
+                <MacroRing
+                  macro="fat"
+                  value={totals.fat_g ?? 0}
+                  target={targets.fat_g}
+                  label={t("today.fat")}
+                />
+              </div>
+
+              {/* Mikronæringsstribe */}
+              <MicroStrip items={microItems} hint={t("today.microHint")} />
+            </div>
+          )}
+        </Card>
+
+        {/* Indsigtsteaser */}
+        <Card>
+          <div className="flex items-center gap-3">
+            <Sparkles className="size-5 shrink-0 text-brand" aria-hidden="true" />
+            <p className="flex-1 text-small text-secondary">{t("today.insightTeaser")}</p>
+            <Chip>{t("today.comingSoon")}</Chip>
+          </div>
+        </Card>
+
+        {/* Dagens log */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-h2 text-ink">{t("today.logTitle")}</h2>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => setAdding(true)}
+            aria-label={t("diary.add.title")}
+          >
+            <Plus className="size-4" aria-hidden="true" />
+            {t("diary.add.button")}
+          </Button>
+        </div>
+
+        {!isLoading && (entries?.length ?? 0) === 0 ? (
+          <div className="rounded-lg border border-hairline bg-surface px-5 py-8 text-center">
+            <p className="text-body text-secondary">{t("today.empty")}</p>
+            <p className="mt-1 text-small text-tertiary">{t("diary.emptyHint")}</p>
+          </div>
+        ) : (
+          <MealSections entries={entries ?? []} onEntryClick={setEditing} />
+        )}
+      </main>
+
+      {/* Avatar-ark: sprog, log ud, designsystem */}
+      <Sheet
+        open={profileSheet}
+        onOpenChange={(open) => {
+          if (!open) setProfileSheet(false);
+        }}
+        title={t("today.profileButton")}
+        showTitle
+      >
+        <div className="space-y-4">
+          <p className="truncate text-small text-tertiary">{session?.user.email}</p>
+          <div className="flex items-center justify-between">
+            <span className="text-body text-ink">{t("common.language")}</span>
+            <LanguageSwitch />
+          </div>
+          <div className="flex items-center justify-between">
+            <Link
+              className="text-small font-medium text-brand hover:text-brand-hover"
+              to="/design"
+              onClick={() => setProfileSheet(false)}
+            >
+              {t("home.designLink")}
+            </Link>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => void supabase.auth.signOut()}
+            >
+              {t("common.logout")}
+            </Button>
+          </div>
+        </div>
+      </Sheet>
+
+      {editing ? (
+        <EntrySheet
+          entry={editing}
+          onClose={() => setEditing(null)}
+          onChanged={(kind) => {
+            setEditing(null);
+            void refresh();
+            show(t(kind === "removed" ? "diary.removed" : "diary.updated"));
+          }}
+        />
+      ) : null}
+
+      {adding ? (
+        <AddFoodSheet
+          day={today}
+          onClose={() => setAdding(false)}
+          onLogged={() => {
+            setAdding(false);
+            void refresh();
+            show(t("portion.logged"));
+          }}
+        />
+      ) : null}
+    </TabShell>
+  );
+}

@@ -71,6 +71,17 @@ export function useProfile() {
   return query;
 }
 
+/** Slår kalorievisning til/fra (øje-toggle på "I dag") — optimistisk, som locale. */
+export async function persistHideCalories(hide: boolean): Promise<void> {
+  const { data } = await supabase.auth.getSession();
+  const userId = data.session?.user.id;
+  if (!userId) return;
+  queryClient.setQueryData<Profile | null>(PROFILE_KEY, (old) =>
+    old ? { ...old, hide_calories: hide } : old,
+  );
+  await supabase.from("profiles").update({ hide_calories: hide }).eq("id", userId);
+}
+
 /** Opdaterer profilens locale (fire-and-forget fra sprogskifteren). */
 export async function persistLocale(locale: string): Promise<void> {
   const { data } = await supabase.auth.getSession();

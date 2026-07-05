@@ -20,14 +20,7 @@
     "tagline": "Forstå din mad — uden skyld og løftede pegefingre."
   },
   "home": {
-    "greeting": "Hej",
-    "signedInAs": "Logget ind som {{email}}",
-    "localeFact": "Sprog på din profil: {{locale}}",
-    "hideCaloriesOn": "Kalorietal er skjult",
-    "hideCaloriesOff": "Kalorietal vises",
-    "designLink": "Designsystem →",
-    "loadingProfile": "Gør din profil klar…",
-    "scanTeaser": "Tryk på den grønne knap for at scanne din første vare."
+    "designLink": "Designsystem"
   },
   "design": {
     "title": "Madro designsystem",
@@ -248,5 +241,29 @@
       "confirmRemove": "Ja, fjern",
       "error": "Kunne ikke gemme — prøv igen."
     }
+  },
+  "today": {
+    "title": "I dag",
+    "profileButton": "Profil og indstillinger",
+    "quality": {
+      "label": "ikke-ultraforarbejdet",
+      "veryClean": "En meget ren dag",
+      "clean": "En ren dag indtil videre",
+      "mixed": "Blandet dag — helt okay",
+      "processed": "Dagen er tung på forarbejdet",
+      "empty": "Ingen kvalitetsdata for dagens måltider endnu"
+    },
+    "caloriesHidden": "kalorier skjult",
+    "hideCalories": "Skjul kalorietal",
+    "showCalories": "Vis kalorietal",
+    "macros": "Makronæringsstoffer",
+    "protein": "Protein",
+    "carbs": "Kulhydrat",
+    "fat": "Fedt",
+    "microHint": "Mikronæring i dag",
+    "insightTeaser": "Ugentlige indsigter om dine mønstre og mikronæring er på vej.",
+    "comingSoon": "kommer snart",
+    "logTitle": "Dagens måltider",
+    "empty": "Ingen måltider logget endnu i dag."
   }
 }

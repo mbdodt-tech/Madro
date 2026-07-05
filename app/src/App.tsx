@@ -2,10 +2,10 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { RequireAuth } from "./auth/RequireAuth";
 import { DesignPage } from "./pages/DesignPage";
 import { DiaryPage } from "./pages/DiaryPage";
-import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
 import { ProductPage } from "./pages/ProductPage";
 import { ScanPage } from "./pages/ScanPage";
+import { TodayPage } from "./pages/TodayPage";
 
 export function App() {
   return (
@@ -15,7 +15,7 @@ export function App() {
           path="/"
           element={
             <RequireAuth>
-              <HomePage />
+              <TodayPage />
             </RequireAuth>
           }
         />

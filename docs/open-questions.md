@@ -4,8 +4,9 @@ Uafklarede beslutninger fra plan-gennemgangen 2026-07-02. Hvert punkt har en eje
 
 ## Produkt
 
-- [ ] **De 8 mikronæringsstoffer i mikrostriben** (trin 1.6). Mockuppen bruger et foreløbigt sæt: D-vitamin, jern, magnesium, calcium, kalium, B12, folat, zink. Skal godkendes eller justeres.
-- [ ] **Verdikt-score-formlen** (trin 1.4). Aftalt proces: Claude foreslår en konkret vægtning af Nutri-Score + NOVA + additiver i `docs/scoring.md`; brugeren godkender før den shippes.
+- [x] **De 8 mikronæringsstoffer i mikrostriben** (afgjort 2026-07-05): mockup-sættet er godkendt — D-vitamin, jern, magnesium, calcium, kalium, B12, folat, zink (`MICRO_STRIP_KEYS` i `@madro/core`). "Se alle" folder fuld liste ud.
+- [x] **Standard-makromål** (afgjort 2026-07-05): NNR-forenklet efter køn — kvinde 2000 / mand 2500 / ukendt 2100 kcal, 20/50/30 E% → gram; overstyres felt for felt af profilens `goals`-jsonb (`resolveTargets` i `@madro/core`). Justeres i Profil-UI senere.
+- [x] **Verdikt-score-formlen** (afgjort 2026-07-05, se `docs/scoring.md`): 50 % Nutri-Score + 35 % NOVA + 15 % additiver, proportional omvægtning ved manglende data.
 - [ ] **Aldersgate** (Fase 0.5/onboarding). Minimumsalder (13 er dansk GDPR-samtykkealder; apps i dette felt vælger ofte højere) og hvad der sker ved afvisning.
 - [x] **Auth-omfang** (afgjort 2026-07-04): magic link (primær) + adgangskode (fallback). Ingen social login i beta — Google/Apple genovervejes før Fase 5 (App Store-kravet om Apple Sign-In gælder kun, hvis social login tilbydes).
 - [ ] **`hide_calories` default**: foreslået *fra* som standard, tilbydes som valg under onboarding.

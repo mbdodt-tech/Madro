@@ -12,8 +12,8 @@ Uafklarede beslutninger fra plan-gennemgangen 2026-07-02. Hvert punkt har en eje
 
 ## Data & jura
 
-- [ ] **Frida kommerciel licens** (gater trin 1.2). Byggeplanen kræver verifikation af DTU's vilkår for kommerciel brug før ingestion.
-- [ ] **ODbL share-alike** (gater trin 1.1). Vurdér om vores cachede OFF-afledte `foods`-tabel er en afledt database under ODbL, og hvad det forpligter til (attribution er allerede planlagt; share-alike er det åbne spørgsmål).
+- [x] **Frida kommerciel licens** (researchet 2026-07-05, se `docs/data.md`): fri brug med tydelig kildeangivelse; ingen kommerciel begrænsning i DTU's egne vilkår. Anbefalet ikke-blokerende forsigtighedstrin: bekræftelsesmail til fvdb@food.dtu.dk (**venter på brugeren**). Trin 1.2 er ikke blokeret.
+- [x] **ODbL share-alike** (researchet 2026-07-05, se `docs/data.md`): vores OFF-udsnit er en derivative database; share-alike opfyldes via "Om data"-side med transformationsbeskrivelse + dump på forespørgsel; §4.5(a) holder USDA/Frida/custom fri af share-alike, når rækker aldrig blandes på tværs af kilder. Trin 1.1 er ikke blokeret.
 - [ ] **RDA/NRV-autoritet** til `nutrient_references` (trin 1.2): EFSA DRV vs. NNR2023 (som Danmark følger) vs. EU-mærknings-NRV — og hvor maskinlæsbare værdier hentes.
 - [ ] **OFF-ingestion runtime** (trin 1.1): hvor kører det natlige job? Anbefaling: GitHub Action på schedule. Tjek Supabase-tier mod forventet tabelstørrelse for det nordiske udsnit.
 

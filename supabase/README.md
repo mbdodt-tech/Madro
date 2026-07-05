@@ -24,4 +24,11 @@ supabase db diff -f <navn> # generér ny migration efter skemaændringer
 
 ## Edge Functions
 
-Kommer i Fase 0.6 (`functions/ai` — eneste indgang til Anthropic API). CORS-template er obligatorisk for alle funktioner.
+`functions/ai` er **eneste indgang til Anthropic API** (CLAUDE.md-regel). Pipeline: CORS-preflight → auth (`getUser`) → zod-envelope `{ task, payload }` → rate-limit (20/min pr. bruger via `ai_requests`) → task-handler. Klienten kalder den via `callAi` fra `@madro/core` (`app/src/lib/ai.ts`).
+
+**Regler for alle nye funktioner:**
+- Brug altid `_shared/cors.ts` (OPTIONS-preflight + origin-allowlist). Tilføj nye domæner dér.
+- Log aldrig payload-indhold — kun task-navn, bruger-id og udfald (GDPR).
+- Anthropic-kald går gennem `_shared/anthropic.ts` (guardrails + JSON-validering). Kræver `ANTHROPIC_API_KEY` som secret (se `docs/env.md`).
+
+Deploy sker p.t. via MCP (`deploy_edge_function` med filerne `ai/index.ts` + `_shared/*`; `verify_jwt=false`, fordi funktionen selv auth'er og preflight skal virke). Med CLI: `supabase functions deploy ai --no-verify-jwt`.

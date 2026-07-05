@@ -14,7 +14,9 @@
     "usePassword": "Brug adgangskode i stedet",
     "passwordLabel": "Adgangskode",
     "signIn": "Log ind",
-    "error": "Det virkede ikke. Tjek dine oplysninger og prøv igen."
+    "error": "Det virkede ikke. Tjek dine oplysninger og prøv igen.",
+    "rateLimited": "For mange forsøg lige nu — vent et par minutter og prøv igen.",
+    "tagline": "Forstå din mad — uden skyld og løftede pegefingre."
   },
   "home": {
     "greeting": "Hej",
@@ -156,6 +158,68 @@
       "usda": "USDA",
       "frida": "Frida (DTU)",
       "custom": "Egen fødevare"
+    }
+  },
+  "verdict": {
+    "sheetTitle": "Scanresultat",
+    "openDetails": "Åbn produktdetaljer",
+    "insufficient": "Endnu ikke nok data til en verdikt",
+    "level": {
+      "excellent": "Fremragende kvalitet",
+      "good": "God kvalitet",
+      "mid": "Middel kvalitet",
+      "poor": "Ringe kvalitet",
+      "bad": "Meget ringe kvalitet"
+    },
+    "novaChip": "NOVA {{group}}",
+    "ultraProcessed": "ultraforarbejdet",
+    "additivesChip_one": "{{count}} additiv",
+    "additivesChip_other": "{{count}} additiver",
+    "per100g": "Pr. 100 g",
+    "protein": "protein",
+    "carbs": "kulhydrat",
+    "fat": "fedt",
+    "quality": {
+      "verified": "verificeret",
+      "crowdsourced": "crowdsourcet",
+      "user": "egen post"
+    },
+    "ateIt": "Jeg spiste det",
+    "showAlternative": "Vis bedre alternativ",
+    "comingSoon": "kommer snart"
+  },
+  "portion": {
+    "back": "Tilbage til resultat",
+    "howMuch": "Hvor meget spiste du?",
+    "less": "Mindre portion",
+    "more": "Større portion",
+    "mealLabel": "Måltid",
+    "meal": {
+      "breakfast": "Morgenmad",
+      "lunch": "Frokost",
+      "dinner": "Aftensmad",
+      "snack": "Snack"
+    },
+    "log": "Log måltid",
+    "logged": "Logget i din dagbog",
+    "error": "Kunne ikke gemme — prøv igen."
+  },
+  "product": {
+    "back": "Tilbage",
+    "notFound": "Varen blev ikke fundet.",
+    "whyHeading": "Bag verdikten",
+    "whyNova": "NOVA-gruppe {{group}} forarbejdningsgrad",
+    "whyNutri": "Nutri-Score {{grade}}",
+    "whyAdditives_one": "{{count}} registreret additiv",
+    "whyAdditives_other": "{{count}} registrerede additiver",
+    "ingredients": "Ingredienser",
+    "additives": "Additiver",
+    "nutritionHeading": "Næringsindhold",
+    "attribution": {
+      "off": "Data: Open Food Facts — under ODbL-licens (opendatacommons.org).",
+      "usda": "Data: USDA FoodData Central (public domain).",
+      "frida": "Data: Fødevaredata (FCDB v6.1, 2026), Fødevareinstituttet, DTU.",
+      "custom": "Din egen post."
     }
   }
 }

@@ -3,11 +3,20 @@ import { supabase } from "../lib/supabase";
 
 export type FoodHit = Pick<
   Tables<"foods">,
-  "id" | "name" | "brand" | "source" | "data_quality" | "nova_group" | "nutriscore" | "nutriments" | "image_url"
+  | "id"
+  | "name"
+  | "brand"
+  | "source"
+  | "data_quality"
+  | "nova_group"
+  | "nutriscore"
+  | "nutriments"
+  | "image_url"
+  | "additives"
 >;
 
 const FOOD_COLUMNS =
-  "id,name,brand,source,data_quality,nova_group,nutriscore,nutriments,image_url";
+  "id,name,brand,source,data_quality,nova_group,nutriscore,nutriments,image_url,additives";
 
 const QUALITY_PRIORITY: Record<string, number> = {
   verified: 0,
@@ -35,20 +44,26 @@ export async function lookupBarcode(barcode: string): Promise<FoodHit | null> {
   return hits[0] ?? null;
 }
 
+/** Registrér scanningen; returnerer scan-id'et til senere 'logged'-opdatering. */
 export async function recordScan(
   barcode: string,
   foodId: string | null,
-): Promise<void> {
+): Promise<string | null> {
   const { data } = await supabase.auth.getSession();
   const userId = data.session?.user.id;
-  if (!userId) return;
-  await supabase.from("scans").insert({
-    user_id: userId,
-    type: "barcode",
-    barcode,
-    food_id: foodId,
-    outcome: "checked",
-  });
+  if (!userId) return null;
+  const { data: row } = await supabase
+    .from("scans")
+    .insert({
+      user_id: userId,
+      type: "barcode",
+      barcode,
+      food_id: foodId,
+      outcome: "checked",
+    })
+    .select("id")
+    .single();
+  return row?.id ?? null;
 }
 
 /** Minimal navnesøgning til miss-tilstanden (fuld søgeside kommer i 1.5). */

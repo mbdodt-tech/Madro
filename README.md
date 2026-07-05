@@ -1,6 +1,10 @@
 # Madro
 
+[![CI](https://github.com/mbdodt-tech/Madro/actions/workflows/ci.yml/badge.svg)](https://github.com/mbdodt-tech/Madro/actions/workflows/ci.yml)
+
 Nutrition & food-quality app: product scanning (NOVA, additives, Nutri-Score via Open Food Facts) combined with full macro- and micronutrient tracking (USDA FoodData Central, Frida/DTU) in one unified profile.
+
+**Production:** https://madro.vercel.app (push to `main` deploys; PRs get preview URLs). Ops/env details in [docs/env.md](docs/env.md).
 
 The full build plan lives in [docs/byggeplan.md](docs/byggeplan.md); the step-by-step checklist in [docs/fase-tjekliste.md](docs/fase-tjekliste.md). The approved visual design mockup is in [docs/design/mockup/](docs/design/mockup/).
 

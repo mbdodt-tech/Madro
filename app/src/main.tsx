@@ -1,3 +1,4 @@
+import "./lib/sentry";
 import { ThemeProvider, ToastProvider } from "@madro/ui";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";

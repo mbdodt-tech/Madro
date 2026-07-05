@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { createScanner, type Scanner } from "../scanner/scanner";
 import {
   lookupBarcode,
+  lookupViaOff,
   recordScan,
   searchFoods,
   type FoodHit,
@@ -14,7 +15,7 @@ import { ResultSheet } from "./scan/ResultSheet";
 
 type Phase =
   | { kind: "scanning"; cameraError: boolean }
-  | { kind: "looking-up" }
+  | { kind: "looking-up"; deep: boolean }
   | { kind: "hit"; food: FoodHit; scanId: string | null }
   | { kind: "miss"; barcode: string; scanId: string | null };
 
@@ -36,9 +37,14 @@ export function ScanPage() {
     if (handledRef.current) return;
     handledRef.current = true;
     scannerRef.current?.stop();
-    setPhase({ kind: "looking-up" });
+    setPhase({ kind: "looking-up", deep: false });
     try {
-      const food = await lookupBarcode(barcode);
+      let food = await lookupBarcode(barcode);
+      if (!food) {
+        // Cache-miss → éngangs-fallback mod OFF (server-side, cacher varen).
+        setPhase({ kind: "looking-up", deep: true });
+        food = await lookupViaOff(barcode);
+      }
       const scanId = await recordScan(barcode, food?.id ?? null);
       setPhase(
         food
@@ -176,9 +182,16 @@ export function ScanPage() {
       <Sheet
         open={phase.kind === "looking-up"}
         onOpenChange={() => undefined}
-        title={t("scan.lookingUp")}
+        title={
+          phase.kind === "looking-up" && phase.deep
+            ? t("scan.lookingUpDeep")
+            : t("scan.lookingUp")
+        }
       >
-        <div className="space-y-3 py-2" aria-label={t("scan.lookingUp")}>
+        <div className="space-y-3 py-2" aria-live="polite">
+          {phase.kind === "looking-up" && phase.deep ? (
+            <p className="text-small text-secondary">{t("scan.lookingUpDeepBody")}</p>
+          ) : null}
           <Skeleton className="h-5 w-2/3" />
           <Skeleton className="h-4 w-1/3" />
         </div>

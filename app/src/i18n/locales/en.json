@@ -145,6 +145,8 @@
     "manualPlaceholder": "e.g. 5701979011107",
     "manualSubmit": "Look up",
     "lookingUp": "Looking up…",
+    "lookingUpDeep": "Searching Open Food Facts…",
+    "lookingUpDeepBody": "Not in our library yet — checking Open Food Facts and saving it for next time.",
     "foundTitle": "Product found",
     "verdictSoon": "verdict coming soon",
     "done": "Done",

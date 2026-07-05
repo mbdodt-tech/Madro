@@ -9,7 +9,7 @@ on:
         description: "Omfang"
         type: choice
         options: [denmark, nordic, full]
-        default: denmark
+        default: nordic
 
 jobs:
   ingest:
@@ -35,7 +35,7 @@ jobs:
         env:
           INGEST_DATABASE_URL: ${{ secrets.INGEST_DATABASE_URL }}
         run: |
-          SCOPE="${{ github.event.inputs.scope || 'denmark' }}"
+          SCOPE="${{ github.event.inputs.scope || 'nordic' }}"
           case "$SCOPE" in
             nordic) FLAG="--nordic" ;;
             full)   FLAG="--full" ;;

@@ -14,7 +14,9 @@
     "usePassword": "Use a password instead",
     "passwordLabel": "Password",
     "signIn": "Sign in",
-    "error": "That didn't work. Check your details and try again."
+    "error": "That didn't work. Check your details and try again.",
+    "rateLimited": "Too many attempts right now — wait a few minutes and try again.",
+    "tagline": "Understand your food — no guilt, no judgement."
   },
   "home": {
     "greeting": "Hi there",
@@ -156,6 +158,68 @@
       "usda": "USDA",
       "frida": "Frida (DTU)",
       "custom": "Own food"
+    }
+  },
+  "verdict": {
+    "sheetTitle": "Scan result",
+    "openDetails": "Open product details",
+    "insufficient": "Not enough data for a verdict yet",
+    "level": {
+      "excellent": "Excellent quality",
+      "good": "Good quality",
+      "mid": "Fair quality",
+      "poor": "Poor quality",
+      "bad": "Very poor quality"
+    },
+    "novaChip": "NOVA {{group}}",
+    "ultraProcessed": "ultra-processed",
+    "additivesChip_one": "{{count}} additive",
+    "additivesChip_other": "{{count}} additives",
+    "per100g": "Per 100 g",
+    "protein": "protein",
+    "carbs": "carbs",
+    "fat": "fat",
+    "quality": {
+      "verified": "verified",
+      "crowdsourced": "crowdsourced",
+      "user": "own entry"
+    },
+    "ateIt": "I ate it",
+    "showAlternative": "Show better alternative",
+    "comingSoon": "coming soon"
+  },
+  "portion": {
+    "back": "Back to result",
+    "howMuch": "How much did you have?",
+    "less": "Smaller portion",
+    "more": "Larger portion",
+    "mealLabel": "Meal",
+    "meal": {
+      "breakfast": "Breakfast",
+      "lunch": "Lunch",
+      "dinner": "Dinner",
+      "snack": "Snack"
+    },
+    "log": "Log meal",
+    "logged": "Logged in your diary",
+    "error": "Couldn't save — try again."
+  },
+  "product": {
+    "back": "Back",
+    "notFound": "Product not found.",
+    "whyHeading": "Behind the verdict",
+    "whyNova": "NOVA group {{group}} processing level",
+    "whyNutri": "Nutri-Score {{grade}}",
+    "whyAdditives_one": "{{count}} registered additive",
+    "whyAdditives_other": "{{count}} registered additives",
+    "ingredients": "Ingredients",
+    "additives": "Additives",
+    "nutritionHeading": "Nutrition",
+    "attribution": {
+      "off": "Data: Open Food Facts — licensed under ODbL (opendatacommons.org).",
+      "usda": "Data: USDA FoodData Central (public domain).",
+      "frida": "Data: Fødevaredata (FCDB v6.1, 2026), National Food Institute, DTU.",
+      "custom": "Your own entry."
     }
   }
 }

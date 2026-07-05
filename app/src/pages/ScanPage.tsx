@@ -1,4 +1,4 @@
-import { Button, Chip, Input, Sheet, Skeleton } from "@madro/ui";
+import { Button, Chip, Input, Sheet, Skeleton, useToast } from "@madro/ui";
 import { motion, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -10,16 +10,18 @@ import {
   searchFoods,
   type FoodHit,
 } from "../scanner/useLookup";
+import { ResultSheet } from "./scan/ResultSheet";
 
 type Phase =
   | { kind: "scanning"; cameraError: boolean }
   | { kind: "looking-up" }
-  | { kind: "hit"; food: FoodHit }
-  | { kind: "miss"; barcode: string };
+  | { kind: "hit"; food: FoodHit; scanId: string | null }
+  | { kind: "miss"; barcode: string; scanId: string | null };
 
 export function ScanPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { show } = useToast();
   const reduceMotion = useReducedMotion();
   const videoRef = useRef<HTMLVideoElement>(null);
   const scannerRef = useRef<Scanner | null>(null);
@@ -37,10 +39,14 @@ export function ScanPage() {
     setPhase({ kind: "looking-up" });
     try {
       const food = await lookupBarcode(barcode);
-      await recordScan(barcode, food?.id ?? null);
-      setPhase(food ? { kind: "hit", food } : { kind: "miss", barcode });
+      const scanId = await recordScan(barcode, food?.id ?? null);
+      setPhase(
+        food
+          ? { kind: "hit", food, scanId }
+          : { kind: "miss", barcode, scanId },
+      );
     } catch {
-      setPhase({ kind: "miss", barcode });
+      setPhase({ kind: "miss", barcode, scanId: null });
     }
   }, []);
 
@@ -178,41 +184,19 @@ export function ScanPage() {
         </div>
       </Sheet>
 
-      {/* Hit */}
-      <Sheet
-        open={phase.kind === "hit"}
-        onOpenChange={(open) => {
-          if (!open) close();
-        }}
-        title={t("scan.foundTitle")}
-      >
-        {phase.kind === "hit" ? (
-          <div className="space-y-4">
-            <div className="flex items-start gap-3">
-              {phase.food.image_url ? (
-                <img
-                  src={phase.food.image_url}
-                  alt=""
-                  className="size-14 flex-none rounded-md border border-hairline object-cover"
-                />
-              ) : null}
-              <div>
-                <h2 className="text-h2 text-ink">{phase.food.name}</h2>
-                {phase.food.brand ? (
-                  <p className="text-small text-secondary">{phase.food.brand}</p>
-                ) : null}
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Chip>{t(`scan.source.${phase.food.source}`)}</Chip>
-              <Chip tone="brand">{t("scan.verdictSoon")}</Chip>
-            </div>
-            <Button className="w-full" onClick={close}>
-              {t("scan.done")}
-            </Button>
-          </div>
-        ) : null}
-      </Sheet>
+      {/* Hit: fuldt verdikt-ark (1.4) */}
+      {phase.kind === "hit" ? (
+        <ResultSheet
+          food={phase.food}
+          scanId={phase.scanId}
+          open
+          onClose={close}
+          onLogged={() => {
+            show(t("portion.logged"));
+            close();
+          }}
+        />
+      ) : null}
 
       {/* Miss */}
       <Sheet
@@ -242,7 +226,13 @@ export function ScanPage() {
                     <li key={food.id}>
                       <button
                         type="button"
-                        onClick={() => setPhase({ kind: "hit", food })}
+                        onClick={() =>
+                          setPhase((p) =>
+                            p.kind === "miss"
+                              ? { kind: "hit", food, scanId: p.scanId }
+                              : p,
+                          )
+                        }
                         className="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left hover:bg-brand-tint focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand"
                       >
                         <span className="min-w-0">

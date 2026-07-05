@@ -18,6 +18,15 @@ export {
 
 export * from "./nutrients";
 
+export {
+  computeVerdict,
+  verdictLevelFor,
+  type VerdictInput,
+  type VerdictResult,
+  type VerdictComponent,
+  type VerdictLevel as CoreVerdictLevel,
+} from "./verdict/verdict";
+
 /**
  * Placeholder for @madro/core — proves workspace linking in Fase 0.1.
  * Real nutrient math, rollups and scoring arrive from Fase 1 onwards.

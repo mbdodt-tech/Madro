@@ -1,14 +1,10 @@
 import type { NutrientMap } from "@madro/core";
-import { Button, PortionsStepper, cn } from "@madro/ui";
+import { Button } from "@madro/ui";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useProfile } from "../../auth/useProfile";
+import { PortionForm } from "../../components/PortionForm";
 import type { FoodHit } from "../../scanner/useLookup";
-import { MEALS, defaultMeal, logMeal, type Meal } from "./logMeal";
-
-const STEP_GRAMS = 25;
-const MIN_GRAMS = 25;
-const MAX_GRAMS = 1000;
+import { defaultMeal, logMeal, type Meal } from "./logMeal";
 
 export function PortionStep({
   food,
@@ -22,8 +18,6 @@ export function PortionStep({
   onLogged: () => void;
 }) {
   const { t } = useTranslation();
-  const { data: profile } = useProfile();
-  const hideCalories = profile?.hide_calories ?? false;
 
   const [grams, setGrams] = useState(100);
   const [meal, setMeal] = useState<Meal>(() => defaultMeal(new Date().getHours()));
@@ -31,10 +25,6 @@ export function PortionStep({
   const [error, setError] = useState(false);
 
   const nutriments = (food.nutriments ?? {}) as NutrientMap;
-  const kcal =
-    nutriments.energy_kcal != null
-      ? Math.round((nutriments.energy_kcal * grams) / 100)
-      : null;
 
   const submit = async () => {
     setBusy(true);
@@ -67,34 +57,13 @@ export function PortionStep({
         </div>
       </div>
 
-      <PortionsStepper
-        valueLabel={`${grams} g`}
-        subLabel={!hideCalories && kcal != null ? `${kcal} kcal` : undefined}
-        onDecrease={() => setGrams((g) => Math.max(MIN_GRAMS, g - STEP_GRAMS))}
-        onIncrease={() => setGrams((g) => Math.min(MAX_GRAMS, g + STEP_GRAMS))}
-        decreaseLabel={t("portion.less")}
-        increaseLabel={t("portion.more")}
-        decreaseDisabled={grams <= MIN_GRAMS}
-        increaseDisabled={grams >= MAX_GRAMS}
+      <PortionForm
+        grams={grams}
+        meal={meal}
+        onGrams={setGrams}
+        onMeal={setMeal}
+        energyKcalPer100={nutriments.energy_kcal ?? null}
       />
-
-      <div className="flex flex-wrap gap-2" role="group" aria-label={t("portion.mealLabel")}>
-        {MEALS.map((m) => (
-          <button
-            key={m}
-            type="button"
-            onClick={() => setMeal(m)}
-            className={cn(
-              "rounded-pill px-4 py-2 text-small font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
-              meal === m
-                ? "bg-brand text-on-brand"
-                : "border border-hairline bg-surface text-secondary hover:bg-brand-tint hover:text-brand",
-            )}
-          >
-            {t(`portion.meal.${m}`)}
-          </button>
-        ))}
-      </div>
 
       {error ? (
         <p className="rounded-md bg-v-poor-tint px-4 py-3 text-small text-v-bad" role="alert">

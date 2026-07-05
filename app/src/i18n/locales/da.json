@@ -2,7 +2,8 @@
   "common": {
     "appName": "Madro",
     "logout": "Log ud",
-    "language": "Sprog"
+    "language": "Sprog",
+    "loading": "Indlæser…"
   },
   "auth": {
     "title": "Velkommen til Madro",
@@ -222,6 +223,30 @@
       "usda": "Data: USDA FoodData Central (public domain).",
       "frida": "Data: Fødevaredata (FCDB v6.1, 2026), Fødevareinstituttet, DTU.",
       "custom": "Din egen post."
+    }
+  },
+  "diary": {
+    "title": "Dagbog",
+    "today": "I dag",
+    "yesterday": "I går",
+    "prevDay": "Forrige dag",
+    "nextDay": "Næste dag",
+    "empty": "Ingen måltider logget denne dag.",
+    "emptyHint": "Scan en vare eller tilføj et måltid med plus-knappen.",
+    "updated": "Ændringen er gemt",
+    "removed": "Posten er fjernet",
+    "add": {
+      "button": "Tilføj",
+      "title": "Tilføj måltid",
+      "hint": "Søg i hele biblioteket — mærkevarer, råvarer og egne fødevarer."
+    },
+    "entry": {
+      "unknownFood": "Ukendt fødevare",
+      "save": "Gem ændringer",
+      "remove": "Fjern fra dagbogen",
+      "keep": "Behold",
+      "confirmRemove": "Ja, fjern",
+      "error": "Kunne ikke gemme — prøv igen."
     }
   }
 }

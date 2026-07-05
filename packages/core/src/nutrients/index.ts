@@ -12,6 +12,7 @@ export {
   ugToMg,
   gToMg,
   sodiumMgToSaltG,
+  scalePer100,
   roundNutrient,
   finalizeNutrients,
   KJ_PER_KCAL,

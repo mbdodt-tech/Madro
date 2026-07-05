@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { RequireAuth } from "./auth/RequireAuth";
 import { DesignPage } from "./pages/DesignPage";
+import { DiaryPage } from "./pages/DiaryPage";
 import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
 import { ProductPage } from "./pages/ProductPage";
@@ -15,6 +16,14 @@ export function App() {
           element={
             <RequireAuth>
               <HomePage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/diary"
+          element={
+            <RequireAuth>
+              <DiaryPage />
             </RequireAuth>
           }
         />

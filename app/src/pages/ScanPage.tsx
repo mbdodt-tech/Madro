@@ -80,16 +80,20 @@ export function ScanPage() {
     };
   }, [handleBarcode]);
 
+  // Sekvensnummer dropper forsinkede svar fra ældre søgninger (stale-race).
+  const searchSeq = useRef(0);
   const runSearch = async (value: string) => {
     setQuery(value);
+    const seq = ++searchSeq.current;
     if (value.trim().length < 2) {
       setResults(null);
       return;
     }
     try {
-      setResults(await searchFoods(value));
+      const hits = await searchFoods(value);
+      if (seq === searchSeq.current) setResults(hits);
     } catch {
-      setResults([]);
+      if (seq === searchSeq.current) setResults([]);
     }
   };
 

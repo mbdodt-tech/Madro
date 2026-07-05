@@ -3,6 +3,7 @@ import { RequireAuth } from "./auth/RequireAuth";
 import { DesignPage } from "./pages/DesignPage";
 import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
+import { ScanPage } from "./pages/ScanPage";
 
 export function App() {
   return (
@@ -13,6 +14,14 @@ export function App() {
           element={
             <RequireAuth>
               <HomePage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/scan"
+          element={
+            <RequireAuth>
+              <ScanPage />
             </RequireAuth>
           }
         />

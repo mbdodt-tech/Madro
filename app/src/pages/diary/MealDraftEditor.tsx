@@ -38,7 +38,8 @@ export function MealDraftEditor({
   day: Date;
   /** Sæt ved foto-flowet: scans-rækken markeres 'logged' ved log. */
   scanId?: string | null;
-  onLogged: () => void;
+  /** Får de endelige rækker med (3.4: fotoflowet gemmer rettelses-parret). */
+  onLogged: (rows: DraftRow[]) => void;
 }) {
   const { t, i18n } = useTranslation();
 
@@ -138,7 +139,7 @@ export function MealDraftEditor({
           consumedAt,
         });
       }
-      onLogged();
+      onLogged(rows);
     } catch {
       setError(t("portion.error"));
       setLogging(false);

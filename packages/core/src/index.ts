@@ -43,6 +43,12 @@ export {
 } from "./rollup/weekly";
 
 export {
+  buildCorrectionHints,
+  type CorrectionItem,
+  type CorrectionPair,
+} from "./ai-hints/hints";
+
+export {
   PORTION_UNITS,
   PORTION_UNIT_IDS,
   unitGrams,

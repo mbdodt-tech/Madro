@@ -45,7 +45,7 @@ export function InsightsPage() {
   const { t, i18n } = useTranslation();
   const { show } = useToast();
   const { data: profile } = useProfile();
-  const { weeklyInsights } = useEntitlements();
+  const { weeklyInsights, ready: entitlementsReady } = useEntitlements();
   const hideCalories = profile?.hide_calories ?? false;
 
   const weekStart = mondayOf(new Date());
@@ -214,7 +214,9 @@ export function InsightsPage() {
             </div>
 
             {/* AI-fortælling / teaser */}
-            {!weeklyInsights ? (
+            {!entitlementsReady ? (
+              <Skeleton className="h-24 w-full" />
+            ) : !weeklyInsights ? (
               <Card>
                 <div className="flex items-start gap-3">
                   <Sparkles className="mt-0.5 size-5 shrink-0 text-brand" aria-hidden="true" />

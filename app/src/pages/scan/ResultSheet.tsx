@@ -4,8 +4,11 @@ import { motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { Sparkles } from "lucide-react";
 import { useProfile } from "../../auth/useProfile";
+import { useEntitlements } from "../../payments/useEntitlements";
 import type { FoodHit } from "../../scanner/useLookup";
+import { AlternativesStep } from "./AlternativesStep";
 import { formatAdditive } from "./format";
 import { PortionStep } from "./PortionStep";
 
@@ -41,16 +44,23 @@ export function ResultSheet({
   open,
   onClose,
   onLogged,
+  onSwapFood,
 }: {
   food: FoodHit;
   scanId: string | null;
   open: boolean;
   onClose: () => void;
   onLogged: () => void;
+  /** Åbn et alternativs eget verdikt-ark (fase 2.5). */
+  onSwapFood?: (food: FoodHit) => void;
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [step, setStep] = useState<"verdict" | "portion">("verdict");
+  const { alternatives: hasAlternatives, ready: entitlementsReady } = useEntitlements();
+  const [step, setStep] = useState<"verdict" | "portion" | "alternatives">("verdict");
+  const [showPremiumHint, setShowPremiumHint] = useState(false);
+
+  const hasCategories = ((food.categories as string[] | null) ?? []).length > 0;
 
   const verdict = useMemo(
     () =>
@@ -147,18 +157,51 @@ export function ResultSheet({
             <Button className="w-full" onClick={() => setStep("portion")}>
               {t("verdict.ateIt")}
             </Button>
-            <Button variant="secondary" className="w-full" disabled>
+            <Button
+              variant="secondary"
+              className="w-full"
+              disabled={!hasCategories}
+              onClick={() => {
+                // Vent på entitlements — ellers ser premium-brugere
+                // fejlagtigt teaseren i et kort vindue efter load.
+                if (!entitlementsReady) return;
+                if (hasAlternatives) setStep("alternatives");
+                else setShowPremiumHint(true);
+              }}
+            >
               {t("verdict.showAlternative")}
-              <Chip tone="brand">{t("verdict.comingSoon")}</Chip>
             </Button>
+            {showPremiumHint ? (
+              <div className="flex items-start gap-3 rounded-lg border border-hairline bg-surface px-4 py-3">
+                <Sparkles className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden="true" />
+                <div className="space-y-1">
+                  <p className="text-small font-medium text-ink">
+                    {t("verdict.alternatives.premiumTitle")}
+                  </p>
+                  <p className="text-caption text-secondary">
+                    {t("verdict.alternatives.premiumBody")}
+                  </p>
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
-      ) : (
+      ) : step === "portion" ? (
         <PortionStep
           food={food}
           scanId={scanId}
           onBack={() => setStep("verdict")}
           onLogged={onLogged}
+        />
+      ) : (
+        <AlternativesStep
+          food={food}
+          scanId={scanId}
+          onBack={() => setStep("verdict")}
+          onPick={(alternative) => {
+            setStep("verdict");
+            onSwapFood?.(alternative);
+          }}
         />
       )}
     </Sheet>

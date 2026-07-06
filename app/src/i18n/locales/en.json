@@ -213,7 +213,16 @@
     },
     "ateIt": "I ate it",
     "showAlternative": "Show better alternative",
-    "comingSoon": "coming soon"
+    "comingSoon": "coming soon",
+    "alternatives": {
+      "back": "Back to result",
+      "title": "Better alternatives",
+      "subtitle": "Same category — higher quality",
+      "loading": "Finding alternatives that fit your week…",
+      "none": "This product actually holds up well in its category — we didn't find anything of higher quality.",
+      "premiumTitle": "Alternative suggestions are part of Premium",
+      "premiumBody": "Get 2-3 concrete products of higher quality, weighted by what you're missing this week."
+    }
   },
   "portion": {
     "back": "Back to result",

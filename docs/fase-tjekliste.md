@@ -190,7 +190,7 @@ Betalingsbeslutning: alt bygges færdigt mod en adapter — RevenueCat/Stripe-n�
 
 **Accept:** eksporten indeholder alle brugerens rækker; sletning efterlader 0 rækker overalt (SQL-bevis) og rører ikke andre brugere.
 
-### 4.3 Paywall + entitlements v2 (adapter)
+### 4.3 Paywall + entitlements v2 (adapter) (bygget 2026-07-06)
 
 > /premium-side i Instrumentet-design: sløret mikronæringsglimt, funktionsliste, 349 kr/år + 14 dages ærlig prøve, altid tydelig "Fortsæt gratis". useEntitlements v2 bag EntitlementsProvider-adapter (stub aktiv; RevenueCat-skelet klar til nøgler). Teasere linker til /premium.
 

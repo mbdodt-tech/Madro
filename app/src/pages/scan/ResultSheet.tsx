@@ -184,6 +184,13 @@ export function ResultSheet({
                   <p className="text-caption text-secondary">
                     {t("verdict.alternatives.premiumBody")}
                   </p>
+                  <button
+                    type="button"
+                    onClick={() => navigate("/premium")}
+                    className="text-caption font-medium text-brand hover:text-brand-hover"
+                  >
+                    {t("verdict.alternatives.seePremium")}
+                  </button>
                 </div>
               </div>
             ) : null}

@@ -269,7 +269,8 @@
       "loading": "Finding alternatives that fit your week…",
       "none": "This product actually holds up well in its category — we didn't find anything of higher quality.",
       "premiumTitle": "Alternative suggestions are part of Premium",
-      "premiumBody": "Get 2-3 concrete products of higher quality, weighted by what you're missing this week."
+      "premiumBody": "Get 2-3 concrete products of higher quality, weighted by what you're missing this week.",
+      "seePremium": "See Premium"
     }
   },
   "portion": {
@@ -396,7 +397,8 @@
     "comingSoon": "coming soon",
     "logTitle": "Today's meals",
     "empty": "No meals logged yet today.",
-    "activityIncluded": "incl. +{{active}} kcal from today's activity (reference {{base}})"
+    "activityIncluded": "incl. +{{active}} kcal from today's activity (reference {{base}})",
+    "premiumChip": "Premium"
   },
   "insights": {
     "title": "Insights",
@@ -413,7 +415,8 @@
     "generated": "This week's insight is ready",
     "premiumTitle": "Weekly insights are part of Premium",
     "premiumBody": "Get a weekly story about your patterns and concrete food ideas that close your micronutrient gaps.",
-    "premiumChip": "coming with Premium"
+    "premiumChip": "coming with Premium",
+    "seePremium": "See Premium"
   },
   "onboarding": {
     "welcomeTitle": "Welcome to Madro",
@@ -437,5 +440,27 @@
     "calorieNote": "Some people do best without numbers. If you hide them, the app focuses on quality and balance — and you can always change your mind in your profile.",
     "finish": "Done",
     "skip": "Skip"
+  },
+  "premium": {
+    "title": "Premium",
+    "back": "Back",
+    "glimpseHint": "Micronutrients today",
+    "glimpseLabel": "The full micronutrient depth",
+    "featuresLabel": "Premium features",
+    "featInsights": "Weekly pattern insights with concrete food ideas",
+    "featPhoto": "Photo-log your meals — the plate becomes entries",
+    "featText": "Write what you ate — the rest happens by itself",
+    "featAlternatives": "Better alternatives, weighted by what YOU lack",
+    "featWearables": "Wearable sync (arrives with the iOS/Android app)",
+    "featExport": "Reports and export of your trends",
+    "perYear": "DKK/yr",
+    "afterTrial": "After a {{days}}-day free trial",
+    "trialNote": "We'll let you know before the trial ends — no hidden renewals.",
+    "cta": "Start {{days}}-day free trial",
+    "betaNote": "Payments open at launch — everything else already works.",
+    "continueFree": "Continue for free",
+    "freeStays": "The free tier stays fully usable",
+    "alreadyTitle": "You have Premium",
+    "alreadyBody": "All features are unlocked. Thanks for being here."
   }
 }

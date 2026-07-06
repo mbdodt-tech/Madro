@@ -5,10 +5,11 @@ import {
   type NutrientMap,
   type WeeklyStats,
 } from "@madro/core";
-import { Button, Card, Chip, Skeleton, useToast } from "@madro/ui";
+import { Button, Card, Skeleton, useToast } from "@madro/ui";
 import { Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import {
   Bar,
   Cell,
@@ -44,6 +45,7 @@ function barColor(pct: number): string {
 export function InsightsPage() {
   const { t, i18n } = useTranslation();
   const { show } = useToast();
+  const navigate = useNavigate();
   const { data: profile } = useProfile();
   const { weeklyInsights, ready: entitlementsReady } = useEntitlements();
   const hideCalories = profile?.hide_calories ?? false;
@@ -226,14 +228,20 @@ export function InsightsPage() {
               <Card>
                 <div className="flex items-start gap-3">
                   <Sparkles className="mt-0.5 size-5 shrink-0 text-brand" aria-hidden="true" />
-                  <div className="space-y-1">
+                  <div className="space-y-2">
                     <p className="text-body font-medium text-ink">
                       {t("insights.premiumTitle")}
                     </p>
                     <p className="text-small text-secondary">
                       {t("insights.premiumBody")}
                     </p>
-                    <Chip>{t("insights.premiumChip")}</Chip>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => navigate("/premium")}
+                    >
+                      {t("insights.seePremium")}
+                    </Button>
                   </div>
                 </div>
               </Card>

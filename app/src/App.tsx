@@ -7,6 +7,7 @@ import { DiaryPage } from "./pages/DiaryPage";
 import { InsightsPage } from "./pages/InsightsPage";
 import { LoginPage } from "./pages/LoginPage";
 import { OnboardingPage } from "./pages/OnboardingPage";
+import { PremiumPage } from "./pages/PremiumPage";
 import { ProductPage } from "./pages/ProductPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { ScanPage } from "./pages/ScanPage";
@@ -31,6 +32,7 @@ export function App() {
         <Route path="/scan" element={<Protected><ScanPage /></Protected>} />
         <Route path="/product/:id" element={<Protected><ProductPage /></Protected>} />
         <Route path="/profile" element={<Protected><ProfilePage /></Protected>} />
+        <Route path="/premium" element={<Protected><PremiumPage /></Protected>} />
         {/* Onboarding kræver login, men naturligvis ikke gennemført onboarding */}
         <Route
           path="/onboarding"

@@ -1,13 +1,14 @@
 import { useProfile } from "../auth/useProfile";
+import { activeProvider } from "./provider";
 
 /**
  * Feature-gating-kontrakten (CLAUDE.md): ingen komponent tjekker
  * plan-navne, Stripe eller StoreKit direkte — kun disse capabilities.
- * Fase 4 kobler RevenueCat på bag PRÆCIS samme interface; indtil da
- * læses profiles.entitlement ('free' er default).
+ * Kilden er entitlements-adapteren (fase 4.3): stub nu, RevenueCat
+ * bag PRÆCIS samme interface når nøglerne findes.
  */
 export interface Entitlements {
-  /** false indtil profilen er indlæst — gate-beslutninger bør vente. */
+  /** false indtil kilden er indlæst — gate-beslutninger bør vente. */
   ready: boolean;
   /** Ugentlige AI-indsigter (fase 2.4). */
   weeklyInsights: boolean;
@@ -19,11 +20,11 @@ export interface Entitlements {
 
 export function useEntitlements(): Entitlements {
   const { data: profile } = useProfile();
-  const premium = profile?.entitlement === "premium";
+  const snapshot = activeProvider(profile);
   return {
-    ready: profile != null,
-    premium,
-    weeklyInsights: premium,
-    alternatives: premium,
+    ready: snapshot.ready,
+    premium: snapshot.premium,
+    weeklyInsights: snapshot.premium,
+    alternatives: snapshot.premium,
   };
 }

@@ -267,14 +267,18 @@ export function TodayPage() {
           </Panel>
         )}
 
-        {/* Indsigtsteaser — tintet mellemtrin mellem panel og hvide kort */}
-        <div className="rounded-xl bg-brand-tint p-4">
+        {/* Indsigtsteaser — tintet mellemtrin; linker til paywallen (4.3) */}
+        <button
+          type="button"
+          onClick={() => navigate("/premium")}
+          className="rounded-xl bg-brand-tint p-4 text-left transition-[filter] hover:brightness-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+        >
           <div className="flex items-center gap-3">
             <Sparkles className="size-5 shrink-0 text-brand" aria-hidden="true" />
             <p className="flex-1 text-small text-secondary">{t("today.insightTeaser")}</p>
-            <Chip>{t("today.comingSoon")}</Chip>
+            <Chip>{t("today.premiumChip")}</Chip>
           </div>
-        </div>
+        </button>
 
         {/* Dagens log */}
         <div className="flex items-center justify-between">

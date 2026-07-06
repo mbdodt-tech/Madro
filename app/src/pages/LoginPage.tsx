@@ -50,10 +50,10 @@ export function LoginPage() {
 
   return (
     <main className="relative flex min-h-screen flex-col bg-bg font-sans">
-      {/* Blød brand-glød øverst */}
+      {/* Blød brand-glød øverst — samme dis som på "I dag" */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-gradient-to-b from-brand-tint to-transparent"
+        className="page-hero-wash pointer-events-none absolute inset-x-0 top-0 h-96"
       />
 
       <header className="relative z-10 flex justify-end px-6 pt-6">
@@ -63,8 +63,9 @@ export function LoginPage() {
       <div className="relative z-10 mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-6 pb-24">
         {/* Brand-mærke */}
         <div className="mb-8 flex flex-col items-center text-center">
-          <div className="mb-5 grid size-16 place-items-center rounded-lg bg-brand shadow-fab">
-            <span className="text-h1 font-semibold text-on-brand">M</span>
+          {/* Brandmærket som lille instrumentplade — signaturen møder én ved døren */}
+          <div className="panel-surface mb-5 grid size-16 place-items-center rounded-lg shadow-panel">
+            <span className="glow-reading font-mono text-h1 font-semibold text-lume">M</span>
           </div>
           <h1 className="text-display text-ink">{t("auth.title")}</h1>
           <p className="mt-1 text-body text-secondary">{t("auth.subtitle")}</p>

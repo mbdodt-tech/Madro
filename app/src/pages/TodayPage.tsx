@@ -269,7 +269,7 @@ export function TodayPage() {
         {isError ? (
           <ErrorState onRetry={retry} />
         ) : !isLoading && (entries?.length ?? 0) === 0 ? (
-          <div className="rounded-lg border border-hairline bg-surface px-5 py-8 text-center">
+          <div className="rounded-lg border border-card-edge bg-surface px-5 py-8 text-center shadow-1">
             <p className="text-body text-secondary">{t("today.empty")}</p>
             <p className="mt-1 text-small text-tertiary">{t("diary.emptyHint")}</p>
           </div>

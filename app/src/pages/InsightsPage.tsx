@@ -140,7 +140,10 @@ export function InsightsPage() {
     <TabShell>
       <main className="mx-auto flex max-w-md flex-col gap-5 px-6 py-8 font-sans">
         <header>
-          <p className="text-small text-secondary first-letter:uppercase">{weekLabel}</p>
+          {/* Graveret uge-eyebrow — samme mønster som datoen på "I dag" */}
+          <p className="text-caption font-semibold uppercase tracking-widest text-tertiary">
+            {weekLabel}
+          </p>
           <h1 className="text-display text-ink">{t("insights.title")}</h1>
         </header>
 
@@ -187,30 +190,33 @@ export function InsightsPage() {
               </div>
             </Card>
 
-            {/* Nøgletal */}
+            {/* Nøgletal — mini-instrumentaflæsninger (som MacroLine på scan-arket);
+                kvaliteten er den ene lysende aflæsning */}
             <div className="grid grid-cols-3 gap-3">
-              <Card className="text-center">
-                <p className="font-mono text-h2 tabular-nums text-ink">{stats.daysLogged}</p>
-                <p className="text-caption text-tertiary">{t("insights.daysLogged")}</p>
-              </Card>
-              <Card className="text-center">
-                <p className="font-mono text-h2 tabular-nums text-ink">
+              <div className="panel-surface rounded-md px-2 py-3 text-center shadow-panel">
+                <p className="font-mono text-h2 tabular-nums text-panel-ink">
+                  {stats.daysLogged}
+                </p>
+                <p className="mt-0.5 text-caption font-semibold uppercase tracking-widest text-panel-dim">
+                  {t("insights.daysLogged")}
+                </p>
+              </div>
+              <div className="panel-surface rounded-md px-2 py-3 text-center shadow-panel">
+                <p className="glow-reading font-mono text-h2 tabular-nums text-lume">
                   {stats.avgNovaShare != null ? `${stats.avgNovaShare}%` : "–"}
                 </p>
-                <p className="text-caption text-tertiary">{t("insights.avgQuality")}</p>
-              </Card>
-              <Card className="text-center">
-                {hideCalories ? (
-                  <p className="font-mono text-h2 tabular-nums text-ink">·</p>
-                ) : (
-                  <p className="font-mono text-h2 tabular-nums text-ink">
-                    {stats.avgKcal ?? "–"}
-                  </p>
-                )}
-                <p className="text-caption text-tertiary">
+                <p className="mt-0.5 text-caption font-semibold uppercase tracking-widest text-panel-dim">
+                  {t("insights.avgQuality")}
+                </p>
+              </div>
+              <div className="panel-surface rounded-md px-2 py-3 text-center shadow-panel">
+                <p className="font-mono text-h2 tabular-nums text-panel-ink">
+                  {hideCalories ? "·" : (stats.avgKcal ?? "–")}
+                </p>
+                <p className="mt-0.5 text-caption font-semibold uppercase tracking-widest text-panel-dim">
                   {hideCalories ? t("insights.hidden") : t("insights.avgKcal")}
                 </p>
-              </Card>
+              </div>
             </div>
 
             {/* AI-fortælling / teaser */}

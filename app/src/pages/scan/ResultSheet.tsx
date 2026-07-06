@@ -30,10 +30,13 @@ function MacroLine({ nutriments }: { nutriments: NutrientMap }) {
   macro("fat_g", t("verdict.fat"));
 
   if (parts.length === 0) return null;
+  // Mini-instrumentpanel — samme signaturflade som "I dag"-heroen.
   return (
-    <div className="rounded-md border border-hairline bg-bg px-4 py-3">
-      <p className="text-caption font-medium text-tertiary">{t("verdict.per100g")}</p>
-      <p className="font-mono text-small text-ink">{parts.join(" · ")}</p>
+    <div className="panel-surface rounded-md px-4 py-3 text-panel-ink shadow-panel">
+      <p className="text-caption font-semibold uppercase tracking-widest text-panel-dim">
+        {t("verdict.per100g")}
+      </p>
+      <p className="mt-1 font-mono text-small">{parts.join(" · ")}</p>
     </div>
   );
 }

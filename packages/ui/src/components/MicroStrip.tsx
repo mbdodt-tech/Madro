@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { cn } from "./cn";
 
-/** Dækningsfarver fra mockuppen (cov-high/mid/low). */
+/** Dækningsfarver på panelet (lysende sæt — ens i begge tilstande). */
 function coverageClass(pct: number | null): string {
-  if (pct == null) return "bg-hairline";
-  if (pct >= 80) return "bg-v-excellent";
-  if (pct >= 50) return "bg-v-mid";
-  return "bg-v-poor";
+  if (pct == null) return "bg-panel-track";
+  if (pct >= 80) return "bg-lume";
+  if (pct >= 50) return "bg-panel-mid";
+  return "bg-panel-low";
 }
 
 export interface MicroStripItem {
@@ -27,8 +27,8 @@ export interface MicroStripProps {
 }
 
 /**
- * Mikronæringsstriben: 8 små søjler farvet efter dækning; tryk folder
- * den fulde liste ud, sorteret efter laveste dækning (Cronometer-dybden).
+ * Mikronæringsstriben på instrumentpanelet: 8 små lysende søjler; tryk
+ * folder den fulde liste ud, sorteret efter laveste dækning.
  */
 export function MicroStrip({ items, hint, className }: MicroStripProps) {
   const [open, setOpen] = useState(false);
@@ -38,17 +38,17 @@ export function MicroStrip({ items, hint, className }: MicroStripProps) {
   );
 
   return (
-    <div className={className}>
+    <div className={cn("border-t border-panel-track pt-3", className)}>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="w-full rounded-lg px-2 py-2 text-left hover:bg-brand-tint focus-visible:outline-2 focus-visible:outline-brand"
+        className="w-full rounded-lg px-2 py-1 text-left focus-visible:outline-2 focus-visible:outline-lume"
       >
         <div className="flex items-end justify-between gap-2" aria-hidden="true">
           {items.map((item) => (
-            <div key={item.key} className="flex flex-1 flex-col items-center gap-1">
-              <span className="relative block h-7 w-1.5 overflow-hidden rounded-pill bg-hairline">
+            <div key={item.key} className="flex flex-1 flex-col items-center gap-1.5">
+              <span className="relative block h-7 w-1 overflow-hidden rounded-pill bg-panel-track">
                 <span
                   className={cn(
                     "absolute inset-x-0 bottom-0 rounded-pill",
@@ -57,11 +57,13 @@ export function MicroStrip({ items, hint, className }: MicroStripProps) {
                   style={{ height: `${Math.min(item.pct ?? 0, 100)}%` }}
                 />
               </span>
-              <span className="font-mono text-caption text-tertiary">{item.letter}</span>
+              <span className="font-mono text-caption font-medium text-panel-dim">
+                {item.letter}
+              </span>
             </div>
           ))}
         </div>
-        <span className="mt-2 flex items-center justify-center gap-1 text-caption text-secondary">
+        <span className="mt-2 flex items-center justify-center gap-1 text-caption font-semibold uppercase tracking-widest text-panel-dim">
           {hint}
           <svg
             viewBox="0 0 24 24"
@@ -79,13 +81,13 @@ export function MicroStrip({ items, hint, className }: MicroStripProps) {
       </button>
 
       {open ? (
-        <ul className="mt-2 space-y-2">
+        <ul className="mt-3 space-y-2.5">
           {sorted.map((item) => (
             <li key={item.key} className="flex items-center gap-3">
-              <span className="w-24 shrink-0 truncate text-small text-ink">
+              <span className="w-24 shrink-0 truncate text-small text-panel-ink">
                 {item.name}
               </span>
-              <span className="relative block h-1.5 flex-1 overflow-hidden rounded-pill bg-hairline">
+              <span className="relative block h-1 flex-1 overflow-hidden rounded-pill bg-panel-track">
                 <span
                   className={cn(
                     "absolute inset-y-0 left-0 rounded-pill",
@@ -94,7 +96,7 @@ export function MicroStrip({ items, hint, className }: MicroStripProps) {
                   style={{ width: `${Math.min(item.pct ?? 0, 100)}%` }}
                 />
               </span>
-              <span className="w-12 shrink-0 text-right font-mono text-caption tabular-nums text-secondary">
+              <span className="w-12 shrink-0 text-right font-mono text-caption tabular-nums text-panel-dim">
                 {item.pct != null ? `${item.pct} %` : "–"}
               </span>
             </li>

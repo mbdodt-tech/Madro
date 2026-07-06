@@ -12,6 +12,7 @@ import {
   Chip,
   MacroRing,
   MicroStrip,
+  Panel,
   QualityArc,
   Sheet,
   Skeleton,
@@ -137,10 +138,12 @@ export function TodayPage() {
   return (
     <TabShell>
       <main className="mx-auto flex max-w-md flex-col gap-5 px-6 py-8 font-sans">
-        {/* Header som mockuppen */}
+        {/* Header: graveret dato-eyebrow over titlen ("Instrumentet") */}
         <header className="flex items-start justify-between">
           <div>
-            <p className="text-small text-secondary first-letter:uppercase">{dateLabel}</p>
+            <p className="text-caption font-semibold uppercase tracking-widest text-tertiary">
+              {dateLabel}
+            </p>
             <h1 className="text-display text-ink">{t("today.title")}</h1>
           </div>
           <button
@@ -153,17 +156,21 @@ export function TodayPage() {
           </button>
         </header>
 
-        {/* Hero-kort */}
-        <Card>
-          {isLoading ? (
+        {/* Instrumentpanelet — signaturen ("Instrumentet", 2026-07-06) */}
+        {isLoading ? (
+          <Card>
             <div className="space-y-4" aria-label={t("common.loading")}>
               <Skeleton className="mx-auto h-24 w-40" />
               <Skeleton className="h-4 w-1/2" />
               <Skeleton className="h-16 w-full" />
             </div>
-          ) : isError ? (
+          </Card>
+        ) : isError ? (
+          <Card>
             <ErrorState onRetry={retry} />
-          ) : (
+          </Card>
+        ) : (
+          <Panel>
             <div className="space-y-5">
               <QualityArc
                 pct={sharePct}
@@ -174,12 +181,15 @@ export function TodayPage() {
               {/* Kalorielinje m. øje-toggle (persisterer hide_calories) */}
               <div className="flex items-center justify-center gap-2">
                 {hideCalories ? (
-                  <span className="text-small text-tertiary">
+                  <span className="text-small text-panel-dim">
                     {t("today.caloriesHidden")}
                   </span>
                 ) : (
-                  <span className="font-mono text-body tabular-nums text-ink">
-                    <strong>{nf.format(kcalNow)}</strong> / {nf.format(targets.kcal)} kcal
+                  <span className="font-mono text-body tabular-nums text-panel-dim">
+                    <strong className="text-h2 font-medium text-panel-ink">
+                      {nf.format(kcalNow)}
+                    </strong>{" "}
+                    / {nf.format(targets.kcal)} kcal
                   </span>
                 )}
                 <button
@@ -189,7 +199,7 @@ export function TodayPage() {
                   aria-label={
                     hideCalories ? t("today.showCalories") : t("today.hideCalories")
                   }
-                  className="grid size-8 place-items-center rounded-pill text-tertiary hover:bg-brand-tint hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
+                  className="grid size-8 place-items-center rounded-pill text-panel-dim hover:text-panel-ink focus-visible:outline-2 focus-visible:outline-lume"
                 >
                   {hideCalories ? (
                     <EyeOff className="size-4" aria-hidden="true" />
@@ -228,8 +238,8 @@ export function TodayPage() {
               {/* Mikronæringsstribe */}
               <MicroStrip items={microItems} hint={t("today.microHint")} />
             </div>
-          )}
-        </Card>
+          </Panel>
+        )}
 
         {/* Indsigtsteaser */}
         <Card>

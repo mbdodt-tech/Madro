@@ -14,20 +14,35 @@
 /* Mørk tilstand via class-strategi (fase-tjekliste 0.2) */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* ---------- Rå tokens: lys tilstand (§3.2) ---------- */
+/* ---------- Rå tokens: lys tilstand (§3.2 + "Instrumentet" 2026-07-06) ---------- */
 :root {
-  --bg: #fbfbf9;
+  --bg: #f4f2ec; /* papir — en anelse dybere, så hvide kort løfter sig */
   --surface: #ffffff;
   --surface-raised: #ffffff;
-  --ink: #16201c;
-  --text-secondary: #5b665f;
-  --text-tertiary: #8a938c;
+  --ink: #14201a;
+  --text-secondary: #56635c;
+  --text-tertiary: #86928b;
   --brand: #0e7a5e;
+  --brand-raise: #14926f; /* gradient-top på primærknapper/FAB */
   --brand-hover: #0b6650;
   --brand-tint: #e7f2ed;
   --accent: #e8a13a;
-  --hairline: rgba(20, 30, 25, 0.08);
+  --hairline: rgba(16, 32, 26, 0.1);
   --on-brand: #ffffff;
+  --card-edge: transparent; /* lys: skygge løfter, ingen kant */
+
+  /* Instrumentpanelet — signaturen (mørk evergreen i BEGGE tilstande) */
+  --panel: #0c2b22;
+  --panel-edge: #123528;
+  --panel-ink: #e9f2ed;
+  --panel-dim: #8fa89d;
+  --panel-track: rgba(233, 242, 237, 0.13);
+  /* Aflæsningsfarver på panelet — lysende, ens i begge tilstande */
+  --lume: #3dd6a3;
+  --panel-carb: #e8b05c;
+  --panel-fat: #8fa9c9;
+  --panel-mid: #e0a63c;
+  --panel-low: #e88e6c;
 
   /* Verdikt-skala (afdæmpet, ikke alarmerende) */
   --v-excellent: #2fa36b;
@@ -42,26 +57,34 @@
   --macro-carb: #e8a13a;
   --macro-fat: #6e87a8;
 
-  /* Dybde (§3.4): subtile, lagdelte skygger i lys tilstand */
-  --shadow-card: 0 1px 3px rgba(20, 30, 25, 0.06);
-  --shadow-sheet: 0 -8px 32px rgba(20, 30, 25, 0.14);
-  --shadow-fab: 0 4px 14px rgba(14, 122, 94, 0.35);
+  /* Dybde (§3.4): to-lags bløde skygger i lys tilstand */
+  --shadow-card: 0 1px 2px rgba(16, 32, 26, 0.05), 0 6px 18px rgba(16, 32, 26, 0.07);
+  --shadow-sheet: 0 -8px 32px rgba(16, 32, 26, 0.14);
+  --shadow-fab: 0 10px 24px rgba(14, 122, 94, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  --shadow-panel: inset 0 1px 0 rgba(233, 242, 237, 0.08), 0 14px 34px rgba(9, 26, 20, 0.35);
+  --shadow-btn: 0 8px 20px rgba(14, 122, 94, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 /* ---------- Rå tokens: mørk tilstand (§3.2, førsteklasses) ---------- */
 .dark {
-  --bg: #0c1210;
+  --bg: #0a0f0d;
   --surface: #131b18;
   --surface-raised: #1a2420;
   --ink: #eaf0ec;
   --text-secondary: #9aa6a0;
   --text-tertiary: #6e7a74;
   --brand: #35c495;
+  --brand-raise: #3ecd9d;
   --brand-hover: #4ad0a4;
   --brand-tint: #12241e;
   --accent: #e8a13a;
   --hairline: rgba(234, 240, 236, 0.09);
-  --on-brand: #0c1210;
+  --on-brand: #08130f;
+  --card-edge: var(--hairline); /* mørk: fladelyshed + hårlinje, ingen skygge */
+
+  /* Panelet smelter sammen med den mørke flade via lysere kant */
+  --panel: #10231c;
+  --panel-edge: #1a3529;
 
   /* Verdikt løftet ca. 8-10 % i lyshed */
   --v-excellent: #3db97d;
@@ -78,7 +101,9 @@
   /* Mørk: fladelyshed + hårlinjer frem for skygge (§3.4) */
   --shadow-card: 0 0 0 0 transparent;
   --shadow-sheet: 0 -8px 32px rgba(0, 0, 0, 0.5);
-  --shadow-fab: 0 4px 14px rgba(53, 196, 149, 0.28);
+  --shadow-fab: 0 10px 26px rgba(53, 196, 149, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  --shadow-panel: inset 0 1px 0 rgba(233, 242, 237, 0.07), 0 10px 26px rgba(0, 0, 0, 0.5);
+  --shadow-btn: 0 8px 20px rgba(53, 196, 149, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.28);
 
   color-scheme: dark;
 }
@@ -114,6 +139,10 @@
   --text-caption: 0.75rem;
   --text-caption--line-height: 1rem;
   --text-caption--font-weight: 500;
+  /* Instrument-aflæsning: det store mono-tal på panelet ("Instrumentet") */
+  --text-reading: 2.625rem;
+  --text-reading--line-height: 1;
+  --text-reading--font-weight: 500;
 
   /* Radius-skala (§3.4): sm 10, md 14, lg 18, xl 24, pill */
   --radius-sm: 10px;
@@ -166,14 +195,50 @@
   --color-macro-carb: var(--macro-carb);
   --color-macro-fat: var(--macro-fat);
 
+  /* Instrumentpanelet */
+  --color-panel: var(--panel);
+  --color-panel-edge: var(--panel-edge);
+  --color-panel-ink: var(--panel-ink);
+  --color-panel-dim: var(--panel-dim);
+  --color-panel-track: var(--panel-track);
+  --color-lume: var(--lume);
+  --color-panel-carb: var(--panel-carb);
+  --color-panel-fat: var(--panel-fat);
+  --color-panel-mid: var(--panel-mid);
+  --color-panel-low: var(--panel-low);
+  --color-brand-raise: var(--brand-raise);
+  --color-card-edge: var(--card-edge);
+
   /* Dybde */
   --shadow-1: var(--shadow-card);
   --shadow-sheet: var(--shadow-sheet);
   --shadow-fab: var(--shadow-fab);
+  --shadow-panel: var(--shadow-panel);
+  --shadow-btn: var(--shadow-btn);
 }
 
 /* Sørg for at Tailwind også scanner ui-pakkens komponenter for klasser */
 @source "../";
+
+/* ---------- Instrument-utilities (token-baserede — ingen hex udenfor) ---------- */
+@layer utilities {
+  /* Panelets stof: svag lume-dis foroven + lodret kant-til-flade-gradient */
+  .panel-surface {
+    background:
+      radial-gradient(120% 90% at 50% -20%, rgba(61, 214, 163, 0.09), transparent 60%),
+      linear-gradient(180deg, var(--panel-edge), var(--panel) 42%);
+  }
+
+  /* Primærknappens stof: diskret lodret gradient (toplys ligger i shadow-btn) */
+  .btn-brand-surface {
+    background: linear-gradient(180deg, var(--brand-raise), var(--brand));
+  }
+
+  /* Glød på aflæsninger — currentColor-baseret, følger elementets farve */
+  .glow-reading {
+    filter: drop-shadow(0 0 6px color-mix(in srgb, currentColor 50%, transparent));
+  }
+}
 
 /* ---------- Basis ---------- */
 @layer base {

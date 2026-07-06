@@ -108,8 +108,8 @@ export function ScanFab({ onClick, label, icon }: ScanFabProps) {
       whileTap={reduceMotion ? undefined : { scale: 0.94 }}
       transition={spring}
       className={cn(
-        "absolute bottom-1.5 grid size-15 place-items-center rounded-pill bg-brand text-on-brand shadow-fab",
-        "hover:bg-brand-hover transition-colors",
+        "absolute bottom-1.5 grid size-15 place-items-center rounded-pill btn-brand-surface text-on-brand shadow-fab",
+        "transition-[filter] hover:brightness-105",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
       )}
     >

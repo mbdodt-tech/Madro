@@ -8,6 +8,7 @@ import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { persistHideCalories, persistProfileFields, useProfile } from "../auth/useProfile";
 import { useSession } from "../auth/useSession";
 import { LanguageSwitch } from "../components/LanguageSwitch";
+import { PillGroup } from "../components/PillGroup";
 import { TabShell } from "../components/TabShell";
 import { supabase } from "../lib/supabase";
 import {
@@ -34,47 +35,6 @@ function SectionLabel({ children }: { children: string }) {
     <p className="text-caption font-semibold uppercase tracking-widest text-tertiary">
       {children}
     </p>
-  );
-}
-
-/** Pillegruppe til få gensidigt udelukkende valg (mønster fra PortionForm). */
-function PillGroup({
-  label,
-  options,
-  value,
-  onChange,
-}: {
-  label: string;
-  options: { id: string; label: string }[];
-  value: string | null;
-  onChange: (id: string) => void;
-}) {
-  return (
-    <div role="radiogroup" aria-label={label} className="space-y-1.5">
-      <span className="text-small font-medium text-secondary">{label}</span>
-      <div className="flex flex-wrap gap-2">
-        {options.map((opt) => {
-          const active = value === opt.id;
-          return (
-            <button
-              key={opt.id}
-              type="button"
-              role="radio"
-              aria-checked={active}
-              onClick={() => onChange(opt.id)}
-              className={cn(
-                "rounded-pill px-4 py-2 text-small font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
-                active
-                  ? "bg-brand text-on-brand"
-                  : "border border-hairline bg-surface text-secondary hover:bg-brand-tint hover:text-brand",
-              )}
-            >
-              {opt.label}
-            </button>
-          );
-        })}
-      </div>
-    </div>
   );
 }
 

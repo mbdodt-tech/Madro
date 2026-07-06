@@ -403,5 +403,28 @@
     "premiumTitle": "Ugeindsigter er en del af Premium",
     "premiumBody": "Få en ugentlig fortælling om dine mønstre og konkrete fødevareidéer, der lukker hullerne i din mikronæring.",
     "premiumChip": "kommer med Premium"
+  },
+  "onboarding": {
+    "welcomeTitle": "Velkommen til Madro",
+    "welcomeBody": "Forstå kvaliteten af det, du spiser — forarbejdning, næring og balance samlet ét sted. Uden skyld.",
+    "start": "Kom i gang",
+    "next": "Videre",
+    "ageTitle": "Først: hvornår er du født?",
+    "ageBody": "Vi bruger kun årstallet til aldersgrænsen og din energireference.",
+    "tooYoungTitle": "Madro er ikke til dig endnu",
+    "tooYoungBody": "Man skal være mindst 13 år for at bruge Madro. Det er ikke noget med dig — apps om mad og krop kræver bare en vis alder. Du er velkommen tilbage senere.",
+    "consentTitle": "Dine data, dine regler",
+    "consentData": "Det, du logger om din mad, er følsomme helbredsdata. De opbevares i EU og bruges KUN til at vise dig dine egne overblik og indsigter — aldrig til reklamer, og de sælges aldrig.",
+    "consentRights": "Du kan til enhver tid downloade alle dine data eller slette din konto helt — begge dele direkte fra din profil.",
+    "consentGive": "Jeg giver samtykke",
+    "consentNote": "Samtykket er nødvendigt, for at appen kan fungere. Du kan trække det tilbage ved at slette din konto.",
+    "basicsTitle": "Et par valgfrie detaljer",
+    "basicsBody": "Gør referencerne mere personlige — alt kan ændres eller udelades.",
+    "calorieLabel": "Kalorietal",
+    "calorieShow": "Vis dem",
+    "calorieHide": "Skjul dem",
+    "calorieNote": "Nogle har det bedst uden tal. Vælger du at skjule dem, fokuserer appen på kvalitet og balance — og du kan altid skifte mening i profilen.",
+    "finish": "Færdig",
+    "skip": "Spring over"
   }
 }

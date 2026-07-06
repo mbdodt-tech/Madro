@@ -119,6 +119,82 @@ describe("resolveTargets — NNR-forenklede defaults + goals-overstyring", () =>
   });
 });
 
+describe("resolveTargets v2 — Mifflin-St Jeor × aktivitetsfaktor (fase 3.1)", () => {
+  // Alle fixtures håndregnet: BMR = 10·kg + 6,25·cm − 5·alder + kønskonstant;
+  // TDEE = BMR × PAL; ±retning; afrundet til nærmeste 10; bund 1500/1700.
+  const year = { referenceYear: 2026 };
+
+  it("kvinde 35 år, 168 cm, 65 kg, moderat: BMR 1364 × 1,6 → 2180 kcal", () => {
+    const t = resolveTargets(null, {
+      sex: "female", birthYear: 1991, heightCm: 168, weightKg: 65,
+      activityLevel: "moderate", ...year,
+    });
+    // protein: max(E% 109, 1,2·65=78) = 109; fedt 30 E% = 73; kulhydrat = rest
+    expect(t).toEqual({ kcal: 2180, protein_g: 109, carbohydrate_g: 273, fat_g: 73 });
+  });
+
+  it("mand 30 år, 183 cm, 80 kg, aktiv: BMR 1798,75 × 1,8 → 3240 kcal", () => {
+    const t = resolveTargets(null, {
+      sex: "male", birthYear: 1996, heightCm: 183, weightKg: 80,
+      activityLevel: "active", ...year,
+    });
+    expect(t.kcal).toBe(3240);
+    expect(t.protein_g).toBe(162); // E% (162) > 1,2 g/kg (96)
+  });
+
+  it("blidt underskud rammer aldrig under bunden (1500 K)", () => {
+    const t = resolveTargets({ direction: "gentle_deficit" }, {
+      sex: "female", birthYear: 1946, heightCm: 155, weightKg: 60,
+      activityLevel: "sedentary", ...year,
+    });
+    // 1007,75 × 1,4 − 300 = 1110,85 → bund 1500
+    expect(t.kcal).toBe(1500);
+  });
+
+  it("1,2 g/kg løfter proteinet når E%-afledningen er lavere", () => {
+    const t = resolveTargets({ direction: "gentle_deficit" }, {
+      sex: "female", birthYear: 1991, heightCm: 160, weightKg: 100,
+      activityLevel: "sedentary", ...year,
+    });
+    // 1664 × 1,4 − 300 = 2029,6 → 2030; max(E% 101,5, 1,2·100=120) = 120
+    expect(t.kcal).toBe(2030);
+    expect(t.protein_g).toBe(120);
+    // makro-kcal summer stadig ca. til målet (rest-kulhydrat)
+    expect(t.protein_g * 4 + t.carbohydrate_g * 4 + t.fat_g * 9)
+      .toBeGreaterThan(2030 - 15);
+  });
+
+  it("blidt overskud: +300 kcal", () => {
+    const t = resolveTargets({ direction: "gentle_surplus" }, {
+      sex: "female", birthYear: 1991, heightCm: 168, weightKg: 65,
+      activityLevel: "moderate", ...year,
+    });
+    expect(t.kcal).toBe(2480); // 2182,4 + 300 = 2482,4 → 2480
+  });
+
+  it("ukendt køn → kønskonstant-midtpunkt, ukendt aktivitet → moderat", () => {
+    const t = resolveTargets(null, {
+      sex: null, birthYear: 1991, heightCm: 170, weightKg: 70, ...year,
+    });
+    // BMR = 700 + 1062,5 − 175 − 78 = 1509,5 × 1,6 = 2415,2 → 2420
+    expect(t.kcal).toBe(2420);
+  });
+
+  it("ufuldstændig kropsprofil (kun vægt) → gamle defaults, men protein følger vægten", () => {
+    const t = resolveTargets(null, { sex: "female", weightKg: 100, ...year });
+    expect(t.kcal).toBe(2000); // ingen højde/fødselsår → NNR-forenklet
+    expect(t.protein_g).toBe(120); // 1,2 g/kg > E% 100
+  });
+
+  it("ukendt retning ignoreres (maintain)", () => {
+    const t = resolveTargets({ direction: "aggressiv" }, {
+      sex: "female", birthYear: 1991, heightCm: 168, weightKg: 65,
+      activityLevel: "moderate", ...year,
+    });
+    expect(t.kcal).toBe(2180);
+  });
+});
+
 describe("micronutrientCoverage", () => {
   const rows: ReferenceRow[] = [
     { nutrient_key: "iron_mg", region: "DK", sex: "female", age_min: 18, age_max: 50, rda: 15, ul: null, unit: "mg" },

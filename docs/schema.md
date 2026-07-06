@@ -6,7 +6,7 @@ Kilde: `supabase/migrations/20260704072000_core_schema.sql`, anvendt på Supabas
 
 | Tabel | Formål | RLS |
 |---|---|---|
-| `profiles` | Én række pr. bruger (PK = `auth.users.id`): locale, `hide_calories`, køn/fødselsår/aktivitetsniveau (RDA-profil), mål, kostpræferencer, `rda_region`, `entitlement` (RevenueCat-spejl) | select/insert/update egen række; ingen delete (kontosletning = Fase 4-flow via cascade) |
+| `profiles` | Én række pr. bruger (PK = `auth.users.id`): locale, `hide_calories`, køn/fødselsår/aktivitetsniveau (RDA-profil), `height_cm`/`weight_kg` (fase 3.1, frivillige — grundlag for Mifflin-St Jeor i core; DB-checks 100-250 cm / 30-300 kg), mål (`goals.direction`: maintain/gentle_deficit/gentle_surplus), kostpræferencer, `rda_region`, `entitlement` (RevenueCat-spejl) | select/insert/update egen række; ingen delete (kontosletning = Fase 4-flow via cascade) |
 | `foods` | Fælles fødevaretabel på tværs af kilder: `source` (off/usda/frida/custom), `data_quality` (verified/crowdsourced/user), stregkode, NOVA, Nutri-Score, additiver, `nutriments` (jsonb, normaliseret nøgleskema fra Fase 1.2), `owner_id` for custom-fødevarer | læs: alle indloggede; skriv: kun egne `custom`-rækker — ingestion kører via service role |
 | `scans` | Scanhændelser: type (barcode/photo), `outcome` (checked/logged), payload | alle operationer egen bruger |
 | `log_entries` | Dagbogsposter: fødevare, mængde/enhed, måltid (breakfast/lunch/dinner/snack), `consumed_at`, evt. ophavs-scan | alle operationer egen bruger |

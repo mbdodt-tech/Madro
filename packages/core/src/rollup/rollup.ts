@@ -94,35 +94,131 @@ const DEFAULT_KCAL: Record<string, number> = {
 };
 const DEFAULT_KCAL_UNKNOWN = 2100;
 
-function targetsFromKcal(kcal: number): MacroTargets {
+/**
+ * Aktivitetsfaktorer (PAL) efter NNR2023's grupper, forenklet til tre
+ * niveauer (kap. "Energy"): stillesiddende ~1,4 · moderat aktiv ~1,6 ·
+ * meget aktiv ~1,8. Ukendt niveau regnes som moderat — midterste antagelse,
+ * ikke et skøn i nogen bestemt retning. (NNR2023-review er stadig åbent
+ * brugerpunkt; faktorerne er samlet her, så de er lette at justere.)
+ */
+const ACTIVITY_FACTOR: Record<string, number> = {
+  sedentary: 1.4,
+  moderate: 1.6,
+  active: 1.8,
+};
+const ACTIVITY_FACTOR_DEFAULT = 1.6;
+
+/**
+ * Målretning (fase 3.1): kun blide justeringer — ±300 kcal, aldrig
+ * aggressive underskud (ansvarlighedsregel: ingen "tab hurtigt"-mekanik).
+ */
+const DIRECTION_DELTA: Record<string, number> = {
+  maintain: 0,
+  gentle_deficit: -300,
+  gentle_surplus: 300,
+};
+
+/**
+ * Konservativ bund for beregnede kcal-mål (K/M/ukendt): et mål under
+ * dette niveau viser vi ikke, uanset profil og retning.
+ */
+const KCAL_FLOOR: Record<string, number> = {
+  female: 1500,
+  male: 1700,
+};
+const KCAL_FLOOR_UNKNOWN = 1500;
+
+export interface TargetsProfile {
+  sex?: string | null;
+  /** Fødselsår — alder beregnes mod referenceYear (injicérbar i tests). */
+  birthYear?: number | null;
+  heightCm?: number | null;
+  weightKg?: number | null;
+  /** sedentary | moderate | active (profiles.activity_level). */
+  activityLevel?: string | null;
+  /** Default: indeværende år. */
+  referenceYear?: number;
+}
+
+/**
+ * Mifflin-St Jeor (1990) hvile-stofskifte i kcal/dag:
+ *   10·kg + 6,25·cm − 5·alder + (mand +5 / kvinde −161).
+ * Ukendt køn → midtpunkt af de to konstanter (−78) frem for at gætte køn.
+ * Kræver vægt, højde og fødselsår; ellers null (→ NNR-forenklet default).
+ */
+function mifflinBmr(profile: TargetsProfile): number | null {
+  const { weightKg, heightCm, birthYear } = profile;
+  if (weightKg == null || heightCm == null || birthYear == null) return null;
+  if (!(weightKg > 0) || !(heightCm > 0)) return null;
+  const year = profile.referenceYear ?? new Date().getFullYear();
+  const age = year - birthYear;
+  if (age < 1 || age > 120) return null;
+  const sexConstant =
+    profile.sex === "male" ? 5 : profile.sex === "female" ? -161 : -78;
+  return 10 * weightKg + 6.25 * heightCm - 5 * age + sexConstant;
+}
+
+function kcalFloor(sex: string | null | undefined): number {
+  return KCAL_FLOOR[sex ?? ""] ?? KCAL_FLOOR_UNKNOWN;
+}
+
+function targetsFromKcal(kcal: number, weightKg?: number | null): MacroTargets {
+  // Protein: mindst 1,2 g/kg (NNR-interval for voksne) når vægten kendes,
+  // dog aldrig under E%-afledningen; fedt 30 E%; kulhydrat = restenergien,
+  // så makro-kcal altid summer til målet.
+  const proteinByEnergy = (kcal * ENERGY_SPLIT.protein) / KCAL_PER_G.protein;
+  const proteinByWeight = weightKg != null && weightKg > 0 ? 1.2 * weightKg : 0;
+  const proteinRaw = Math.max(proteinByEnergy, proteinByWeight);
+  const fatRaw = (kcal * ENERGY_SPLIT.fat) / KCAL_PER_G.fat;
+  // Resten regnes på de urundede energier, så standardstien (uden vægt)
+  // giver præcis den gamle 20/50/30-fordeling.
+  const carbohydrate_g = Math.round(
+    Math.max(0, kcal - proteinRaw * KCAL_PER_G.protein - fatRaw * KCAL_PER_G.fat) /
+      KCAL_PER_G.carbohydrate,
+  );
   return {
     kcal,
-    protein_g: Math.round((kcal * ENERGY_SPLIT.protein) / KCAL_PER_G.protein),
-    carbohydrate_g: Math.round(
-      (kcal * ENERGY_SPLIT.carbohydrate) / KCAL_PER_G.carbohydrate,
-    ),
-    fat_g: Math.round((kcal * ENERGY_SPLIT.fat) / KCAL_PER_G.fat),
+    protein_g: Math.round(proteinRaw),
+    carbohydrate_g,
+    fat_g: Math.round(fatRaw),
   };
 }
 
 /**
- * Profilens goals-jsonb vinder felt for felt (delvise mål tilladt —
- * fx kun kcal sat: makro-gram afledes af den); ellers NNR-forenklet
- * default efter køn.
+ * Profilens goals-jsonb vinder felt for felt (delvise mål tilladt — fx kun
+ * kcal sat: makro-gram afledes af den). Ellers, fase 3.1: fuld kropsprofil →
+ * Mifflin-St Jeor × aktivitetsfaktor ± blid målretning, afrundet til nærmeste
+ * 10 kcal og aldrig under den konservative bund. Ufuldstændig profil →
+ * NNR-forenklet default efter køn (uændret siden 1.6).
  */
 export function resolveTargets(
   goals: Record<string, unknown> | null | undefined,
-  profile: { sex?: string | null },
+  profile: TargetsProfile,
 ): MacroTargets {
   const goalNumber = (key: string): number | null => {
     const v = goals?.[key];
     return typeof v === "number" && Number.isFinite(v) && v > 0 ? v : null;
   };
-  const kcal =
-    goalNumber("kcal") ??
-    DEFAULT_KCAL[profile.sex ?? ""] ??
-    DEFAULT_KCAL_UNKNOWN;
-  const base = targetsFromKcal(kcal);
+
+  let kcal = goalNumber("kcal");
+  if (kcal == null) {
+    const bmr = mifflinBmr(profile);
+    if (bmr != null) {
+      const factor =
+        ACTIVITY_FACTOR[profile.activityLevel ?? ""] ?? ACTIVITY_FACTOR_DEFAULT;
+      const direction =
+        typeof goals?.direction === "string" ? goals.direction : "maintain";
+      const delta = DIRECTION_DELTA[direction] ?? 0;
+      kcal = Math.max(
+        kcalFloor(profile.sex),
+        Math.round((bmr * factor + delta) / 10) * 10,
+      );
+    } else {
+      kcal = DEFAULT_KCAL[profile.sex ?? ""] ?? DEFAULT_KCAL_UNKNOWN;
+    }
+  }
+
+  const base = targetsFromKcal(kcal, profile.weightKg);
   return {
     kcal,
     protein_g: goalNumber("protein_g") ?? base.protein_g,

@@ -5,6 +5,7 @@ import { DiaryPage } from "./pages/DiaryPage";
 import { InsightsPage } from "./pages/InsightsPage";
 import { LoginPage } from "./pages/LoginPage";
 import { ProductPage } from "./pages/ProductPage";
+import { ProfilePage } from "./pages/ProfilePage";
 import { ScanPage } from "./pages/ScanPage";
 import { TodayPage } from "./pages/TodayPage";
 
@@ -49,6 +50,14 @@ export function App() {
           element={
             <RequireAuth>
               <ProductPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <RequireAuth>
+              <ProfilePage />
             </RequireAuth>
           }
         />

@@ -23,6 +23,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { persistHideCalories, useProfile } from "../auth/useProfile";
 import { useSession } from "../auth/useSession";
+import { ErrorState } from "../components/ErrorState";
 import { LanguageSwitch } from "../components/LanguageSwitch";
 import { TabShell } from "../components/TabShell";
 import { supabase } from "../lib/supabase";
@@ -64,8 +65,18 @@ export function TodayPage() {
   const { data: profile, isLoading: profileLoading } = useProfile();
   const today = new Date();
 
-  const { data: entries, isLoading: entriesLoading } = useDiaryEntries(today);
-  const { data: summary, isLoading: summaryLoading } = useDailySummary(today);
+  const {
+    data: entries,
+    isLoading: entriesLoading,
+    isError: entriesError,
+    refetch: refetchEntries,
+  } = useDiaryEntries(today);
+  const {
+    data: summary,
+    isLoading: summaryLoading,
+    isError: summaryError,
+    refetch: refetchSummary,
+  } = useDailySummary(today);
   const { data: referenceRows } = useReferences(profile?.rda_region ?? undefined);
 
   const [editing, setEditing] = useState<DiaryEntry | null>(null);
@@ -74,6 +85,11 @@ export function TodayPage() {
 
   const hideCalories = profile?.hide_calories ?? false;
   const isLoading = entriesLoading || profileLoading || summaryLoading;
+  const isError = entriesError || summaryError;
+  const retry = () => {
+    void refetchEntries();
+    void refetchSummary();
+  };
 
   // ---- Tallene kommer fra daily_summaries (Postgres-triggeren, 1.7);
   // formlerne bor stadig i @madro/core og bevogtes af fixtures-tests. ----
@@ -145,6 +161,8 @@ export function TodayPage() {
               <Skeleton className="h-4 w-1/2" />
               <Skeleton className="h-16 w-full" />
             </div>
+          ) : isError ? (
+            <ErrorState onRetry={retry} />
           ) : (
             <div className="space-y-5">
               <QualityArc
@@ -236,7 +254,9 @@ export function TodayPage() {
           </Button>
         </div>
 
-        {!isLoading && (entries?.length ?? 0) === 0 ? (
+        {isError ? (
+          <ErrorState onRetry={retry} />
+        ) : !isLoading && (entries?.length ?? 0) === 0 ? (
           <div className="rounded-lg border border-hairline bg-surface px-5 py-8 text-center">
             <p className="text-body text-secondary">{t("today.empty")}</p>
             <p className="mt-1 text-small text-tertiary">{t("diary.emptyHint")}</p>

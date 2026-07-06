@@ -2,6 +2,7 @@ import { Button, Skeleton, useToast } from "@madro/ui";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { ErrorState } from "../components/ErrorState";
 import { TabShell } from "../components/TabShell";
 import { AddFoodSheet } from "./diary/AddFoodSheet";
 import { EntrySheet } from "./diary/EntrySheet";
@@ -23,7 +24,7 @@ export function DiaryPage() {
   const [editing, setEditing] = useState<DiaryEntry | null>(null);
   const [adding, setAdding] = useState(false);
 
-  const { data: entries, isLoading } = useDiaryEntries(day);
+  const { data: entries, isLoading, isError, refetch } = useDiaryEntries(day);
   const isToday = isSameDay(day, new Date());
 
   const dateLabel = isToday
@@ -86,6 +87,8 @@ export function DiaryPage() {
             <Skeleton className="h-14 w-full" />
             <Skeleton className="h-14 w-full" />
           </div>
+        ) : isError ? (
+          <ErrorState onRetry={() => void refetch()} />
         ) : !hasEntries ? (
           <div className="rounded-lg border border-hairline bg-surface px-5 py-8 text-center">
             <p className="text-body text-secondary">{t("diary.empty")}</p>

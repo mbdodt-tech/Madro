@@ -13,6 +13,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { formatAdditive } from "./scan/format";
 import { useProfile } from "../auth/useProfile";
+import { ErrorState } from "../components/ErrorState";
 
 type Food = Tables<"foods">;
 
@@ -24,17 +25,32 @@ export function ProductPage() {
   const hideCalories = profile?.hide_calories ?? false;
 
   const [food, setFood] = useState<Food | null | undefined>(undefined);
+  const [failed, setFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     if (!id) return;
+    setFailed(false);
+    setFood(undefined);
     void supabase
       .from("foods")
       .select("*")
       .eq("id", id)
       .maybeSingle()
-      .then(({ data }) => setFood((data as Food | null) ?? null));
-  }, [id]);
+      .then(({ data, error }) => {
+        // Netværks-/serverfejl må ikke ligne "findes ikke".
+        if (error) setFailed(true);
+        else setFood((data as Food | null) ?? null);
+      });
+  }, [id, attempt]);
 
+  if (failed) {
+    return (
+      <main className="mx-auto max-w-md px-6 py-10">
+        <ErrorState onRetry={() => setAttempt((a) => a + 1)} />
+      </main>
+    );
+  }
   if (food === undefined) {
     return (
       <main className="mx-auto max-w-md space-y-4 px-6 py-10">

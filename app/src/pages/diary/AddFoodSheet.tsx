@@ -24,6 +24,7 @@ export function AddFoodSheet({
 
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<FoodHit[] | null>(null);
+  const [searchFailed, setSearchFailed] = useState(false);
   const [selected, setSelected] = useState<FoodHit | null>(null);
   const [grams, setGrams] = useState(100);
   const [meal, setMeal] = useState<Meal>(() => defaultMeal(new Date().getHours()));
@@ -42,9 +43,15 @@ export function AddFoodSheet({
     }
     try {
       const hits = await searchFoods(value);
-      if (seq === searchSeq.current) setResults(hits);
+      if (seq === searchSeq.current) {
+        setResults(hits);
+        setSearchFailed(false);
+      }
     } catch {
-      if (seq === searchSeq.current) setResults([]);
+      if (seq === searchSeq.current) {
+        setResults(null);
+        setSearchFailed(true);
+      }
     }
   };
 
@@ -128,7 +135,11 @@ export function AddFoodSheet({
             value={query}
             onChange={(e) => void runSearch(e.target.value)}
           />
-          {results !== null ? (
+          {searchFailed ? (
+            <p role="alert" className="text-small text-v-bad">
+              {t("diary.add.searchError")}
+            </p>
+          ) : results !== null ? (
             results.length > 0 ? (
               <ul className="divide-y divide-hairline overflow-hidden rounded-lg border border-hairline">
                 {results.map((food) => (

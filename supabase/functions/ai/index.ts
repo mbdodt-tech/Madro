@@ -81,6 +81,50 @@ const PARSE_LABEL_SYSTEM = `Opgave: Aflæs varedeklarationen (ingrediensliste og
 - Medtag KUN hvad der faktisk kan læses på billedet. Gæt aldrig.
 - Kan intet af ovenstående læses, returnér {"additives":[],"nutriments":{}}.`;
 
+// ---- rank_alternatives (fase 2.5): bedre alternativer m. begrundelse ----
+// Kandidaterne er ALLEREDE filtreret til højere verdikt-score i klienten.
+const rankAlternativesPayload = z.object({
+  locale: z.enum(["da", "en"]),
+  product: z.object({
+    name: z.string().min(1).max(200),
+    score: z.number().min(0).max(100),
+  }),
+  weeklyGaps: z
+    .array(z.object({ name: z.string().min(1).max(60), pct: z.number().min(0).max(500) }))
+    .max(3),
+  candidates: z
+    .array(
+      z.object({
+        id: z.string().uuid(),
+        name: z.string().min(1).max(200),
+        brand: z.string().max(120).optional(),
+        score: z.number().min(0).max(100),
+        novaGroup: z.number().int().min(1).max(4).optional(),
+        nutriscore: z.string().max(1).optional(),
+        gapNutrients: z.record(z.string(), z.number()).optional(),
+      }),
+    )
+    .min(2)
+    .max(8),
+});
+
+const rankAlternativesResult = z.object({
+  picks: z
+    .array(z.object({ id: z.string().uuid(), reason: z.string().min(1).max(200) }))
+    .min(1)
+    .max(3),
+});
+
+const RANK_ALTERNATIVES_SYSTEM = `Opgave: Vælg de bedste alternativer til en scannet vare.
+- Returnér JSON: {"picks":[{"id","reason"}]} — 2-3 valg (1 hvis kun ét skiller sig ud).
+- Alle kandidater har allerede HØJERE kvalitetsscore end varen; vælg dem der
+  bedst kombinerer kvalitet (score, NOVA, Nutri-Score) med brugerens ugentlige
+  mangler (weeklyGaps + kandidaternes gapNutrients pr. 100 g).
+- "reason": ÉN kort, saglig sætning på det angivne sprog, fx
+  "Bedre Nutri-Score og et solidt bidrag af jern".
+- Omtal ALDRIG den oprindelige vare nedladende, og brug aldrig skyld-sprog.
+- "id" skal være et id fra kandidatlisten.`;
+
 // ---- weekly_insight (fase 2.4): ugens tal → fortælling + forslag ----
 // Payload er KUN tal/navne fra daily_summaries — aldrig brugerfritekst.
 const weeklyInsightPayload = z.object({
@@ -206,6 +250,18 @@ const tasks: Record<
         system: WEEKLY_INSIGHT_SYSTEM,
         user: `Sprog: ${locale}\nTalgrundlag: ${JSON.stringify(stats)}`,
         schema: weeklyInsightResult,
+        maxTokens: 1024,
+      });
+    },
+  },
+  rank_alternatives: {
+    schema: rankAlternativesPayload,
+    handler: async (payload) => {
+      const data = payload as z.infer<typeof rankAlternativesPayload>;
+      return askClaude({
+        system: RANK_ALTERNATIVES_SYSTEM,
+        user: `Sprog: ${data.locale}\nVare: ${JSON.stringify(data.product)}\nUgens mangler: ${JSON.stringify(data.weeklyGaps)}\nKandidater: ${JSON.stringify(data.candidates)}`,
+        schema: rankAlternativesResult,
         maxTokens: 1024,
       });
     },

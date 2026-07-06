@@ -135,6 +135,31 @@ describe("callAi", () => {
     expect(result.items).toEqual([]);
   });
 
+  it("validates rank_alternatives picks (fase 2.5)", async () => {
+    const client = createAiClient({
+      ...baseOptions,
+      fetchFn: mockFetch(200, {
+        data: {
+          picks: [
+            { id: "5f8008ba-c289-47b2-8340-da074c335495", reason: "Bedre Nutri-Score og mere fiber" },
+          ],
+        },
+      }),
+    });
+    const result = await client.callAi("rank_alternatives", {});
+    expect(result.picks).toHaveLength(1);
+  });
+
+  it("rejects rank_alternatives with non-uuid ids", async () => {
+    const client = createAiClient({
+      ...baseOptions,
+      fetchFn: mockFetch(200, { data: { picks: [{ id: "abc", reason: "x" }] } }),
+    });
+    await expect(client.callAi("rank_alternatives", {})).rejects.toMatchObject({
+      code: "invalid_result",
+    });
+  });
+
   it("rejects malformed success envelopes", async () => {
     const client = createAiClient({
       ...baseOptions,

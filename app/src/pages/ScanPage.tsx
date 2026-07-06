@@ -236,6 +236,9 @@ export function ScanPage() {
           scanId={phase.scanId}
           open
           onClose={close}
+          onSwapFood={(alternative) =>
+            setPhase({ kind: "hit", food: alternative, scanId: phase.scanId })
+          }
           onLogged={() => {
             // Sørg for at Dagbog + "I dag" (summary) er friske ved hjemkomst,
             // uanset staleTime.

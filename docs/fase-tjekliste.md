@@ -136,11 +136,13 @@ Hvert trin har **acceptkriterier** — trinnet er først færdigt, når de alle 
 
 **Accept:** ugen opsummeres korrekt mod summaries; tonen består stikprøven; gratis tier ser en ærlig teaser.
 
-### 2.5 Bedre alternativ-forslag
+### 2.5 Bedre alternativ-forslag (bygget 2026-07-06)
 
 > Aktivér knappen fra 1.4: alternativer i samme kategori, vægtet efter kvalitet OG ugens mangler (byggeplan §2.3). Persisteres i `recommendations`. Kandidater hentes fra egne foods (kategorier), AI rangerer og begrunder kort.
 
 **Accept:** knappen virker på scannede varer med kategori; forslag er købbare varer af bedre kvalitet; aldrig moraliserende begrundelser.
+
+**⛳ Fase 2 færdig (2026-07-06):** al intelligens er live — NL-logning, måltidsfoto med rettetrin, deklarationsfoto, ugeindsigt og alternativer, alt gennem den ene AI-gateway med guardrails. Næste: Fase 3 (wearables/forfining) eller design-gennemgangen.
 
 ---
 

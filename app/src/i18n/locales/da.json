@@ -213,7 +213,16 @@
     },
     "ateIt": "Jeg spiste det",
     "showAlternative": "Vis bedre alternativ",
-    "comingSoon": "kommer snart"
+    "comingSoon": "kommer snart",
+    "alternatives": {
+      "back": "Tilbage til resultat",
+      "title": "Bedre alternativer",
+      "subtitle": "Samme kategori — højere kvalitet",
+      "loading": "Finder alternativer, der passer til din uge…",
+      "none": "Denne vare står sig faktisk godt i sin kategori — vi fandt ikke noget med højere kvalitet.",
+      "premiumTitle": "Alternativforslag er en del af Premium",
+      "premiumBody": "Få 2-3 konkrete varer af højere kvalitet, vægtet efter hvad du mangler i ugen."
+    }
   },
   "portion": {
     "back": "Tilbage til resultat",

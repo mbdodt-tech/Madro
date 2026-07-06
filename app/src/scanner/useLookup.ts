@@ -13,10 +13,11 @@ export type FoodHit = Pick<
   | "nutriments"
   | "image_url"
   | "additives"
+  | "categories"
 >;
 
 const FOOD_COLUMNS =
-  "id,name,brand,source,data_quality,nova_group,nutriscore,nutriments,image_url,additives";
+  "id,name,brand,source,data_quality,nova_group,nutriscore,nutriments,image_url,additives,categories";
 
 const QUALITY_PRIORITY: Record<string, number> = {
   verified: 0,

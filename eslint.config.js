@@ -13,6 +13,9 @@ export default tseslint.config(
       "**/.vite/**",
       "docs/design/mockup/**",
       "supabase/functions/**",
+      // Capacitor-platformmapperne (fase 5): scaffold + genererede web-kopier
+      "native/ios/**",
+      "native/android/**",
     ],
   },
   js.configs.recommended,

@@ -14,6 +14,9 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
+      // Registreringen sker manuelt i main.tsx (springes over i
+      // Capacitor-skallen — SW oven på capacitor:// giver kun kolbøtter).
+      injectRegister: null,
       // App-shell-caching KUN (fase 0.7): ingen runtime-caching af
       // Supabase-API'et — kostdata må ikke ligge offline (GDPR).
       workbox: {

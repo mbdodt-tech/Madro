@@ -56,6 +56,38 @@ describe("callAi", () => {
     });
   });
 
+  it("validates parse_meal items (fase 2.1)", async () => {
+    const client = createAiClient({
+      ...baseOptions,
+      fetchFn: mockFetch(200, {
+        data: {
+          items: [
+            { name: "rugbrød", grams: 100, note: "2 skiver" },
+            { name: "banan", grams: 120 },
+          ],
+        },
+      }),
+    });
+    const result = await client.callAi("parse_meal", {
+      text: "to skiver rugbrød og en banan",
+      locale: "da",
+    });
+    expect(result.items).toHaveLength(2);
+    expect(result.items[0]).toMatchObject({ name: "rugbrød", grams: 100 });
+  });
+
+  it("rejects parse_meal with invalid grams", async () => {
+    const client = createAiClient({
+      ...baseOptions,
+      fetchFn: mockFetch(200, {
+        data: { items: [{ name: "olie", grams: -5 }] },
+      }),
+    });
+    await expect(
+      client.callAi("parse_meal", { text: "x", locale: "da" }),
+    ).rejects.toMatchObject({ code: "invalid_result" });
+  });
+
   it("rejects malformed success envelopes", async () => {
     const client = createAiClient({
       ...baseOptions,

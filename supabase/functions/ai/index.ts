@@ -4,6 +4,7 @@
 
 import { createClient } from "npm:@supabase/supabase-js@2.47.10";
 import { z } from "npm:zod@3.23.8";
+import { askClaude } from "../_shared/anthropic.ts";
 import { handlePreflight, jsonResponse } from "../_shared/cors.ts";
 
 const RATE_LIMIT_PER_MINUTE = 20;
@@ -13,8 +14,38 @@ const envelopeSchema = z.object({
   payload: z.unknown(),
 });
 
-/** Task-registret: zod-skema for payload + handler. Fase 2 tilføjer
- *  Anthropic-kaldende tasks via askClaude fra ../_shared/anthropic.ts. */
+// ---- parse_meal (fase 2.1): måltidsbeskrivelse → poster ----
+// Skemaet spejler aiResultSchemas.parse_meal i packages/core/src/ai.ts.
+const parseMealPayload = z.object({
+  text: z.string().min(3).max(500),
+  locale: z.enum(["da", "en"]),
+});
+
+const parseMealResult = z.object({
+  items: z
+    .array(
+      z.object({
+        name: z.string().min(1).max(80),
+        grams: z.number().min(1).max(2000),
+        note: z.string().max(120).optional(),
+      }),
+    )
+    .min(1)
+    .max(8),
+});
+
+const PARSE_MEAL_SYSTEM = `Opgave: Parsér en måltidsbeskrivelse til enkeltposter.
+- Returnér JSON på formen {"items":[{"name":string,"grams":number,"note":string?}]}.
+- "name": fødevarens navn på beskrivelsens sprog, kort og opslagsvenligt
+  (fx "rugbrød", ikke "to skiver dejligt rugbrød").
+- "grams": skønnet portion i gram. Brug almindelige husholdningsmål:
+  1 skive rugbrød ≈ 50 g, 1 skive franskbrød ≈ 35 g, 1 skive ost ≈ 20 g,
+  1 banan ≈ 120 g, 1 æble ≈ 150 g, 1 æg ≈ 55 g, 1 spsk olie/smør ≈ 14 g,
+  1 dl mælk ≈ 100 g, 1 portion ≈ 250-350 g.
+- "note": valgfrit, kort — fx mængdeangivelsen fra beskrivelsen ("2 skiver").
+- 1-8 poster. Ingredienser nævnt sammen ("rugbrød med ost") deles i separate poster.`;
+
+/** Task-registret: zod-skema for payload + handler. */
 const tasks: Record<
   string,
   {
@@ -25,6 +56,18 @@ const tasks: Record<
   ping: {
     schema: z.object({}).strict(),
     handler: () => Promise.resolve({ pong: true, time: new Date().toISOString() }),
+  },
+  parse_meal: {
+    schema: parseMealPayload,
+    handler: async (payload) => {
+      const { text, locale } = payload as z.infer<typeof parseMealPayload>;
+      return askClaude({
+        system: PARSE_MEAL_SYSTEM,
+        user: `Sprog: ${locale}\nMåltidsbeskrivelse: ${text}`,
+        schema: parseMealResult,
+        maxTokens: 1024,
+      });
+    },
   },
 };
 
@@ -106,6 +149,14 @@ Deno.serve(async (req) => {
     // Aldrig payload-indhold i logs — kun fejlklassen.
     const code = err instanceof Error ? err.message : "internal";
     console.error(`ai task=${envelope.data.task} user=${userId} outcome=error code=${code}`);
+    // Kendte, ufarlige koder sendes til klienten (rolig UX-besked);
+    // alt andet skjules som "internal".
+    const KNOWN_CODES: Record<string, number> = {
+      missing_anthropic_key: 503,
+      model_refusal: 502,
+      invalid_model_json: 502,
+    };
+    if (code in KNOWN_CODES) return error(req, KNOWN_CODES[code], code);
     return error(req, 500, "internal");
   }
 });

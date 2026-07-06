@@ -2,8 +2,7 @@
 // (CLAUDE.md: al AI går gennem én indgang; nøglen findes kun i
 // Edge Function-secrets som ANTHROPIC_API_KEY).
 //
-// Ingen task kalder den endnu (Fase 0.6 er et skelet) — Fase 2-tasks
-// (sprogparsing, indsigter, alternativer) bygger ovenpå.
+// Første kaldende task: parse_meal (fase 2.1).
 
 import Anthropic from "npm:@anthropic-ai/sdk@0.39.0";
 import type { z } from "npm:zod@3.23.8";

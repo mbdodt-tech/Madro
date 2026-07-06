@@ -10,6 +10,8 @@ export {
   AiError,
   createAiClient,
   aiResultSchemas,
+  parsedMealItemSchema,
+  type ParsedMealItem,
   type AiClient,
   type AiClientOptions,
   type AiTask,

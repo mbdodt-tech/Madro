@@ -1,15 +1,17 @@
 import type { NutrientMap } from "@madro/core";
-import { Button, Chip, Input, Sheet } from "@madro/ui";
+import { Button, Chip, Input, Sheet, Tabs } from "@madro/ui";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { PortionForm } from "../../components/PortionForm";
 import { searchFoods, type FoodHit } from "../../scanner/useLookup";
 import { defaultMeal, logMeal, type Meal } from "../scan/logMeal";
 import { isSameDay } from "./useDiary";
+import { WriteMealTab } from "./WriteMealTab";
 
 /**
- * "+"-flowet: manuel tekstsøgning på tværs af kilder (kilde-badge på
- * hvert resultat) → portionsvalg → log på den viste dag.
+ * "+"-flowet med to faner: "Søg" (tekstsøgning på tværs af kilder m.
+ * kilde-badge → portionsvalg) og "Skriv" (naturligt sprog → AI-forslag,
+ * fase 2.1). Logger på den viste dag.
  */
 export function AddFoodSheet({
   day,
@@ -127,50 +129,66 @@ export function AddFoodSheet({
           </Button>
         </div>
       ) : (
-        <div className="space-y-4">
-          <Input
-            id="diary-search"
-            label={t("scan.searchLabel")}
-            placeholder={t("scan.searchPlaceholder")}
-            value={query}
-            onChange={(e) => void runSearch(e.target.value)}
-          />
-          {searchFailed ? (
-            <p role="alert" className="text-small text-v-bad">
-              {t("diary.add.searchError")}
-            </p>
-          ) : results !== null ? (
-            results.length > 0 ? (
-              <ul className="divide-y divide-hairline overflow-hidden rounded-lg border border-hairline">
-                {results.map((food) => (
-                  <li key={food.id}>
-                    <button
-                      type="button"
-                      onClick={() => setSelected(food)}
-                      className="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left hover:bg-brand-tint focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand"
-                    >
-                      <span className="min-w-0">
-                        <span className="block truncate text-body text-ink">
-                          {food.name}
-                        </span>
-                        {food.brand ? (
-                          <span className="block truncate text-caption text-tertiary">
-                            {food.brand}
-                          </span>
-                        ) : null}
-                      </span>
-                      <Chip>{t(`scan.source.${food.source}`)}</Chip>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-small text-tertiary">{t("scan.noResults")}</p>
-            )
-          ) : (
-            <p className="text-small text-tertiary">{t("diary.add.hint")}</p>
-          )}
-        </div>
+        <Tabs
+          listLabel={t("diary.add.tabsLabel")}
+          items={[
+            {
+              value: "search",
+              label: t("diary.add.tabSearch"),
+              content: (
+                <div className="space-y-4">
+                  <Input
+                    id="diary-search"
+                    label={t("scan.searchLabel")}
+                    placeholder={t("scan.searchPlaceholder")}
+                    value={query}
+                    onChange={(e) => void runSearch(e.target.value)}
+                  />
+                  {searchFailed ? (
+                    <p role="alert" className="text-small text-v-bad">
+                      {t("diary.add.searchError")}
+                    </p>
+                  ) : results !== null ? (
+                    results.length > 0 ? (
+                      <ul className="divide-y divide-hairline overflow-hidden rounded-lg border border-hairline">
+                        {results.map((food) => (
+                          <li key={food.id}>
+                            <button
+                              type="button"
+                              onClick={() => setSelected(food)}
+                              className="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left hover:bg-brand-tint focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand"
+                            >
+                              <span className="min-w-0">
+                                <span className="block truncate text-body text-ink">
+                                  {food.name}
+                                </span>
+                                {food.brand ? (
+                                  <span className="block truncate text-caption text-tertiary">
+                                    {food.brand}
+                                  </span>
+                                ) : null}
+                              </span>
+                              <Chip>{t(`scan.source.${food.source}`)}</Chip>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-small text-tertiary">{t("scan.noResults")}</p>
+                    )
+                  ) : (
+                    <p className="text-small text-tertiary">{t("diary.add.hint")}</p>
+                  )}
+                </div>
+              ),
+            },
+            {
+              value: "write",
+              label: t("diary.add.tabWrite"),
+              content: <WriteMealTab day={day} onLogged={onLogged} />,
+            },
+          ]}
+        />
       )}
     </Sheet>
   );

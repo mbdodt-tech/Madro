@@ -110,6 +110,40 @@ Hvert trin har **acceptkriterier** — trinnet er først færdigt, når de alle 
 
 ---
 
+## Fase 2 — Intelligens og måltidsscanning (trinliste godkendt 2026-07-06)
+
+### 2.1 Naturligt-sprog-logning
+
+> "Skriv hvad du spiste" i +-arket: fri tekst → gateway-task `parse_meal` (første rigtige Anthropic-kald: guardrails, JSON-only, zod, rate limit) → redigerbare rækker matchet mod `foods` → ét tryk logger alle. Diskret "estimat — ret hvis nødvendigt". Payload-indhold logges aldrig.
+
+**Accept:** tekst → AI-forslag som redigerbare rækker → logget i dagbogen; rolig fejlhåndtering (manglende nøgle, rate limit, offline); tone-/format-stikprøve ren.
+
+### 2.2 AI-måltidsscanning (foto) med rettetrin
+
+> Foto af tallerken → genkendte retter som redigerbare rækker (byggeplan §2.3): ret/fjern/tilføj, skydere for portioner, hurtig-knapper for usynlige ingredienser (olie, smør, sauce, dressing). Billeder i privat bucket via signerede URL'er. Scan-typen `photo` findes allerede i scans-tabellen.
+
+**Accept:** foto → redigerbare rækker → log; rettetrinnet (særligt tilføjet fedtstof) genberegner med det samme; "estimat"-mærkning.
+
+### 2.3 Foto af ingrediensliste → analyse + opret vare
+
+> Brugerens ønske fra telefontest: fotografér ingredienslisten/næringsdeklarationen på en vare, der hverken findes hos os eller OFF → AI udtrækker ingredienser, additiver og næringstal → forhåndsvisning → gem som `custom`-vare (verdikt-signal via additiver; NOVA/Nutri kan mangle → ærlig "utilstrækkelig"-håndtering findes).
+
+**Accept:** miss-arket tilbyder "fotografér varedeklarationen"; gemt vare kan scannes/logges fremover.
+
+### 2.4 Ugentlig mønster-indsigt
+
+> Indsigt-fanen bliver rigtig: ugeaggregat fra daily_summaries → AI-fortælling i almindeligt sprog ("sådan spiser du endnu bedre", aldrig "sådan har du fejlet") + enkel trendgraf (Recharts) + konkrete fødevareforslag. Persisteres i `insights`-tabellen. Premium-gate via `useEntitlements()`-stubben.
+
+**Accept:** ugen opsummeres korrekt mod summaries; tonen består stikprøven; gratis tier ser en ærlig teaser.
+
+### 2.5 Bedre alternativ-forslag
+
+> Aktivér knappen fra 1.4: alternativer i samme kategori, vægtet efter kvalitet OG ugens mangler (byggeplan §2.3). Persisteres i `recommendations`. Kandidater hentes fra egne foods (kategorier), AI rangerer og begrunder kort.
+
+**Accept:** knappen virker på scannede varer med kategori; forslag er købbare varer af bedre kvalitet; aldrig moraliserende begrundelser.
+
+---
+
 ## Faste vaner undervejs
 
 - Én gren/PR pr. trin; små commits med conventional commits.

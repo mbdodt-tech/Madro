@@ -5,8 +5,23 @@ import { z } from "zod";
  * i appen. Transporten er injiceret, så pakken forbliver ren logik.
  */
 
+/** Én foreslået post fra naturligt-sprog-parsingen (fase 2.1). */
+export const parsedMealItemSchema = z.object({
+  /** Fødevarenavn på beskrivelsens sprog, fx "rugbrød". */
+  name: z.string().min(1).max(80),
+  /** Skønnet portion i gram (husholdningsmål omregnet af modellen). */
+  grams: z.number().min(1).max(2000),
+  /** Valgfri note, fx "2 skiver". */
+  note: z.string().max(120).optional(),
+});
+
+export type ParsedMealItem = z.infer<typeof parsedMealItemSchema>;
+
 export const aiResultSchemas = {
   ping: z.object({ pong: z.literal(true), time: z.string() }),
+  parse_meal: z.object({
+    items: z.array(parsedMealItemSchema).min(1).max(8),
+  }),
 } as const;
 
 export type AiTask = keyof typeof aiResultSchemas;
@@ -48,7 +63,10 @@ export function createAiClient(options: AiClientOptions): AiClient {
   const doFetch = options.fetchFn ?? fetch;
 
   return {
-    async callAi(task, payload) {
+    async callAi<T extends AiTask>(
+      task: T,
+      payload: Record<string, unknown>,
+    ): Promise<AiResult<T>> {
       const token = await options.getAccessToken();
       if (!token) throw new AiError("not_authenticated", 401);
 
@@ -82,7 +100,9 @@ export function createAiClient(options: AiClientOptions): AiClient {
 
       const result = aiResultSchemas[task].safeParse(parsed.data.data);
       if (!result.success) throw new AiError("invalid_result", response.status);
-      return result.data;
+      // Skemaet er valgt pr. task, så outputtet ER AiResult<T> — TS kan
+      // bare ikke narrowe unionen over den generiske nøgle.
+      return result.data as AiResult<T>;
     },
   };
 }

@@ -192,6 +192,7 @@ export function TodayPage() {
               />
 
               {/* Kalorielinje m. øje-toggle (persisterer hide_calories) */}
+              <div>
               <div className="flex items-center justify-center gap-2">
                 {hideCalories ? (
                   <span className="text-small text-panel-dim">
@@ -220,6 +221,18 @@ export function TodayPage() {
                     <Eye className="size-4" aria-hidden="true" />
                   )}
                 </button>
+              </div>
+              {/* Gennemsigtighed (telefonfeedback 2026-07-06): når dagens
+                  aktivitet løfter målet, skal man kunne se hvorfor tallet
+                  afviger fra profilens reference. */}
+              {!hideCalories && activeKcal > 0 ? (
+                <p className="mt-1 text-center text-caption text-panel-dim">
+                  {t("today.activityIncluded", {
+                    active: nf.format(activeKcal),
+                    base: nf.format(targets.kcal),
+                  })}
+                </p>
+              ) : null}
               </div>
 
               {/* Makroringe */}

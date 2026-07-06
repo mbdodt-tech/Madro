@@ -12,6 +12,7 @@ import {
   type FoodHit,
 } from "../scanner/useLookup";
 import { invalidateDiary } from "./diary/useDiary";
+import { LabelCaptureStep } from "./scan/LabelCaptureStep";
 import { ResultSheet } from "./scan/ResultSheet";
 
 type Phase =
@@ -19,6 +20,8 @@ type Phase =
   | { kind: "looking-up"; deep: boolean }
   | { kind: "hit"; food: FoodHit; scanId: string | null }
   | { kind: "miss"; barcode: string; scanId: string | null }
+  /** Fotografér varedeklarationen (fase 2.3) — opretter egen vare. */
+  | { kind: "label"; barcode: string; scanId: string | null }
   /** Netværks-/serverfejl — IKKE det samme som et ærligt miss. */
   | { kind: "error"; barcode: string };
 
@@ -302,7 +305,44 @@ export function ScanPage() {
                 <p className="text-small text-tertiary">{t("scan.noResults")}</p>
               )
             ) : null}
+
+            {/* Tredje vej (2.3): fotografér varedeklarationen */}
+            <Button
+              variant="secondary"
+              className="w-full"
+              onClick={() =>
+                setPhase((p) =>
+                  p.kind === "miss"
+                    ? { kind: "label", barcode: p.barcode, scanId: p.scanId }
+                    : p,
+                )
+              }
+            >
+              {t("scan.label.openButton")}
+            </Button>
           </div>
+        ) : null}
+      </Sheet>
+
+      {/* Deklarationsfoto (2.3) */}
+      <Sheet
+        open={phase.kind === "label"}
+        onOpenChange={(open) => {
+          if (!open) close();
+        }}
+        title={t("scan.label.title")}
+        showTitle
+      >
+        {phase.kind === "label" ? (
+          <LabelCaptureStep
+            barcode={phase.barcode}
+            onBack={() =>
+              setPhase({ kind: "miss", barcode: phase.barcode, scanId: phase.scanId })
+            }
+            onSaved={(food) =>
+              setPhase({ kind: "hit", food, scanId: phase.scanId })
+            }
+          />
         ) : null}
       </Sheet>
     </div>

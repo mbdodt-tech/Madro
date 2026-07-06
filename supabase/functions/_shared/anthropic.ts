@@ -25,6 +25,9 @@ export interface AskClaudeOptions<T> {
   system?: string;
   /** Brugerindhold (payload-afledt — logges aldrig). */
   user: string;
+  /** Valgfrit billede (vision-tasks, fx parse_label). Persisteres aldrig. */
+  imageBase64?: string;
+  imageMediaType?: "image/jpeg" | "image/png";
   /** Zod-skema som svaret valideres imod. */
   schema: z.ZodType<T>;
   model?: string;
@@ -45,13 +48,27 @@ export async function askClaude<T>(options: AskClaudeOptions<T>): Promise<T> {
 
   const client = new Anthropic({ apiKey });
 
+  const content: Anthropic.ContentBlockParam[] = options.imageBase64
+    ? [
+        {
+          type: "image",
+          source: {
+            type: "base64",
+            media_type: options.imageMediaType ?? "image/jpeg",
+            data: options.imageBase64,
+          },
+        },
+        { type: "text", text: options.user },
+      ]
+    : [{ type: "text", text: options.user }];
+
   const response = await client.messages.create({
     model: options.model ?? "claude-opus-4-8",
     max_tokens: options.maxTokens ?? 4096,
     system: options.system
       ? `${BASE_SYSTEM}\n\n${options.system}`
       : BASE_SYSTEM,
-    messages: [{ role: "user", content: options.user }],
+    messages: [{ role: "user", content }],
   });
 
   if (response.stop_reason === "refusal") {

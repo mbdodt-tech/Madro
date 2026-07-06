@@ -88,6 +88,40 @@ describe("callAi", () => {
     ).rejects.toMatchObject({ code: "invalid_result" });
   });
 
+  it("validates parse_label output (fase 2.3)", async () => {
+    const client = createAiClient({
+      ...baseOptions,
+      fetchFn: mockFetch(200, {
+        data: {
+          name: "Proteinbar kakao",
+          additives: ["e330", "e422"],
+          nova_group: 4,
+          nutriments: { energy_kcal: 380, protein_g: 30, salt_g: 0.4 },
+        },
+      }),
+    });
+    const result = await client.callAi("parse_label", {
+      image_base64: "x",
+      media_type: "image/jpeg",
+      locale: "da",
+    });
+    expect(result.additives).toEqual(["e330", "e422"]);
+    expect(result.nova_group).toBe(4);
+    expect(result.nutriments.energy_kcal).toBe(380);
+  });
+
+  it("rejects parse_label with malformed additive codes", async () => {
+    const client = createAiClient({
+      ...baseOptions,
+      fetchFn: mockFetch(200, {
+        data: { additives: ["citronsyre"], nutriments: {} },
+      }),
+    });
+    await expect(
+      client.callAi("parse_label", { image_base64: "x", media_type: "image/jpeg", locale: "da" }),
+    ).rejects.toMatchObject({ code: "invalid_result" });
+  });
+
   it("rejects malformed success envelopes", async () => {
     const client = createAiClient({
       ...baseOptions,

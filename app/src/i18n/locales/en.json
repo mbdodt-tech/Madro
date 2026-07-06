@@ -160,7 +160,24 @@
       "custom": "Own food"
     },
     "errorTitle": "Lookup failed",
-    "errorBody": "We couldn't look up the barcode — check your connection."
+    "errorBody": "We couldn't look up the barcode — check your connection.",
+    "label": {
+      "openButton": "Photograph the label",
+      "title": "Photograph the label",
+      "intro": "Take a clear photo of the ingredient list and nutrition declaration — we'll fill in the product for you.",
+      "takePhoto": "Take photo",
+      "analyzing": "Reading the label…",
+      "nothingFound": "We couldn't read a label in the photo — try again with better light and the full text in frame.",
+      "nameLabel": "Product name",
+      "brandLabel": "Brand (optional)",
+      "novaEstimate": "NOVA {{group}} · estimate",
+      "removeAdditive": "Remove {{code}}",
+      "per100": "Per 100 g — as declared",
+      "save": "Save product",
+      "retake": "Retake photo",
+      "saveError": "Couldn't save the product — try again.",
+      "back": "Back to search"
+    }
   },
   "verdict": {
     "sheetTitle": "Scan result",

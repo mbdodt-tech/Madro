@@ -17,11 +17,39 @@ export const parsedMealItemSchema = z.object({
 
 export type ParsedMealItem = z.infer<typeof parsedMealItemSchema>;
 
+/** Udtræk fra et foto af en varedeklaration (fase 2.3). Alt er valgfrit —
+ *  kun hvad der faktisk kunne læses; ingen gæt. */
+export const parsedLabelSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  brand: z.string().min(1).max(120).optional(),
+  ingredients_text: z.string().max(4000).optional(),
+  /** Normaliserede E-numre, fx "e330". */
+  additives: z.array(z.string().regex(/^e\d{3,4}[a-z]?$/)).max(40).default([]),
+  /** NOVA-skøn ud fra ingredienslisten; udelades hvis usikkert. */
+  nova_group: z.number().int().min(1).max(4).optional(),
+  /** Deklarationens tal pr. 100 g. */
+  nutriments: z
+    .object({
+      energy_kcal: z.number().min(0).max(950).optional(),
+      fat_g: z.number().min(0).max(100).optional(),
+      saturated_fat_g: z.number().min(0).max(100).optional(),
+      carbohydrate_g: z.number().min(0).max(100).optional(),
+      sugars_g: z.number().min(0).max(100).optional(),
+      fiber_g: z.number().min(0).max(100).optional(),
+      protein_g: z.number().min(0).max(100).optional(),
+      salt_g: z.number().min(0).max(100).optional(),
+    })
+    .default({}),
+});
+
+export type ParsedLabel = z.infer<typeof parsedLabelSchema>;
+
 export const aiResultSchemas = {
   ping: z.object({ pong: z.literal(true), time: z.string() }),
   parse_meal: z.object({
     items: z.array(parsedMealItemSchema).min(1).max(8),
   }),
+  parse_label: parsedLabelSchema,
 } as const;
 
 export type AiTask = keyof typeof aiResultSchemas;

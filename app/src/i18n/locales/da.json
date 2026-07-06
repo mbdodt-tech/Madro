@@ -160,7 +160,24 @@
       "custom": "Egen fødevare"
     },
     "errorTitle": "Opslaget mislykkedes",
-    "errorBody": "Vi kunne ikke slå stregkoden op — tjek din forbindelse."
+    "errorBody": "Vi kunne ikke slå stregkoden op — tjek din forbindelse.",
+    "label": {
+      "openButton": "Fotografér varedeklarationen",
+      "title": "Fotografér varedeklarationen",
+      "intro": "Tag et tydeligt billede af ingredienslisten og næringsdeklarationen — så udfylder vi varen for dig.",
+      "takePhoto": "Tag billede",
+      "analyzing": "Aflæser deklarationen…",
+      "nothingFound": "Vi kunne ikke læse en deklaration på billedet — prøv igen med bedre lys og hele teksten i billedet.",
+      "nameLabel": "Varenavn",
+      "brandLabel": "Mærke (valgfrit)",
+      "novaEstimate": "NOVA {{group}} · skøn",
+      "removeAdditive": "Fjern {{code}}",
+      "per100": "Pr. 100 g — som deklareret",
+      "save": "Gem vare",
+      "retake": "Tag nyt billede",
+      "saveError": "Kunne ikke gemme varen — prøv igen.",
+      "back": "Tilbage til søgning"
+    }
   },
   "verdict": {
     "sheetTitle": "Scanresultat",

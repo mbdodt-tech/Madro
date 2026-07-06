@@ -124,7 +124,7 @@ Hvert trin har **acceptkriterier** — trinnet er først færdigt, når de alle 
 
 **Accept:** foto → redigerbare rækker → log; rettetrinnet (særligt tilføjet fedtstof) genberegner med det samme; "estimat"-mærkning.
 
-### 2.3 Foto af ingrediensliste → analyse + opret vare
+### 2.3 Foto af ingrediensliste → analyse + opret vare (bygget 2026-07-06)
 
 > Brugerens ønske fra telefontest: fotografér ingredienslisten/næringsdeklarationen på en vare, der hverken findes hos os eller OFF → AI udtrækker ingredienser, additiver og næringstal → forhåndsvisning → gem som `custom`-vare (verdikt-signal via additiver; NOVA/Nutri kan mangle → ærlig "utilstrækkelig"-håndtering findes).
 

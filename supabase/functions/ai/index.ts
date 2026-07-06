@@ -34,6 +34,51 @@ const parseMealResult = z.object({
     .max(8),
 });
 
+// ---- parse_label (fase 2.3): foto af varedeklaration → varedata ----
+// Skemaet spejler aiResultSchemas.parse_label i packages/core/src/ai.ts.
+// Billedet persisteres og logges ALDRIG.
+const parseLabelPayload = z.object({
+  image_base64: z.string().min(100).max(2_800_000),
+  media_type: z.enum(["image/jpeg", "image/png"]),
+  locale: z.enum(["da", "en"]),
+});
+
+const parseLabelResult = z.object({
+  name: z.string().min(1).max(200).optional(),
+  brand: z.string().min(1).max(120).optional(),
+  ingredients_text: z.string().max(4000).optional(),
+  additives: z.array(z.string().regex(/^e\d{3,4}[a-z]?$/)).max(40).default([]),
+  nova_group: z.number().int().min(1).max(4).optional(),
+  nutriments: z
+    .object({
+      energy_kcal: z.number().min(0).max(950).optional(),
+      fat_g: z.number().min(0).max(100).optional(),
+      saturated_fat_g: z.number().min(0).max(100).optional(),
+      carbohydrate_g: z.number().min(0).max(100).optional(),
+      sugars_g: z.number().min(0).max(100).optional(),
+      fiber_g: z.number().min(0).max(100).optional(),
+      protein_g: z.number().min(0).max(100).optional(),
+      salt_g: z.number().min(0).max(100).optional(),
+    })
+    .default({}),
+});
+
+const PARSE_LABEL_SYSTEM = `Opgave: Aflæs varedeklarationen (ingrediensliste og/eller næringsdeklaration) på billedet.
+- Returnér JSON: { "name"?, "brand"?, "ingredients_text"?, "additives": [..],
+  "nova_group"?, "nutriments": {..} }.
+- "additives": alle E-numre fra ingredienslisten, normaliseret småt uden mellemrum
+  (fx "e330", "e160a"). Genkend også navngivne tilsætningsstoffer med kendt E-nummer
+  (fx "citronsyre" → "e330").
+- "nova_group": skøn 1-4 EFTER NOVA-kriterierne ud fra ingredienslisten
+  (fx: kun én råvare → 1; industrielle ingredienser som glukosesirup,
+  modificeret stivelse, aromaer, emulgatorer → 4). Udelad feltet, hvis
+  ingredienslisten ikke kan læses.
+- "nutriments": tallene PR. 100 g præcis som deklareret (energy_kcal, fat_g,
+  saturated_fat_g, carbohydrate_g, sugars_g, fiber_g, protein_g, salt_g).
+  Deklareres kun pr. portion, omregn ikke — udelad feltet.
+- Medtag KUN hvad der faktisk kan læses på billedet. Gæt aldrig.
+- Kan intet af ovenstående læses, returnér {"additives":[],"nutriments":{}}.`;
+
 const PARSE_MEAL_SYSTEM = `Opgave: Parsér en måltidsbeskrivelse til enkeltposter.
 - Returnér JSON på formen {"items":[{"name":string,"grams":number,"note":string?}]}.
 - "name": fødevarens navn på beskrivelsens sprog, kort og opslagsvenligt
@@ -66,6 +111,21 @@ const tasks: Record<
         user: `Sprog: ${locale}\nMåltidsbeskrivelse: ${text}`,
         schema: parseMealResult,
         maxTokens: 1024,
+      });
+    },
+  },
+  parse_label: {
+    schema: parseLabelPayload,
+    handler: async (payload) => {
+      const { image_base64, media_type, locale } =
+        payload as z.infer<typeof parseLabelPayload>;
+      return askClaude({
+        system: PARSE_LABEL_SYSTEM,
+        user: `Sprog: ${locale}. Aflæs varedeklarationen på billedet.`,
+        imageBase64: image_base64,
+        imageMediaType: media_type,
+        schema: parseLabelResult,
+        maxTokens: 2048,
       });
     },
   },

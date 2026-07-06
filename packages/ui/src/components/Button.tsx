@@ -28,7 +28,7 @@ export function Button({
         size === "md" && "px-4 py-3 text-body",
         size === "sm" && "px-3 py-2 text-small",
         variant === "primary" &&
-          "bg-brand text-on-brand hover:bg-brand-hover",
+          "btn-brand-surface text-on-brand shadow-btn hover:brightness-105",
         variant === "secondary" &&
           "border border-hairline bg-surface font-medium text-ink hover:bg-brand-tint",
         variant === "ghost" &&

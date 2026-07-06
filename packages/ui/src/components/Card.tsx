@@ -16,7 +16,8 @@ export function Card({
   return (
     <div
       className={cn(
-        "rounded-xl border border-hairline shadow-1",
+        // Lys: skyggen løfter (card-edge er transparent); mørk: hårlinje-kant.
+        "rounded-xl border border-card-edge shadow-1",
         raised ? "bg-surface-raised" : "bg-surface",
         padding === "md" && "p-4",
         padding === "lg" && "p-6",

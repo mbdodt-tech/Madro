@@ -15,6 +15,7 @@ export {
 export { cn } from "./components/cn";
 export { Button, type ButtonProps } from "./components/Button";
 export { Card, type CardProps } from "./components/Card";
+export { Panel, type PanelProps } from "./components/Panel";
 export { Chip, type ChipProps } from "./components/Chip";
 export { VerdiktBadge, type VerdiktBadgeProps } from "./components/VerdiktBadge";
 export { QualityArc, type QualityArcProps } from "./components/QualityArc";

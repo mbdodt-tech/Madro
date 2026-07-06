@@ -2,15 +2,16 @@ import { motion, useReducedMotion } from "motion/react";
 import { cn } from "./cn";
 import { useCountUp } from "./useCountUp";
 
-const R = 30;
-const CIRC = 2 * Math.PI * R; // ≈ 188.5
+const R = 26;
+const CIRC = 2 * Math.PI * R;
 
 export type MacroKind = "protein" | "carb" | "fat";
 
+/** Aflæsningsfarver på panelet — lysende, ens i begge tilstande. */
 const colorClass: Record<MacroKind, string> = {
-  protein: "text-macro-protein",
-  carb: "text-macro-carb",
-  fat: "text-macro-fat",
+  protein: "text-lume",
+  carb: "text-panel-carb",
+  fat: "text-panel-fat",
 };
 
 export interface MacroRingProps {
@@ -25,8 +26,8 @@ export interface MacroRingProps {
 }
 
 /**
- * Makroring fra mockuppen. Fyldet cappes ved 100 % — der findes ingen
- * rød "over målet"-tilstand (ansvarlighedsregel: ingen skyld-mekanik).
+ * Makroring på instrumentpanelet. Fyldet cappes ved 100 % — der findes
+ * ingen rød "over målet"-tilstand (ansvarlighedsregel: ingen skyld-mekanik).
  */
 export function MacroRing({ macro, value, target, label, className }: MacroRingProps) {
   const reduceMotion = useReducedMotion();
@@ -35,44 +36,46 @@ export function MacroRing({ macro, value, target, label, className }: MacroRingP
   const offset = CIRC * (1 - fraction);
 
   return (
-    <div className={cn("flex flex-col items-center gap-1", className)}>
-      <div className="relative size-18">
-        <svg viewBox="0 0 72 72" className="size-full -rotate-90" aria-hidden="true">
+    <div className={cn("flex flex-col items-center gap-1.5", className)}>
+      <div className="relative size-16">
+        <svg viewBox="0 0 64 64" className="size-full -rotate-90" aria-hidden="true">
           <circle
-            cx="36"
-            cy="36"
+            cx="32"
+            cy="32"
             r={R}
             fill="none"
-            className="stroke-hairline"
-            strokeWidth="7"
+            strokeWidth="5.5"
+            className="stroke-panel-track"
           />
           <motion.circle
-            cx="36"
-            cy="36"
+            cx="32"
+            cy="32"
             r={R}
             fill="none"
             stroke="currentColor"
-            strokeWidth="7"
+            strokeWidth="5.5"
             strokeLinecap="round"
             strokeDasharray={CIRC}
-            className={colorClass[macro]}
+            className={cn("glow-reading", colorClass[macro])}
             initial={reduceMotion ? false : { strokeDashoffset: CIRC }}
             animate={{ strokeDashoffset: offset }}
             transition={
-              reduceMotion ? { duration: 0 } : { duration: 0.6, ease: "easeOut" }
+              reduceMotion ? { duration: 0 } : { duration: 0.7, ease: [0.2, 0.8, 0.25, 1] }
             }
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="font-mono text-small font-semibold tabular-nums text-ink">
+          <span className="font-mono text-small font-medium tabular-nums text-panel-ink">
             {displayValue}
           </span>
-          <span className="font-mono text-caption tabular-nums text-tertiary">
+          <span className="font-mono text-caption tabular-nums text-panel-dim">
             /{Math.round(target)} g
           </span>
         </div>
       </div>
-      <span className="text-caption text-secondary">{label}</span>
+      <span className="text-caption font-semibold uppercase tracking-widest text-panel-dim">
+        {label}
+      </span>
     </div>
   );
 }

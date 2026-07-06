@@ -326,5 +326,22 @@
     "comingSoon": "kommer snart",
     "logTitle": "Dagens måltider",
     "empty": "Ingen måltider logget endnu i dag."
+  },
+  "insights": {
+    "title": "Indsigt",
+    "trendTitle": "Kvalitet denne uge",
+    "trendNote": "Andel ikke-ultraforarbejdet pr. dag (NOVA 1-3).",
+    "daysLogged": "dage logget",
+    "avgQuality": "gns. kvalitet",
+    "avgKcal": "gns. kcal",
+    "hidden": "skjult",
+    "tooFewDays": "Log et par dage mere, så kan vi tegne ugens mønster for dig.",
+    "generateHint": "Få en kort fortælling om ugens mønstre og konkrete idéer, der lukker hullerne.",
+    "generate": "Lav ugens indsigt",
+    "generating": "Skriver ugens indsigt…",
+    "generated": "Ugens indsigt er klar",
+    "premiumTitle": "Ugeindsigter er en del af Premium",
+    "premiumBody": "Få en ugentlig fortælling om dine mønstre og konkrete fødevareidéer, der lukker hullerne i din mikronæring.",
+    "premiumChip": "kommer med Premium"
   }
 }

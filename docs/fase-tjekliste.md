@@ -130,7 +130,7 @@ Hvert trin har **acceptkriterier** — trinnet er først færdigt, når de alle 
 
 **Accept:** miss-arket tilbyder "fotografér varedeklarationen"; gemt vare kan scannes/logges fremover.
 
-### 2.4 Ugentlig mønster-indsigt
+### 2.4 Ugentlig mønster-indsigt (bygget 2026-07-06)
 
 > Indsigt-fanen bliver rigtig: ugeaggregat fra daily_summaries → AI-fortælling i almindeligt sprog ("sådan spiser du endnu bedre", aldrig "sådan har du fejlet") + enkel trendgraf (Recharts) + konkrete fødevareforslag. Persisteres i `insights`-tabellen. Premium-gate via `useEntitlements()`-stubben.
 

@@ -31,12 +31,15 @@
   --on-brand: #ffffff;
   --card-edge: transparent; /* lys: skygge løfter, ingen kant */
 
-  /* Instrumentpanelet — signaturen (mørk evergreen i BEGGE tilstande) */
-  --panel: #0c2b22;
-  --panel-edge: #123528;
-  --panel-ink: #e9f2ed;
-  --panel-dim: #8fa89d;
-  --panel-track: rgba(233, 242, 237, 0.13);
+  /* Instrumentpanelet — signaturen. Lys tilstand: lysere, blødere
+     salvie-grøn (brugerjustering 2026-07-06: "for grøn" → lysere nuance);
+     mørk tilstand beholder den dybe tone og overstyrer nedenfor. */
+  --panel: #33604e;
+  --panel-edge: #3e6f5b;
+  --panel-ink: #f3f8f5;
+  --panel-dim: #bdd2c7;
+  --panel-track: rgba(243, 248, 245, 0.2);
+  --panel-haze: rgba(61, 214, 163, 0.05);
   /* Aflæsningsfarver på panelet — lysende, ens i begge tilstande */
   --lume: #3dd6a3;
   --panel-carb: #e8b05c;
@@ -85,6 +88,10 @@
   /* Panelet smelter sammen med den mørke flade via lysere kant */
   --panel: #10231c;
   --panel-edge: #1a3529;
+  --panel-ink: #e9f2ed;
+  --panel-dim: #8fa89d;
+  --panel-track: rgba(233, 242, 237, 0.13);
+  --panel-haze: rgba(61, 214, 163, 0.09);
 
   /* Verdikt løftet ca. 8-10 % i lyshed */
   --v-excellent: #3db97d;
@@ -225,8 +232,18 @@
   /* Panelets stof: svag lume-dis foroven + lodret kant-til-flade-gradient */
   .panel-surface {
     background:
-      radial-gradient(120% 90% at 50% -20%, rgba(61, 214, 163, 0.09), transparent 60%),
+      radial-gradient(120% 90% at 50% -20%, var(--panel-haze), transparent 60%),
       linear-gradient(180deg, var(--panel-edge), var(--panel) 42%);
+  }
+
+  /* Side-dis: binder panelet til papiret i lys tilstand (svag grøn tone
+     der toner ud nedad — én sammenhængende flade, ikke blokke). */
+  .page-hero-wash {
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--brand-tint) 65%, transparent),
+      transparent 22rem
+    );
   }
 
   /* Primærknappens stof: diskret lodret gradient (toplys ligger i shadow-btn) */

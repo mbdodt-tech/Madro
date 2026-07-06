@@ -137,6 +137,8 @@ export function TodayPage() {
 
   return (
     <TabShell>
+      {/* Side-dis: binder panelet til papiret (fuld bredde, toner ud) */}
+      <div className="page-hero-wash min-h-full">
       <main className="mx-auto flex max-w-md flex-col gap-5 px-6 py-8 font-sans">
         {/* Header: graveret dato-eyebrow over titlen ("Instrumentet") */}
         <header className="flex items-start justify-between">
@@ -241,14 +243,14 @@ export function TodayPage() {
           </Panel>
         )}
 
-        {/* Indsigtsteaser */}
-        <Card>
+        {/* Indsigtsteaser — tintet mellemtrin mellem panel og hvide kort */}
+        <div className="rounded-xl bg-brand-tint p-4">
           <div className="flex items-center gap-3">
             <Sparkles className="size-5 shrink-0 text-brand" aria-hidden="true" />
             <p className="flex-1 text-small text-secondary">{t("today.insightTeaser")}</p>
             <Chip>{t("today.comingSoon")}</Chip>
           </div>
-        </Card>
+        </div>
 
         {/* Dagens log */}
         <div className="flex items-center justify-between">
@@ -275,6 +277,7 @@ export function TodayPage() {
           <MealSections entries={entries ?? []} onEntryClick={setEditing} />
         )}
       </main>
+      </div>
 
       {/* Avatar-ark: sprog, log ud, designsystem */}
       <Sheet

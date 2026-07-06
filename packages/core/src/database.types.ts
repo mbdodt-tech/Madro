@@ -18,6 +18,57 @@ export type Database = {
   };
   public: {
     Tables: {
+      activity_days: {
+        Row: {
+          active_kcal: number | null;
+          created_at: string;
+          day: string;
+          source: string;
+          steps: number | null;
+          user_id: string;
+        };
+        Insert: {
+          active_kcal?: number | null;
+          created_at?: string;
+          day: string;
+          source?: string;
+          steps?: number | null;
+          user_id: string;
+        };
+        Update: {
+          active_kcal?: number | null;
+          created_at?: string;
+          day?: string;
+          source?: string;
+          steps?: number | null;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      body_metrics: {
+        Row: {
+          created_at: string;
+          day: string;
+          source: string;
+          user_id: string;
+          weight_kg: number;
+        };
+        Insert: {
+          created_at?: string;
+          day: string;
+          source?: string;
+          user_id: string;
+          weight_kg: number;
+        };
+        Update: {
+          created_at?: string;
+          day?: string;
+          source?: string;
+          user_id?: string;
+          weight_kg?: number;
+        };
+        Relationships: [];
+      };
       daily_summaries: {
         Row: {
           computed_at: string;

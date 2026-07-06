@@ -177,6 +177,14 @@
       "retake": "Retake photo",
       "saveError": "Couldn't save the product — try again.",
       "back": "Back to search"
+    },
+    "photo": {
+      "openButton": "Photograph the meal instead",
+      "title": "Photograph the meal",
+      "intro": "Take a photo of the plate — we'll recognise the food and estimate portions. You can adjust everything afterwards.",
+      "takePhoto": "Take photo",
+      "analyzing": "Recognising the food…",
+      "nothingFound": "We couldn't recognise food in the photo — try again with the whole meal in frame."
     }
   },
   "verdict": {
@@ -281,6 +289,18 @@
       "logAll_other": "Log {{count}} entries",
       "aiNotConfigured": "The AI helper isn't set up yet — use search for now.",
       "rateLimited": "Many attempts in a short time — try again shortly."
+    },
+    "editor": {
+      "invisible": "What the camera can't see — add it yourself:",
+      "quick": {
+        "oil": "Oil (1 tbsp)",
+        "butter": "Butter",
+        "dressing": "Dressing",
+        "sauce": "Sauce"
+      },
+      "addByText": "Add by text",
+      "addByTextPlaceholder": "e.g. a glass of milk",
+      "add": "Add"
     }
   },
   "today": {

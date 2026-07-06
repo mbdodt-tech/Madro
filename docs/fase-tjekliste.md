@@ -112,13 +112,13 @@ Hvert trin har **acceptkriterier** — trinnet er først færdigt, når de alle 
 
 ## Fase 2 — Intelligens og måltidsscanning (trinliste godkendt 2026-07-06)
 
-### 2.1 Naturligt-sprog-logning
+### 2.1 Naturligt-sprog-logning (bygget 2026-07-06)
 
 > "Skriv hvad du spiste" i +-arket: fri tekst → gateway-task `parse_meal` (første rigtige Anthropic-kald: guardrails, JSON-only, zod, rate limit) → redigerbare rækker matchet mod `foods` → ét tryk logger alle. Diskret "estimat — ret hvis nødvendigt". Payload-indhold logges aldrig.
 
 **Accept:** tekst → AI-forslag som redigerbare rækker → logget i dagbogen; rolig fejlhåndtering (manglende nøgle, rate limit, offline); tone-/format-stikprøve ren.
 
-### 2.2 AI-måltidsscanning (foto) med rettetrin
+### 2.2 AI-måltidsscanning (foto) med rettetrin (bygget 2026-07-06)
 
 > Foto af tallerken → genkendte retter som redigerbare rækker (byggeplan §2.3): ret/fjern/tilføj, skydere for portioner, hurtig-knapper for usynlige ingredienser (olie, smør, sauce, dressing). Billeder i privat bucket via signerede URL'er. Scan-typen `photo` findes allerede i scans-tabellen.
 

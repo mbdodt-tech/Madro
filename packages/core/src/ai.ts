@@ -50,6 +50,10 @@ export const aiResultSchemas = {
     items: z.array(parsedMealItemSchema).min(1).max(8),
   }),
   parse_label: parsedLabelSchema,
+  /** Foto af tallerken (fase 2.2). 0 items tilladt = ingen mad genkendt. */
+  parse_photo_meal: z.object({
+    items: z.array(parsedMealItemSchema).max(8),
+  }),
 } as const;
 
 export type AiTask = keyof typeof aiResultSchemas;

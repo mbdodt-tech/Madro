@@ -11,6 +11,7 @@ import { Camera, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { aiClient } from "../../lib/aiClient";
+import { downscaleToJpegBase64 } from "../../lib/image";
 import { supabase } from "../../lib/supabase";
 import type { FoodHit } from "../../scanner/useLookup";
 
@@ -25,22 +26,6 @@ const LABEL_FIELDS: NutrientKey[] = [
   "protein_g",
   "salt_g",
 ];
-
-const MAX_DIMENSION = 1280;
-const JPEG_QUALITY = 0.8;
-
-/** Nedskalér i klienten: mindre payload, og originalfotoet forlader aldrig enheden i fuld størrelse. */
-async function downscaleToJpegBase64(file: File): Promise<string> {
-  const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, MAX_DIMENSION / Math.max(bitmap.width, bitmap.height));
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.round(bitmap.width * scale);
-  canvas.height = Math.round(bitmap.height * scale);
-  canvas.getContext("2d")!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  bitmap.close();
-  const dataUrl = canvas.toDataURL("image/jpeg", JPEG_QUALITY);
-  return dataUrl.split(",")[1]!;
-}
 
 interface Draft {
   name: string;

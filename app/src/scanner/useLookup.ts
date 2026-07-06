@@ -61,8 +61,9 @@ export async function lookupViaOff(barcode: string): Promise<FoodHit | null> {
 
 /** Registrér scanningen; returnerer scan-id'et til senere 'logged'-opdatering. */
 export async function recordScan(
-  barcode: string,
+  barcode: string | null,
   foodId: string | null,
+  type: "barcode" | "photo" = "barcode",
 ): Promise<string | null> {
   const { data } = await supabase.auth.getSession();
   const userId = data.session?.user.id;
@@ -71,7 +72,7 @@ export async function recordScan(
     .from("scans")
     .insert({
       user_id: userId,
-      type: "barcode",
+      type,
       barcode,
       food_id: foodId,
       outcome: "checked",

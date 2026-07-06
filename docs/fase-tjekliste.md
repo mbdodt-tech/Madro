@@ -190,17 +190,19 @@ Rækkefølge-beslutning: appen gøres teknisk færdig → brugerens testperiode 
 
 **Accept:** web-scanning uændret; native-stien kompilerer i CI.
 
-### 5.3 CI: native byg i skyen
+### 5.3 CI: native byg i skyen (bygget 2026-07-06)
 
-> `.github/workflows/native.yml` (manuel dispatch): Android-job → debug-APK-artefakt; iOS-job (macos) → usigneret kompileringsbevis; TestFlight-upload klar bag APPLE_READY-flag + secrets.
+> `.github/workflows/native.yml` (manuel dispatch): Android-job → debug-APK-artefakt (sideload-klar); iOS-job (macos) → usigneret kompileringsbevis; TestFlight-upload klar bag APPLE_READY-flag + secrets.
 
-**Accept:** Android-APK som artefakt; iOS bygger rent (brugerens klik).
+**Accept:** Android-APK som artefakt; iOS bygger rent (brugerens klik — første kørsel er kompileringsbeviset for 5.1+5.2).
 
-### 5.4 Ikoner/splash + butiks-køreplan
+### 5.4 Ikoner/splash + butiks-køreplan (bygget 2026-07-06)
 
-> Logo-kilde → @capacitor/assets genererer alle størrelser; docs/native.md er brugerens komplette køreplan (Apple-konto → TestFlight → RevenueCat/Stripe → App Store m. privacy labels, aldersgrænse, ODbL, HealthKit-plan).
+> Instrumentet-ikon (dyb evergreen + lysende Geist Mono-M) og splash genereret via @capacitor/assets til begge platforme (kilder i native/assets). docs/native.md er brugerens komplette køreplan: testperiode-tjekliste (native scanning først!) → Apple/TestFlight → RevenueCat/Stripe → HealthKit → App Store (privacy labels, 13+-grænse, ODbL, kontosletning i review-noter).
 
 **Accept:** ikoner/splash committet; native.md kan følges uden assistance.
+
+**⛳ Fase 5 færdig (2026-07-06) — teknisk:** skallen, native scanning, CI-byg og butiksmaterialet står klar. De resterende punkter er bevidst brugerens (testperiode → Apple-konto → betaling → indsendelse) og står i docs/native.md. Enhedstest af native scanning + HealthKit-aktivering sker i testperioden.
 
 ---
 

@@ -82,6 +82,23 @@ export async function persistHideCalories(hide: boolean): Promise<void> {
   await supabase.from("profiles").update({ hide_calories: hide }).eq("id", userId);
 }
 
+/**
+ * Gemmer vilkårlige profilfelter (Profil-siden, fase 3.1) — optimistisk
+ * cache-opdatering som de øvrige persist-hjælpere, så "I dag"-målene
+ * flytter sig med det samme.
+ */
+export async function persistProfileFields(
+  fields: Partial<Profile>,
+): Promise<void> {
+  const { data } = await supabase.auth.getSession();
+  const userId = data.session?.user.id;
+  if (!userId) return;
+  queryClient.setQueryData<Profile | null>(PROFILE_KEY, (old) =>
+    old ? { ...old, ...fields } : old,
+  );
+  await supabase.from("profiles").update(fields).eq("id", userId);
+}
+
 /** Opdaterer profilens locale (fire-and-forget fra sprogskifteren). */
 export async function persistLocale(locale: string): Promise<void> {
   const { data } = await supabase.auth.getSession();

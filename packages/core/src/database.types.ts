@@ -242,6 +242,7 @@ export type Database = {
           dietary_preferences: string[];
           entitlement: string;
           goals: Json;
+          height_cm: number | null;
           hide_calories: boolean;
           id: string;
           locale: string;
@@ -249,6 +250,7 @@ export type Database = {
           sex: string | null;
           timezone: string;
           updated_at: string;
+          weight_kg: number | null;
         };
         Insert: {
           activity_level?: string | null;
@@ -257,6 +259,7 @@ export type Database = {
           dietary_preferences?: string[];
           entitlement?: string;
           goals?: Json;
+          height_cm?: number | null;
           hide_calories?: boolean;
           id: string;
           locale?: string;
@@ -264,6 +267,7 @@ export type Database = {
           sex?: string | null;
           timezone?: string;
           updated_at?: string;
+          weight_kg?: number | null;
         };
         Update: {
           activity_level?: string | null;
@@ -272,6 +276,7 @@ export type Database = {
           dietary_preferences?: string[];
           entitlement?: string;
           goals?: Json;
+          height_cm?: number | null;
           hide_calories?: boolean;
           id?: string;
           locale?: string;
@@ -279,6 +284,7 @@ export type Database = {
           sex?: string | null;
           timezone?: string;
           updated_at?: string;
+          weight_kg?: number | null;
         };
         Relationships: [];
       };

@@ -146,6 +146,36 @@ Hvert trin har **acceptkriterier** — trinnet er først færdigt, når de alle 
 
 ---
 
+## Fase 3 — Integration og forfining (trinliste godkendt 2026-07-06)
+
+Wearable-beslutning: fundament + manuel indtastning nu; HealthKit kobler på samme datalag i Fase 5 (ingen OAuth-leverandører i Fase 3).
+
+### 3.1 Profil-side + rigtige behov (targets v2)
+
+> Profil-fanen bliver rigtig: køn, fødselsår, højde, vægt, aktivitetsniveau, blid målretning, hide_calories, sprog, RDA-region, log ud + LMS-støttelink. Core: `resolveTargets` v2 — Mifflin-St Jeor × NNR-aktivitetsfaktor (1,4/1,6/1,8) ± blid retning (±300 kcal), konservativ bund (1500/1700), protein min. 1,2 g/kg; ufuldstændig profil → NNR-forenklede defaults som hidtil. Migration: `profiles` + `height_cm`/`weight_kg`.
+
+**Accept:** udfyldt profil ændrer målene på "I dag" med det samme; tom profil = uændret adfærd; copy-stikprøve neutral; LMS-link findes.
+
+### 3.2 Aktivitets-/kropsdatalag (wearable-fundamentet)
+
+> Migration: `body_metrics` (vægt pr. dag) + `activity_days` (skridt/aktiv-kcal pr. dag) med RLS og `source`-kolonne ('manual' nu, 'healthkit' m.fl. i Fase 5). Profil-siden: "Log vægt i dag" + lille historik; vægtlog spejler profiles.weight_kg. "I dag": dagens aktiv-kcal lægges neutralt oven i kcal-målet.
+
+**Accept:** vægtlog vises i historik og flytter targets; RLS-bevis for begge tabeller; ingen skyld-sprog.
+
+### 3.3 Bedre portions- og fedtstof-estimering
+
+> Core: dansk husholdningsmåls-tabel (`PORTION_UNITS` + `convertToGrams`) med kilder og tests. Gateway v8: portionsheuristikker i parse_meal/parse_photo_meal + krav om synlig tilberedningsfedt-række ved stegt/friteret. App: enhedsvælger i MealDraftEditor (g/stk/skive/spsk/dl) — databasen forbliver gram.
+
+**Accept:** "2 skiver rugbrød med smør" → fornuftige gram; stegt ret → synlig fedtstof-række; enhedsvælgeren regner rigtigt.
+
+### 3.4 Foto-forfining ud fra brugerrettelser
+
+> Ved log fra fotoflowet gemmes `{ai_items, final_items}` (kun tekst — aldrig billeder) i scans.payload. Core: `buildCorrectionHints` aggregerer seneste ≤20 rettelser (portions-bias, hyppigt tilføjet/fjernet). Hints sendes med i parse_photo_meal som blød kalibrering; ny bruger uden hints = uændret adfærd.
+
+**Accept:** simulerede rettelses-runder flytter estimatet i biasens retning (netværksbevis); payload-indhold logges fortsat aldrig.
+
+---
+
 ## Faste vaner undervejs
 
 - Én gren/PR pr. trin; små commits med conventional commits.

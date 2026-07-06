@@ -14,20 +14,17 @@ import {
   MicroStrip,
   Panel,
   QualityArc,
-  Sheet,
   Skeleton,
   useToast,
 } from "@madro/ui";
 import { Eye, EyeOff, Plus, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { persistHideCalories, useProfile } from "../auth/useProfile";
 import { useSession } from "../auth/useSession";
 import { ErrorState } from "../components/ErrorState";
-import { LanguageSwitch } from "../components/LanguageSwitch";
 import { TabShell } from "../components/TabShell";
-import { supabase } from "../lib/supabase";
 import { useReferences } from "../lib/useReferences";
 import { AddFoodSheet } from "./diary/AddFoodSheet";
 import { EntrySheet } from "./diary/EntrySheet";
@@ -62,6 +59,7 @@ function qualityCaptionKey(pct: number | null): string {
 export function TodayPage() {
   const { t, i18n } = useTranslation();
   const { show } = useToast();
+  const navigate = useNavigate();
   const { data: session } = useSession();
   const { data: profile, isLoading: profileLoading } = useProfile();
   const today = new Date();
@@ -82,7 +80,6 @@ export function TodayPage() {
 
   const [editing, setEditing] = useState<DiaryEntry | null>(null);
   const [adding, setAdding] = useState(false);
-  const [profileSheet, setProfileSheet] = useState(false);
 
   const hideCalories = profile?.hide_calories ?? false;
   const isLoading = entriesLoading || profileLoading || summaryLoading;
@@ -99,7 +96,13 @@ export function TodayPage() {
   const sharePct = summary?.nova_share != null ? Math.round(Number(summary.nova_share)) : null;
   const targets = resolveTargets(
     (profile?.goals as Record<string, unknown> | null) ?? null,
-    { sex: profile?.sex },
+    {
+      sex: profile?.sex,
+      birthYear: profile?.birth_year,
+      heightCm: profile?.height_cm != null ? Number(profile.height_cm) : null,
+      weightKg: profile?.weight_kg != null ? Number(profile.weight_kg) : null,
+      activityLevel: profile?.activity_level,
+    },
   );
   // Ukendt køn/alder → kvinde/35 som konservativ reference (højere jern-RDA
   // viser lavere dækning frem for at oversælge den). Justeres i Profil senere.
@@ -150,7 +153,7 @@ export function TodayPage() {
           </div>
           <button
             type="button"
-            onClick={() => setProfileSheet(true)}
+            onClick={() => navigate("/profile")}
             aria-label={t("today.profileButton")}
             className="grid size-10 place-items-center rounded-pill bg-brand-tint text-small font-semibold text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
           >
@@ -278,40 +281,6 @@ export function TodayPage() {
         )}
       </main>
       </div>
-
-      {/* Avatar-ark: sprog, log ud, designsystem */}
-      <Sheet
-        open={profileSheet}
-        onOpenChange={(open) => {
-          if (!open) setProfileSheet(false);
-        }}
-        title={t("today.profileButton")}
-        showTitle
-      >
-        <div className="space-y-4">
-          <p className="truncate text-small text-tertiary">{session?.user.email}</p>
-          <div className="flex items-center justify-between">
-            <span className="text-body text-ink">{t("common.language")}</span>
-            <LanguageSwitch />
-          </div>
-          <div className="flex items-center justify-between">
-            <Link
-              className="text-small font-medium text-brand hover:text-brand-hover"
-              to="/design"
-              onClick={() => setProfileSheet(false)}
-            >
-              {t("home.designLink")}
-            </Link>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => void supabase.auth.signOut()}
-            >
-              {t("common.logout")}
-            </Button>
-          </div>
-        </div>
-      </Sheet>
 
       {editing ? (
         <EntrySheet

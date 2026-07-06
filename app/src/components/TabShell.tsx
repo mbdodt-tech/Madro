@@ -8,11 +8,12 @@ const TAB_ROUTES: Record<string, string> = {
   today: "/",
   diary: "/diary",
   insights: "/insights",
+  profile: "/profile",
 };
 
 /**
  * Fælles skal for fane-siderne: tab-bar med rute-afledt aktiv fane og
- * scan-FAB. Faner uden side endnu (indsigt, profil) viser "kommer snart".
+ * scan-FAB. Alle fire faner har en side (profil kom til i 3.1).
  */
 export function TabShell({ children }: { children: ReactNode }) {
   const { t } = useTranslation();

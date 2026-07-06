@@ -208,7 +208,7 @@ export function ProfilePage() {
                       { id: "unspecified", label: t("profile.sexUnspecified") },
                     ]}
                   />
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-3 items-end gap-3">
                     <NumberField
                       id="profile-birth-year"
                       field="birth_year"
@@ -290,7 +290,8 @@ export function ProfilePage() {
               <Card>
                 <div className="space-y-4">
                   <p className="text-small text-tertiary">{t("profile.activityNote")}</p>
-                  <div className="grid grid-cols-2 gap-3">
+                  {/* items-end: toliniet label må ikke skubbe felterne skævt */}
+                  <div className="grid grid-cols-2 items-end gap-3">
                     <NumberField
                       id="profile-steps"
                       field="steps"

@@ -384,7 +384,8 @@
     "insightTeaser": "Ugentlige indsigter om dine mønstre og mikronæring er på vej.",
     "comingSoon": "kommer snart",
     "logTitle": "Dagens måltider",
-    "empty": "Ingen måltider logget endnu i dag."
+    "empty": "Ingen måltider logget endnu i dag.",
+    "activityIncluded": "inkl. +{{active}} kcal fra dagens aktivitet (reference {{base}})"
   },
   "insights": {
     "title": "Indsigt",

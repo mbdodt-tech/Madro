@@ -384,7 +384,8 @@
     "insightTeaser": "Weekly insights about your patterns and micronutrition are on the way.",
     "comingSoon": "coming soon",
     "logTitle": "Today's meals",
-    "empty": "No meals logged yet today."
+    "empty": "No meals logged yet today.",
+    "activityIncluded": "incl. +{{active}} kcal from today's activity (reference {{base}})"
   },
   "insights": {
     "title": "Insights",

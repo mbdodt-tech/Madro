@@ -74,10 +74,12 @@ export function BottomTabBar({
     );
   };
 
+  // pb: mindst den gamle pb-5; på iPhone vinder home-indikatorens
+  // safe-area-inset (fase 5.1 — env() kan ikke tokeniseres).
   return (
     <nav
       aria-label={navLabel}
-      className="absolute inset-x-0 bottom-0 flex items-stretch border-t border-hairline bg-surface/85 px-2 pb-5 pt-2 backdrop-blur-lg"
+      className="absolute inset-x-0 bottom-0 flex items-stretch border-t border-hairline bg-surface/85 px-2 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur-lg"
     >
       {left.map(renderTab)}
       {center ? (

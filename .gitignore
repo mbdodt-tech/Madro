@@ -38,3 +38,12 @@ test-results/
 
 # Ingestion-cache (store dumps)
 scripts/.cache/
+
+# Capacitor (fase 5): genererede web-kopier og plugin-mapper — cap sync genskaber dem
+native/ios/App/App/public
+native/ios/App/App/capacitor.config.json
+native/ios/App/Pods
+native/ios/capacitor-cordova-ios-plugins
+native/android/app/src/main/assets/public
+native/android/app/src/main/assets/capacitor.config.json
+native/android/capacitor-cordova-android-plugins

@@ -18,7 +18,8 @@
     "ingest:usda": "pnpm --filter @madro/scripts ingest:usda",
     "ingest:frida": "pnpm --filter @madro/scripts ingest:frida",
     "ingest:references": "pnpm --filter @madro/scripts ingest:references",
-    "e2e": "pnpm --filter @madro/app e2e"
+    "e2e": "pnpm --filter @madro/app e2e",
+    "native:sync": "pnpm build && pnpm --filter @madro/native sync"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.0",

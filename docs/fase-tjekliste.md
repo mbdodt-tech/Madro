@@ -174,6 +174,36 @@ Wearable-beslutning: fundament + manuel indtastning nu; HealthKit kobler på sam
 
 **Accept:** simulerede rettelses-runder flytter estimatet i biasens retning (netværksbevis); payload-indhold logges fortsat aldrig.
 
+## Fase 5 — Native (trinliste godkendt 2026-07-06)
+
+Rækkefølge-beslutning: appen gøres teknisk færdig → brugerens testperiode → RevenueCat/Stripe + App Store (rene brugerskridt, dokumenteret i docs/native.md). iOS bygges via GitHub Actions (macOS-runner) — ingen Mac nødvendig.
+
+### 5.1 Capacitor-skal (bygget 2026-07-06)
+
+> `native/`-workspace: Capacitor 7 m. iOS+Android-platformmapper committet (genererede web-kopier gitignoreres; `pnpm native:sync` genskaber). appId dk.madro.app; splash i dyb evergreen; kamera-permissions m. da-tekst i begge platforme. App: `isNative()`-hjælper, SW registreres kun på web, tab-bar bruger safe-area-inset-bottom (web uændret — env()=0).
+
+**Accept:** `cap sync` rent på Windows; web-appen uændret (3/3 e2e).
+
+### 5.2 Native stregkodescanning (MLKit)
+
+> `@capacitor-mlkit/barcode-scanning` bag scanner-kontrakten fra 1.3 (`takesOverUi`-capability); web-stien urørt. Enhedstest = første punkt i testperiode-tjeklisten.
+
+**Accept:** web-scanning uændret; native-stien kompilerer i CI.
+
+### 5.3 CI: native byg i skyen
+
+> `.github/workflows/native.yml` (manuel dispatch): Android-job → debug-APK-artefakt; iOS-job (macos) → usigneret kompileringsbevis; TestFlight-upload klar bag APPLE_READY-flag + secrets.
+
+**Accept:** Android-APK som artefakt; iOS bygger rent (brugerens klik).
+
+### 5.4 Ikoner/splash + butiks-køreplan
+
+> Logo-kilde → @capacitor/assets genererer alle størrelser; docs/native.md er brugerens komplette køreplan (Apple-konto → TestFlight → RevenueCat/Stripe → App Store m. privacy labels, aldersgrænse, ODbL, HealthKit-plan).
+
+**Accept:** ikoner/splash committet; native.md kan følges uden assistance.
+
+---
+
 ## Fase 4 — Monetering & polering (trinliste godkendt 2026-07-06)
 
 Betalingsbeslutning: alt bygges færdigt mod en adapter — RevenueCat/Stripe-nøgler kobles på senere uden ombygning. Pris i konfig: 349 kr/år + 14 dages prøve.

@@ -346,7 +346,20 @@
       },
       "addByText": "Add by text",
       "addByTextPlaceholder": "e.g. a glass of milk",
-      "add": "Add"
+      "add": "Add",
+      "unitLabel": "Unit",
+      "countLabel": "Count"
+    },
+    "units": {
+      "g": "g",
+      "slice": "slice",
+      "piece": "pc",
+      "tbsp": "tbsp",
+      "tsp": "tsp",
+      "dl": "dl",
+      "glass": "glass",
+      "handful": "handful",
+      "portion": "portion"
     }
   },
   "today": {

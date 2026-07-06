@@ -1,4 +1,10 @@
-import { AiError, type ParsedMealItem } from "@madro/core";
+import {
+  AiError,
+  PORTION_UNIT_IDS,
+  convertToGrams,
+  type ParsedMealItem,
+  type PortionUnitId,
+} from "@madro/core";
 import { Button, Chip, Input, cn } from "@madro/ui";
 import { Plus, X } from "lucide-react";
 import { useState } from "react";
@@ -45,6 +51,30 @@ export function MealDraftEditor({
 
   const updateRow = (key: number, changes: Partial<DraftRow>) => {
     setRows((old) => old.map((r) => (r.key === key ? { ...r, ...changes } : r)));
+  };
+
+  /** Enhedsskifte (3.3): husholdningsmål → gram via core-tabellen. */
+  const changeUnit = (row: DraftRow, unit: PortionUnitId) => {
+    if (unit === "g") {
+      updateRow(row.key, { unit, gramsText: String(row.grams) });
+      return;
+    }
+    const hint = row.match?.name ?? row.name;
+    const grams = clampGrams(convertToGrams(unit, 1, hint) ?? row.grams);
+    updateRow(row.key, { unit, countText: "1", grams, gramsText: String(grams) });
+  };
+
+  const changeCount = (row: DraftRow, raw: string) => {
+    const cleaned = raw.replace(",", ".").replace(/[^\d.]/g, "");
+    const parsed = Number(cleaned);
+    const hint = row.match?.name ?? row.name;
+    const grams = convertToGrams(row.unit, parsed, hint);
+    updateRow(row.key, {
+      countText: cleaned,
+      ...(grams != null
+        ? { grams: clampGrams(grams), gramsText: String(clampGrams(grams)) }
+        : {}),
+    });
   };
 
   const rowSearch = async (key: number, query: string) => {
@@ -148,28 +178,56 @@ export function MealDraftEditor({
                   </button>
                 )}
               </span>
-              <span className="flex shrink-0 items-baseline gap-1">
-                <input
-                  inputMode="numeric"
-                  aria-label={t("portion.gramsLabel")}
-                  value={row.gramsText}
-                  onChange={(e) => {
-                    const raw = e.target.value.replace(/[^\d]/g, "");
-                    const parsed = Number(raw);
-                    updateRow(row.key, {
-                      gramsText: raw,
-                      ...(Number.isFinite(parsed) && parsed > 0
-                        ? { grams: clampGrams(parsed) }
-                        : {}),
-                    });
-                  }}
-                  onBlur={() => updateRow(row.key, { gramsText: String(row.grams) })}
-                  className={cn(
-                    "w-12 rounded-md bg-transparent text-right font-mono text-small tabular-nums text-ink",
-                    "focus-visible:outline-2 focus-visible:outline-brand",
-                  )}
-                />
-                <span className="font-mono text-small text-secondary">g</span>
+              <span className="flex shrink-0 flex-col items-end gap-0.5">
+                <span className="flex items-baseline gap-1">
+                  <input
+                    inputMode="decimal"
+                    aria-label={
+                      row.unit === "g" ? t("portion.gramsLabel") : t("diary.editor.countLabel")
+                    }
+                    value={row.unit === "g" ? row.gramsText : row.countText}
+                    onChange={(e) => {
+                      if (row.unit !== "g") {
+                        changeCount(row, e.target.value);
+                        return;
+                      }
+                      const raw = e.target.value.replace(/[^\d]/g, "");
+                      const parsed = Number(raw);
+                      updateRow(row.key, {
+                        gramsText: raw,
+                        ...(Number.isFinite(parsed) && parsed > 0
+                          ? { grams: clampGrams(parsed) }
+                          : {}),
+                      });
+                    }}
+                    onBlur={() =>
+                      row.unit === "g"
+                        ? updateRow(row.key, { gramsText: String(row.grams) })
+                        : undefined
+                    }
+                    className={cn(
+                      "w-12 rounded-md bg-transparent text-right font-mono text-small tabular-nums text-ink",
+                      "focus-visible:outline-2 focus-visible:outline-brand",
+                    )}
+                  />
+                  <select
+                    aria-label={t("diary.editor.unitLabel")}
+                    value={row.unit}
+                    onChange={(e) => changeUnit(row, e.target.value as PortionUnitId)}
+                    className="rounded-md border-0 bg-transparent font-mono text-small text-secondary focus-visible:outline-2 focus-visible:outline-brand"
+                  >
+                    {PORTION_UNIT_IDS.map((u) => (
+                      <option key={u} value={u}>
+                        {t(`diary.units.${u}`)}
+                      </option>
+                    ))}
+                  </select>
+                </span>
+                {row.unit !== "g" ? (
+                  <span className="font-mono text-caption tabular-nums text-tertiary">
+                    = {row.grams} g
+                  </span>
+                ) : null}
               </span>
               <button
                 type="button"

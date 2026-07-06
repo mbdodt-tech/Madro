@@ -346,7 +346,20 @@
       },
       "addByText": "Tilføj med tekst",
       "addByTextPlaceholder": "fx et glas mælk",
-      "add": "Tilføj"
+      "add": "Tilføj",
+      "unitLabel": "Enhed",
+      "countLabel": "Antal"
+    },
+    "units": {
+      "g": "g",
+      "slice": "skive",
+      "piece": "stk",
+      "tbsp": "spsk",
+      "tsp": "tsk",
+      "dl": "dl",
+      "glass": "glas",
+      "handful": "håndfuld",
+      "portion": "portion"
     }
   },
   "today": {

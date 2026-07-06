@@ -28,6 +28,7 @@ export {
   resolveTargets,
   micronutrientCoverage,
   MICRO_STRIP_KEYS,
+  type TargetsProfile,
   type RollupEntry,
   type NovaShare,
   type MacroTargets,
@@ -40,6 +41,15 @@ export {
   type WeeklyStats,
   type WeeklyTrendPoint,
 } from "./rollup/weekly";
+
+export {
+  PORTION_UNITS,
+  PORTION_UNIT_IDS,
+  unitGrams,
+  convertToGrams,
+  type PortionUnit,
+  type PortionUnitId,
+} from "./portions/portions";
 
 export {
   computeVerdict,

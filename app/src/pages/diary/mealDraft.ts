@@ -1,4 +1,4 @@
-import type { ParsedMealItem } from "@madro/core";
+import type { ParsedMealItem, PortionUnitId } from "@madro/core";
 import { searchFoodsRanked, type FoodHit } from "../../scanner/useLookup";
 
 export interface DraftRow {
@@ -7,6 +7,9 @@ export interface DraftRow {
   note?: string;
   grams: number;
   gramsText: string;
+  /** Husholdningsmål (3.3): "g" = gram-felt; ellers antal × enhed → gram. */
+  unit: PortionUnitId;
+  countText: string;
   match: FoodHit | null;
   /** Række-lokal søgning når brugeren vil skifte match. */
   searching: boolean;
@@ -88,6 +91,8 @@ export async function buildRows(items: ParsedMealItem[]): Promise<DraftRow[]> {
         note: item.note,
         grams: clampGrams(item.grams),
         gramsText: String(clampGrams(item.grams)),
+        unit: "g",
+        countText: "1",
         match: pickBestMatch(query, candidates),
         searching: false,
         candidates,

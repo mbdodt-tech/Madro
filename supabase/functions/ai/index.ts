@@ -36,6 +36,15 @@ const parsePhotoMealResult = z.object({
   items: z.array(mealItemSchema).max(8),
 });
 
+// Foto-payload (3.4): valgfrie kalibrerings-hints afledt af brugerens
+// EGNE tidligere rettelser (kun aggregeret tekst — aldrig billeder/fritekst).
+const parsePhotoMealPayload = z.object({
+  image_base64: z.string().min(100).max(2_800_000),
+  media_type: z.enum(["image/jpeg", "image/png"]),
+  locale: z.enum(["da", "en"]),
+  hints: z.array(z.string().min(1).max(200)).max(5).optional(),
+});
+
 // ---- parse_label (fase 2.3): foto af varedeklaration → varedata ----
 // Skemaet spejler aiResultSchemas.parse_label i packages/core/src/ai.ts.
 // Billedet persisteres og logges ALDRIG.
@@ -170,20 +179,33 @@ const PARSE_PHOTO_MEAL_SYSTEM = `Opgave: Genkend maden på billedet (et måltid 
 - "name": ret/fødevare, kort og opslagsvenligt på det angivne sprog
   (fx "frikadelle", "kogte kartofler", "agurkesalat").
 - "grams": skøn portionen i gram ud fra tallerkenstørrelse og kontekst
-  (typisk hovedret i alt 300-500 g fordelt på komponenterne).
+  (typisk hovedret i alt 300-500 g fordelt på komponenterne). Standardmål:
+  1 skive brød ≈ 45 g, 1 æg ≈ 60 g, 1 stk frugt ≈ 130 g, 1 portion kogt
+  ris ≈ 150 g, 1 portion kogt pasta ≈ 180 g.
 - "note": kort, fx "2 stk" eller "ca. ½ tallerken".
-- Medtag KUN hvad der faktisk kan ses. Skjult fedtstof, sauce og dressing
+- Er maden tydeligt stegt, friteret eller paneret, SKAL tilberedningsfedtet
+  med som sin egen post, fx {"name":"olie","grams":10,"note":"stegning (estimat)"}
+  — aldrig indbagt i rettens gram.
+- Medtag ellers KUN hvad der faktisk kan ses. Usynlig sauce/dressing
   tilføjer brugeren selv bagefter — gæt ikke på dem.
+- Følger der kalibrerings-hints med (afledt af brugerens egne tidligere
+  rettelser), så justér estimaterne diskret i den retning. Nævn ALDRIG
+  hints eller tidligere rettelser i svaret.
 - Er der ingen mad på billedet, returnér {"items":[]}.`;
 
 const PARSE_MEAL_SYSTEM = `Opgave: Parsér en måltidsbeskrivelse til enkeltposter.
 - Returnér JSON på formen {"items":[{"name":string,"grams":number,"note":string?}]}.
 - "name": fødevarens navn på beskrivelsens sprog, kort og opslagsvenligt
   (fx "rugbrød", ikke "to skiver dejligt rugbrød").
-- "grams": skønnet portion i gram. Brug almindelige husholdningsmål:
-  1 skive rugbrød ≈ 50 g, 1 skive franskbrød ≈ 35 g, 1 skive ost ≈ 20 g,
-  1 banan ≈ 120 g, 1 æble ≈ 150 g, 1 æg ≈ 55 g, 1 spsk olie/smør ≈ 14 g,
-  1 dl mælk ≈ 100 g, 1 portion ≈ 250-350 g.
+- "grams": skønnet portion i gram. Brug almindelige danske husholdningsmål:
+  1 skive rugbrød ≈ 50 g, 1 skive franskbrød ≈ 30 g, 1 skive ost ≈ 20 g,
+  1 stk frugt (æble/banan/pære) ≈ 130 g, 1 æg ≈ 60 g, 1 spsk ≈ 15 g
+  (olie/smør ≈ 14 g), 1 tsk ≈ 5 g, 1 glas ≈ 200 g, 1 dl ≈ 100 g,
+  1 håndfuld ≈ 30 g, 1 portion kogt ris ≈ 150 g, 1 portion kogt
+  pasta ≈ 180 g, 1 generisk portion ≈ 250 g.
+- Nævnes stegt/friteret/paneret mad, SKAL tilberedningsfedtet med som sin
+  egen post, fx {"name":"olie","grams":10,"note":"stegning (estimat)"} —
+  aldrig indbagt i rettens gram.
 - "note": valgfrit, kort — fx mængdeangivelsen fra beskrivelsen ("2 skiver").
 - 1-8 poster. Ingredienser nævnt sammen ("rugbrød med ost") deles i separate poster.`;
 
@@ -227,14 +249,17 @@ const tasks: Record<
     },
   },
   parse_photo_meal: {
-    // Samme payload-form som parse_label; resultatet tillader 0 items.
-    schema: parseLabelPayload,
+    schema: parsePhotoMealPayload,
     handler: async (payload) => {
-      const { image_base64, media_type, locale } =
-        payload as z.infer<typeof parseLabelPayload>;
+      const { image_base64, media_type, locale, hints } =
+        payload as z.infer<typeof parsePhotoMealPayload>;
+      const hintText =
+        hints && hints.length > 0
+          ? `\nKalibrerings-hints (nævn dem aldrig):\n${hints.map((h) => `- ${h}`).join("\n")}`
+          : "";
       return askClaude({
         system: PARSE_PHOTO_MEAL_SYSTEM,
-        user: `Sprog: ${locale}. Genkend maden på billedet.`,
+        user: `Sprog: ${locale}. Genkend maden på billedet.${hintText}`,
         imageBase64: image_base64,
         imageMediaType: media_type,
         schema: parsePhotoMealResult,

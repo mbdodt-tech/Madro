@@ -233,7 +233,8 @@
       "takePhoto": "Take photo",
       "analyzing": "Recognising the food…",
       "nothingFound": "We couldn't recognise food in the photo — try again with the whole meal in frame."
-    }
+    },
+    "openNative": "Open the scanner"
   },
   "verdict": {
     "sheetTitle": "Scan result",

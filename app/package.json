@@ -11,6 +11,7 @@
     "e2e": "playwright test"
   },
   "dependencies": {
+    "@capacitor-mlkit/barcode-scanning": "^7.5.0",
     "@capacitor/core": "^7.6.7",
     "@madro/core": "workspace:*",
     "@madro/ui": "workspace:*",

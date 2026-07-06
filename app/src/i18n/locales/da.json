@@ -233,7 +233,8 @@
       "takePhoto": "Tag billede",
       "analyzing": "Genkender maden…",
       "nothingFound": "Vi kunne ikke genkende mad på billedet — prøv igen med hele måltidet i billedet."
-    }
+    },
+    "openNative": "Åbn scanneren"
   },
   "verdict": {
     "sheetTitle": "Scanresultat",

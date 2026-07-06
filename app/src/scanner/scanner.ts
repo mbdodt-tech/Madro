@@ -27,13 +27,26 @@ export function nativeDetectorAvailable(): boolean {
     "function";
 }
 
-export async function createScanner(): Promise<{ scanner: Scanner; kind: ScannerKind }> {
+/**
+ * Fase 5.2: 'inline' = web-kamera i video-elementet (uændret siden 1.3);
+ * 'native' = MLKit's eget scanner-UI tager over (Capacitor-skallen).
+ */
+export type ScannerSetup =
+  | { mode: "inline"; scanner: Scanner; kind: ScannerKind }
+  | { mode: "native"; scanOnce: () => Promise<string | null> };
+
+export async function createScanner(): Promise<ScannerSetup> {
+  const { isNative } = await import("../lib/platform");
+  if (isNative()) {
+    const { scanOnce } = await import("./mlkit");
+    return { mode: "native", scanOnce };
+  }
   if (nativeDetectorAvailable()) {
     const { BarcodeDetectorScanner } = await import("./barcode-detector");
-    return { scanner: new BarcodeDetectorScanner(), kind: "barcode-detector" };
+    return { mode: "inline", scanner: new BarcodeDetectorScanner(), kind: "barcode-detector" };
   }
   const { ZxingScanner } = await import("./zxing");
-  return { scanner: new ZxingScanner(), kind: "zxing" };
+  return { mode: "inline", scanner: new ZxingScanner(), kind: "zxing" };
 }
 
 export type { BarcodeDetectorLike, BarcodeDetectorCtor };

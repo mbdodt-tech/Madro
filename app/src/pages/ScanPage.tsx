@@ -71,15 +71,38 @@ export function ScanPage() {
     void handleBarcode(barcode);
   };
 
+  // Native (5.2): MLKit's scanner-UI tager over — knappen genåbner den.
+  const [nativeScanOnce, setNativeScanOnce] = useState<
+    (() => Promise<string | null>) | null
+  >(null);
+  const runNativeScan = useCallback(
+    async (scanOnce: () => Promise<string | null>) => {
+      try {
+        const code = await scanOnce();
+        if (code) void handleBarcode(code);
+      } catch {
+        setPhase((p) =>
+          p.kind === "scanning" ? { kind: "scanning", cameraError: true } : p,
+        );
+      }
+    },
+    [handleBarcode],
+  );
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const { scanner } = await createScanner();
+        const setup = await createScanner();
         if (cancelled) return;
-        scannerRef.current = scanner;
+        if (setup.mode === "native") {
+          setNativeScanOnce(() => setup.scanOnce);
+          void runNativeScan(setup.scanOnce);
+          return;
+        }
+        scannerRef.current = setup.scanner;
         if (videoRef.current) {
-          await scanner.start(videoRef.current, (code) => void handleBarcode(code));
+          await setup.scanner.start(videoRef.current, (code) => void handleBarcode(code));
         }
       } catch {
         if (!cancelled) {
@@ -93,7 +116,7 @@ export function ScanPage() {
       cancelled = true;
       scannerRef.current?.stop();
     };
-  }, [handleBarcode]);
+  }, [handleBarcode, runNativeScan]);
 
   // Sekvensnummer dropper forsinkede svar fra ældre søgninger (stale-race).
   const searchSeq = useRef(0);
@@ -136,6 +159,15 @@ export function ScanPage() {
             <path d="M18 6 6 18M6 6l12 12" />
           </svg>
         </button>
+
+        {/* Native tilstand: MLKit-UI'et er lukket igen — genåbn med knappen */}
+        {nativeScanOnce ? (
+          <div className="absolute inset-0 z-10 grid place-items-center">
+            <Button onClick={() => void runNativeScan(nativeScanOnce)}>
+              {t("scan.openNative")}
+            </Button>
+          </div>
+        ) : null}
 
         {/* Viewfinder */}
         <div className="absolute inset-0 grid place-items-center">

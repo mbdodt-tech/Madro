@@ -1,5 +1,6 @@
-import { AppShell, BottomTabBar, ScanFab, useToast } from "@madro/ui";
+import { AppShell, BottomTabBar, ScanFab, spring, useToast } from "@madro/ui";
 import { BarChart3, BookOpen, House, ScanBarcode, User } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -20,6 +21,7 @@ export function TabShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { show } = useToast();
+  const reduceMotion = useReducedMotion();
 
   const activeId =
     Object.entries(TAB_ROUTES).find(([, route]) => route === pathname)?.[0] ??
@@ -57,7 +59,17 @@ export function TabShell({ children }: { children: ReactNode }) {
           />
         }
       >
-        {children}
+        {/* Fane-entrance (4.4): diskret fade+løft ved sideskift — hver side
+            monterer sin egen TabShell, så ruteskift afspiller den én gang.
+            Reduced motion → intet. */}
+        <motion.div
+          className="min-h-full"
+          initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={spring}
+        >
+          {children}
+        </motion.div>
       </AppShell>
     </div>
   );

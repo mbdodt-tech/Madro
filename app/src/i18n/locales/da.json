@@ -3,7 +3,10 @@
     "appName": "Madro",
     "logout": "Log ud",
     "language": "Sprog",
-    "loading": "Indlæser…"
+    "loading": "Indlæser…",
+    "errorTitle": "Noget gik galt",
+    "errorBody": "Tjek din forbindelse, og prøv igen.",
+    "retry": "Prøv igen"
   },
   "auth": {
     "title": "Velkommen til Madro",
@@ -155,7 +158,9 @@
       "usda": "USDA",
       "frida": "Frida (DTU)",
       "custom": "Egen fødevare"
-    }
+    },
+    "errorTitle": "Opslaget mislykkedes",
+    "errorBody": "Vi kunne ikke slå stregkoden op — tjek din forbindelse."
   },
   "verdict": {
     "sheetTitle": "Scanresultat",
@@ -233,7 +238,8 @@
     "add": {
       "button": "Tilføj",
       "title": "Tilføj måltid",
-      "hint": "Søg i hele biblioteket — mærkevarer, råvarer og egne fødevarer."
+      "hint": "Søg i hele biblioteket — mærkevarer, råvarer og egne fødevarer.",
+      "searchError": "Søgningen mislykkedes — tjek din forbindelse."
     },
     "entry": {
       "unknownFood": "Ukendt fødevare",

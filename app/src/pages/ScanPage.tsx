@@ -11,13 +11,16 @@ import {
   searchFoods,
   type FoodHit,
 } from "../scanner/useLookup";
+import { invalidateDiary } from "./diary/useDiary";
 import { ResultSheet } from "./scan/ResultSheet";
 
 type Phase =
   | { kind: "scanning"; cameraError: boolean }
   | { kind: "looking-up"; deep: boolean }
   | { kind: "hit"; food: FoodHit; scanId: string | null }
-  | { kind: "miss"; barcode: string; scanId: string | null };
+  | { kind: "miss"; barcode: string; scanId: string | null }
+  /** Netværks-/serverfejl — IKKE det samme som et ærligt miss. */
+  | { kind: "error"; barcode: string };
 
 export function ScanPage() {
   const { t } = useTranslation();
@@ -52,9 +55,15 @@ export function ScanPage() {
           : { kind: "miss", barcode, scanId },
       );
     } catch {
-      setPhase({ kind: "miss", barcode, scanId: null });
+      // Kunne ikke slå op (offline/serverfejl) — vis fejl, ikke miss.
+      setPhase({ kind: "error", barcode });
     }
   }, []);
+
+  const retryLookup = (barcode: string) => {
+    handledRef.current = false;
+    void handleBarcode(barcode);
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -209,11 +218,33 @@ export function ScanPage() {
           open
           onClose={close}
           onLogged={() => {
+            // Sørg for at Dagbog + "I dag" (summary) er friske ved hjemkomst,
+            // uanset staleTime.
+            invalidateDiary();
             show(t("portion.logged"));
             close();
           }}
         />
       ) : null}
+
+      {/* Fejl (offline/serverfejl) — adskilt fra ærligt miss */}
+      <Sheet
+        open={phase.kind === "error"}
+        onOpenChange={(open) => {
+          if (!open) close();
+        }}
+        title={t("scan.errorTitle")}
+        showTitle
+      >
+        {phase.kind === "error" ? (
+          <div className="space-y-4">
+            <p className="text-small text-secondary">{t("scan.errorBody")}</p>
+            <Button className="w-full" onClick={() => retryLookup(phase.barcode)}>
+              {t("common.retry")}
+            </Button>
+          </div>
+        ) : null}
+      </Sheet>
 
       {/* Miss */}
       <Sheet

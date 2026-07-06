@@ -17,7 +17,8 @@
     "ingest:off": "pnpm --filter @madro/scripts ingest:off",
     "ingest:usda": "pnpm --filter @madro/scripts ingest:usda",
     "ingest:frida": "pnpm --filter @madro/scripts ingest:frida",
-    "ingest:references": "pnpm --filter @madro/scripts ingest:references"
+    "ingest:references": "pnpm --filter @madro/scripts ingest:references",
+    "e2e": "pnpm --filter @madro/app e2e"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.0",

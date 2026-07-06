@@ -34,3 +34,21 @@
 ## Kommer senere
 
 - RevenueCat-nøgler (Fase 4). PostHog-beslutning udestår (se `docs/open-questions.md`).
+
+
+## E2E-tests (fase 1.8)
+
+Playwright-kerneløkke-tests i `app/e2e/` mod en prod-preview (port 4173).
+
+- **Lokalt:** `pnpm e2e` (kræver gitignoret `app/.env.e2e` med `E2E_EMAIL`/`E2E_PASSWORD`
+  for den permanente testbruger `madro-e2e@madro.test`).
+- **CI:** `e2e`-jobbet i `.github/workflows/ci.yml` kører kun når repo-variablen
+  `E2E_ENABLED=true` og secret `E2E_PASSWORD` er sat. **Aktiveres manuelt:**
+
+  ```
+  gh variable set E2E_ENABLED --body true
+  grep E2E_PASSWORD app/.env.e2e | cut -d= -f2 | gh secret set E2E_PASSWORD
+  ```
+
+- Windows-gotcha: `vite preview` kan efterlade en orphan på port 4173 — dræb den,
+  ellers genbruger Playwright en forældet bygning (`reuseExistingServer`).

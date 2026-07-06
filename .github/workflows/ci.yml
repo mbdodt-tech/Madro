@@ -34,3 +34,43 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+  # Kerneløkke-e2e (fase 1.8). Aktiveres manuelt: repo-var E2E_ENABLED=true
+  # + secret E2E_PASSWORD (den permanente e2e-brugers adgangskode).
+  e2e:
+    runs-on: ubuntu-latest
+    needs: verify
+    if: ${{ vars.E2E_ENABLED == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm --filter @madro/app exec playwright install --with-deps chromium
+
+      - name: E2E
+        env:
+          E2E_EMAIL: madro-e2e@madro.test
+          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+        run: pnpm e2e
+
+      - name: Upload trace ved fejl
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: |
+            app/test-results/
+            app/playwright-report/
+          retention-days: 7

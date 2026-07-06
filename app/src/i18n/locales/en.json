@@ -3,7 +3,10 @@
     "appName": "Madro",
     "logout": "Log out",
     "language": "Language",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "errorTitle": "Something went wrong",
+    "errorBody": "Check your connection and try again.",
+    "retry": "Try again"
   },
   "auth": {
     "title": "Welcome to Madro",
@@ -155,7 +158,9 @@
       "usda": "USDA",
       "frida": "Frida (DTU)",
       "custom": "Own food"
-    }
+    },
+    "errorTitle": "Lookup failed",
+    "errorBody": "We couldn't look up the barcode — check your connection."
   },
   "verdict": {
     "sheetTitle": "Scan result",
@@ -233,7 +238,8 @@
     "add": {
       "button": "Add",
       "title": "Add meal",
-      "hint": "Search the whole library — brands, whole foods and your own items."
+      "hint": "Search the whole library — brands, whole foods and your own items.",
+      "searchError": "Search failed — check your connection."
     },
     "entry": {
       "unknownFood": "Unknown food",

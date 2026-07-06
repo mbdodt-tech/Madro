@@ -46,7 +46,10 @@ Playwright-kerneløkke-tests i `app/e2e/` mod en prod-preview (port 4173).
   ikke rammer e2e-suiten. Engangsbrugeren `madro-onb@madro.test` (samme kodeord)
   bruges til onboarding-/GDPR-verifikation og kan nulstilles/slettes frit —
   GoTrue-gotcha ved SQL-oprettede brugere: token-kolonnerne i `auth.users`
-  skal være `''`, ikke `NULL`, ellers fejler login.
+  skal være `''`, ikke `NULL`, ellers fejler login. (4.2-sletningstesten
+  sletter brugeren helt — genopret ved at klone e2e-brugerens auth-rækker.)
+- Edge Function `account` (4.2): eneste server-side GDPR-operation
+  (fuld sletning m. service role); eksport sker client-side via RLS.
 - **CI:** `e2e`-jobbet i `.github/workflows/ci.yml` kører kun når repo-variablen
   `E2E_ENABLED=true` og secret `E2E_PASSWORD` er sat. **Aktiveres manuelt:**
 

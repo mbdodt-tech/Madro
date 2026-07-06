@@ -184,7 +184,7 @@ Betalingsbeslutning: alt bygges færdigt mod en adapter — RevenueCat/Stripe-n�
 
 **Accept:** ny bruger tvinges gennem gate+samtykke; under-13 stoppes venligt; flowet vises aldrig igen efter gennemførsel; consent_at/onboarded_at sat (SQL-bevis).
 
-### 4.2 GDPR: dataeksport + slet konto
+### 4.2 GDPR: dataeksport + slet konto (bygget 2026-07-06)
 
 > Profil: "Download mine data" (alle egne rækker → JSON client-side, gratis — GDPR-retten, ikke premium-featuren) og "Slet konto" (ny Edge Function `account` m. CORS: sletter alle rækker + storage + auth-bruger; UI kræver skriv-SLET-bekræftelse).
 

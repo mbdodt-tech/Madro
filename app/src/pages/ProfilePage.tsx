@@ -1,6 +1,6 @@
 import { resolveTargets } from "@madro/core";
-import { Button, Card, Input, Skeleton, cn, useToast } from "@madro/ui";
-import { HeartHandshake } from "lucide-react";
+import { Button, Card, Input, Sheet, Skeleton, cn, useToast } from "@madro/ui";
+import { Download, HeartHandshake, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -17,6 +17,7 @@ import {
   useTodayActivity,
   useWeightHistory,
 } from "./profile/useBody";
+import { deleteAccount, downloadMyData } from "./profile/dataRights";
 
 /** Grænser spejler DB-checkene (migrationer 20260706200000/210000) — ellers afvises skrivningen. */
 const BOUNDS = {
@@ -101,6 +102,11 @@ export function ProfilePage() {
   const { data: profile, isLoading } = useProfile();
   const { data: weightHistory } = useWeightHistory();
   const { data: activity } = useTodayActivity();
+
+  const [deleteSheet, setDeleteSheet] = useState(false);
+  const [deleteText, setDeleteText] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(false);
 
   const hideCalories = profile?.hide_calories ?? false;
   const goals = (profile?.goals ?? {}) as Record<string, unknown>;
@@ -370,6 +376,43 @@ export function ProfilePage() {
               </Card>
             </section>
 
+            {/* Data & privatliv — GDPR-rettighederne (fase 4.2) */}
+            <section className="space-y-2">
+              <SectionLabel>{t("profile.dataTitle")}</SectionLabel>
+              <Card>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-small text-secondary">{t("profile.exportBody")}</p>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() =>
+                        void downloadMyData().then(() => show(t("profile.exported")))
+                      }
+                    >
+                      <Download className="size-4" aria-hidden="true" />
+                      {t("profile.export")}
+                    </Button>
+                  </div>
+                  <div className="flex items-center justify-between gap-3 border-t border-hairline pt-4">
+                    <p className="text-small text-secondary">{t("profile.deleteBody")}</p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDeleteText("");
+                        setDeleteError(false);
+                        setDeleteSheet(true);
+                      }}
+                      className="inline-flex shrink-0 items-center gap-1.5 rounded-pill border border-hairline bg-surface px-4 py-2 text-small font-medium text-v-bad hover:bg-v-poor-tint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-v-bad"
+                    >
+                      <Trash2 className="size-4" aria-hidden="true" />
+                      {t("profile.delete")}
+                    </button>
+                  </div>
+                </div>
+              </Card>
+            </section>
+
             {/* Støtte — altid tilgængelig fra indstillinger (ansvarlighedsregel) */}
             <div className="rounded-xl bg-brand-tint p-4">
               <div className="flex items-start gap-3">
@@ -391,6 +434,52 @@ export function ProfilePage() {
           </>
         )}
       </main>
+
+      {/* Slet konto — kræver skrevet bekræftelsesord (irreversibelt) */}
+      <Sheet
+        open={deleteSheet}
+        onOpenChange={(open) => {
+          if (!open && !deleting) setDeleteSheet(false);
+        }}
+        title={t("profile.deleteTitle")}
+        showTitle
+      >
+        <div className="space-y-4">
+          <p className="text-small text-secondary">{t("profile.deleteWarning")}</p>
+          <Input
+            id="delete-confirm"
+            label={t("profile.deleteConfirmLabel", { word: t("profile.deleteWord") })}
+            value={deleteText}
+            autoComplete="off"
+            onChange={(e) => setDeleteText(e.target.value)}
+          />
+          {deleteError ? (
+            <p role="alert" className="rounded-md bg-v-poor-tint px-4 py-3 text-small text-v-bad">
+              {t("common.errorBody")}
+            </p>
+          ) : null}
+          <button
+            type="button"
+            disabled={deleteText !== t("profile.deleteWord") || deleting}
+            onClick={() => {
+              setDeleting(true);
+              setDeleteError(false);
+              deleteAccount()
+                .then(() => {
+                  // Sessionen er død — RequireAuth sender til login.
+                  window.location.assign("/login");
+                })
+                .catch(() => {
+                  setDeleting(false);
+                  setDeleteError(true);
+                });
+            }}
+            className="w-full rounded-md bg-v-bad px-4 py-3 text-body font-medium text-on-brand transition-opacity disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-v-bad"
+          >
+            {deleting ? t("common.loading") : t("profile.deleteConfirm")}
+          </button>
+        </div>
+      </Sheet>
     </TabShell>
   );
 }

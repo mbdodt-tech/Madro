@@ -70,7 +70,7 @@ export function MealSections({
         return (
           <section key={meal} aria-label={t(`portion.meal.${meal}`)}>
             <div className="mb-2 flex items-baseline justify-between">
-              <h2 className="text-small font-semibold uppercase tracking-wide text-tertiary">
+              <h2 className="text-caption font-semibold uppercase tracking-widest text-tertiary">
                 {t(`portion.meal.${meal}`)}
               </h2>
               {!hideCalories && subtotal != null ? (
@@ -79,7 +79,7 @@ export function MealSections({
                 </span>
               ) : null}
             </div>
-            <ul className="divide-y divide-hairline overflow-hidden rounded-lg border border-hairline">
+            <ul className="divide-y divide-hairline overflow-hidden rounded-lg border border-card-edge shadow-1">
               {mealEntries.map((entry) => {
                 const kcal = entryKcal(entry);
                 return (

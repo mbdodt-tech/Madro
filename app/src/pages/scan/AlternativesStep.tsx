@@ -91,7 +91,7 @@ export function AlternativesStep({
         </div>
       ) : alternatives.length === 0 ? (
         // Ærlig, positiv besked: intet i kategorien slår varens score.
-        <div className="rounded-lg border border-hairline bg-surface px-5 py-6 text-center">
+        <div className="rounded-lg border border-card-edge bg-surface px-5 py-6 text-center shadow-1">
           <p className="text-body text-secondary">{t("verdict.alternatives.none")}</p>
         </div>
       ) : (
@@ -101,7 +101,7 @@ export function AlternativesStep({
               <button
                 type="button"
                 onClick={() => onPick(alt.food)}
-                className="w-full space-y-2 rounded-lg border border-hairline bg-surface px-4 py-3 text-left hover:bg-brand-tint focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand"
+                className="w-full space-y-2 rounded-lg border border-card-edge bg-surface px-4 py-3 text-left shadow-1 hover:bg-brand-tint focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand"
               >
                 <span className="flex items-center justify-between gap-3">
                   <span className="min-w-0">

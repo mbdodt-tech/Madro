@@ -57,8 +57,8 @@ export function DiaryPage() {
           </Button>
         </div>
 
-        {/* Dato-navigation */}
-        <div className="flex items-center justify-between rounded-lg border border-hairline bg-surface px-2 py-1.5">
+        {/* Dato-navigation — løftet som kort ("Instrumentet": skygge i lys, hårlinje i mørk) */}
+        <div className="flex items-center justify-between rounded-lg border border-card-edge bg-surface px-2 py-1.5 shadow-1">
           <button
             type="button"
             onClick={() => setDay((d) => addDays(d, -1))}
@@ -90,7 +90,7 @@ export function DiaryPage() {
         ) : isError ? (
           <ErrorState onRetry={() => void refetch()} />
         ) : !hasEntries ? (
-          <div className="rounded-lg border border-hairline bg-surface px-5 py-8 text-center">
+          <div className="rounded-lg border border-card-edge bg-surface px-5 py-8 text-center shadow-1">
             <p className="text-body text-secondary">{t("diary.empty")}</p>
             <p className="mt-1 text-small text-tertiary">{t("diary.emptyHint")}</p>
           </div>

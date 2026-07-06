@@ -120,7 +120,8 @@
       "scanToast": "Scan-flowet kommer i Fase 1",
       "activeTab": "aktiv fane: {{tab}}",
       "monoIron": "jern"
-    }
+    },
+    "backToApp": "Tilbage til appen"
   },
   "shell": {
     "navLabel": "Hovednavigation",
@@ -198,7 +199,8 @@
     },
     "log": "Log måltid",
     "logged": "Logget i din dagbog",
-    "error": "Kunne ikke gemme — prøv igen."
+    "error": "Kunne ikke gemme — prøv igen.",
+    "gramsLabel": "Gram"
   },
   "product": {
     "back": "Tilbage",

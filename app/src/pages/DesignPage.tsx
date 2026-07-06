@@ -20,6 +20,7 @@ import {
 import { BarChart3, BookOpen, House, ScanBarcode, User } from "lucide-react";
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 /**
  * Midlertidig specimen-side for designsystemet (fase-tjekliste 0.2 + 0.3).
@@ -328,6 +329,15 @@ export function DesignPage() {
       <header className="sticky top-0 z-10 border-b border-hairline bg-bg/85 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <div>
+            <Link
+              to="/"
+              className="mb-1 inline-flex items-center gap-1 text-small font-medium text-brand hover:text-brand-hover"
+            >
+              <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+              {t("design.backToApp")}
+            </Link>
             <h1 className="text-h1">{t("design.title")}</h1>
             <p className="text-caption text-tertiary">{t("design.subtitle")}</p>
           </div>

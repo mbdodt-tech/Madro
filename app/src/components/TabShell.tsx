@@ -26,8 +26,11 @@ export function TabShell({ children }: { children: ReactNode }) {
   const iconCls = "size-5";
 
   return (
-    <AppShell
-      bottomBar={
+    // h-dvh: skallen fylder præcis viewporten, så indholdet scroller
+    // indeni og tab-baren (absolute bottom-0 + blur) altid er synlig.
+    <div className="h-dvh">
+      <AppShell
+        bottomBar={
         <BottomTabBar
           navLabel={t("shell.navLabel")}
           activeId={activeId}
@@ -49,10 +52,11 @@ export function TabShell({ children }: { children: ReactNode }) {
               onClick={() => navigate("/scan")}
             />
           }
-        />
-      }
-    >
-      {children}
-    </AppShell>
+          />
+        }
+      >
+        {children}
+      </AppShell>
+    </div>
   );
 }

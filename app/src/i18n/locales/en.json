@@ -120,7 +120,8 @@
       "scanToast": "The scan flow arrives in Phase 1",
       "activeTab": "active tab: {{tab}}",
       "monoIron": "iron"
-    }
+    },
+    "backToApp": "Back to the app"
   },
   "shell": {
     "navLabel": "Main navigation",
@@ -198,7 +199,8 @@
     },
     "log": "Log meal",
     "logged": "Logged in your diary",
-    "error": "Couldn't save — try again."
+    "error": "Couldn't save — try again.",
+    "gramsLabel": "Grams"
   },
   "product": {
     "back": "Back",

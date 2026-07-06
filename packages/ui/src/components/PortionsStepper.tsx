@@ -4,8 +4,8 @@ import { cn } from "./cn";
 import { spring } from "../tokens";
 
 export interface PortionsStepperProps {
-  /** Primær værdi-tekst, fx "1 håndfuld". */
-  valueLabel: string;
+  /** Primær værdi — tekst ("1 håndfuld") eller et redigerbart felt. */
+  valueLabel: ReactNode;
   /** Sekundær linje, fx "30 g · 159 kcal". */
   subLabel?: ReactNode;
   onDecrease: () => void;

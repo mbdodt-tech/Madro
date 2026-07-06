@@ -1,11 +1,10 @@
 import {
   MICRO_STRIP_KEYS,
   micronutrientCoverage,
-  novaShare,
   NUTRIENT_INFO,
   resolveTargets,
-  sumNutrients,
   type NutrientKey,
+  type NutrientMap,
 } from "@madro/core";
 import {
   Button,
@@ -26,13 +25,17 @@ import { persistHideCalories, useProfile } from "../auth/useProfile";
 import { useSession } from "../auth/useSession";
 import { LanguageSwitch } from "../components/LanguageSwitch";
 import { TabShell } from "../components/TabShell";
-import { queryClient } from "../lib/queryClient";
 import { supabase } from "../lib/supabase";
 import { useReferences } from "../lib/useReferences";
 import { AddFoodSheet } from "./diary/AddFoodSheet";
 import { EntrySheet } from "./diary/EntrySheet";
 import { MealSections } from "./diary/MealSections";
-import { DIARY_KEY, useDiaryEntries, type DiaryEntry } from "./diary/useDiary";
+import {
+  invalidateDiary,
+  useDailySummary,
+  useDiaryEntries,
+  type DiaryEntry,
+} from "./diary/useDiary";
 
 /** Korte søjle-labels til striben (grundstof-/vitaminforkortelser). */
 const MICRO_LETTERS: Partial<Record<NutrientKey, string>> = {
@@ -62,6 +65,7 @@ export function TodayPage() {
   const today = new Date();
 
   const { data: entries, isLoading: entriesLoading } = useDiaryEntries(today);
+  const { data: summary, isLoading: summaryLoading } = useDailySummary(today);
   const { data: referenceRows } = useReferences(profile?.rda_region ?? undefined);
 
   const [editing, setEditing] = useState<DiaryEntry | null>(null);
@@ -69,20 +73,13 @@ export function TodayPage() {
   const [profileSheet, setProfileSheet] = useState(false);
 
   const hideCalories = profile?.hide_calories ?? false;
-  const isLoading = entriesLoading || profileLoading;
+  const isLoading = entriesLoading || profileLoading || summaryLoading;
 
-  // ---- Beregninger (alt i @madro/core) ----
-  const rollupEntries = (entries ?? []).map((e) => ({
-    nutriments: e.foods?.nutriments as Record<string, number> | null,
-    grams: Number(e.amount),
-  }));
-  const totals = sumNutrients(rollupEntries);
-  const share = novaShare(
-    (entries ?? []).map((e) => ({
-      novaGroup: e.foods?.nova_group,
-      grams: Number(e.amount),
-    })),
-  );
+  // ---- Tallene kommer fra daily_summaries (Postgres-triggeren, 1.7);
+  // formlerne bor stadig i @madro/core og bevogtes af fixtures-tests. ----
+  const macros = (summary?.macros ?? {}) as NutrientMap;
+  const micros = (summary?.micros ?? {}) as NutrientMap;
+  const sharePct = summary?.nova_share != null ? Math.round(Number(summary.nova_share)) : null;
   const targets = resolveTargets(
     (profile?.goals as Record<string, unknown> | null) ?? null,
     { sex: profile?.sex },
@@ -95,7 +92,7 @@ export function TodayPage() {
     region: profile?.rda_region ?? "DK",
   };
   const coverage = micronutrientCoverage(
-    totals,
+    micros,
     referenceRows ?? [],
     referenceProfile,
     MICRO_STRIP_KEYS,
@@ -110,7 +107,7 @@ export function TodayPage() {
     pct: c.pct,
   }));
 
-  const kcalNow = Math.round(totals.energy_kcal ?? 0);
+  const kcalNow = Math.round(Number(summary?.kcal ?? 0));
   const nf = new Intl.NumberFormat(i18n.language === "da" ? "da-DK" : "en-GB");
 
   const dateLabel = new Intl.DateTimeFormat(
@@ -118,7 +115,7 @@ export function TodayPage() {
     { weekday: "long", day: "numeric", month: "long" },
   ).format(today);
 
-  const refresh = () => queryClient.invalidateQueries({ queryKey: [DIARY_KEY] });
+  const refresh = () => invalidateDiary();
   const initial = (session?.user.email ?? "M")[0]!.toUpperCase();
 
   return (
@@ -151,9 +148,9 @@ export function TodayPage() {
           ) : (
             <div className="space-y-5">
               <QualityArc
-                pct={share?.pct ?? null}
+                pct={sharePct}
                 label={t("today.quality.label")}
-                caption={t(qualityCaptionKey(share?.pct ?? null))}
+                caption={t(qualityCaptionKey(sharePct))}
               />
 
               {/* Kalorielinje m. øje-toggle (persisterer hide_calories) */}
@@ -192,19 +189,19 @@ export function TodayPage() {
               >
                 <MacroRing
                   macro="protein"
-                  value={totals.protein_g ?? 0}
+                  value={Number(macros.protein_g ?? 0)}
                   target={targets.protein_g}
                   label={t("today.protein")}
                 />
                 <MacroRing
                   macro="carb"
-                  value={totals.carbohydrate_g ?? 0}
+                  value={Number(macros.carbohydrate_g ?? 0)}
                   target={targets.carbohydrate_g}
                   label={t("today.carbs")}
                 />
                 <MacroRing
                   macro="fat"
-                  value={totals.fat_g ?? 0}
+                  value={Number(macros.fat_g ?? 0)}
                   target={targets.fat_g}
                   label={t("today.fat")}
                 />

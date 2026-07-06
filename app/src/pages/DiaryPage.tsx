@@ -3,13 +3,12 @@ import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { TabShell } from "../components/TabShell";
-import { queryClient } from "../lib/queryClient";
 import { AddFoodSheet } from "./diary/AddFoodSheet";
 import { EntrySheet } from "./diary/EntrySheet";
 import { MealSections } from "./diary/MealSections";
 import {
   addDays,
-  DIARY_KEY,
+  invalidateDiary,
   isSameDay,
   startOfDay,
   useDiaryEntries,
@@ -39,7 +38,7 @@ export function DiaryPage() {
 
   const hasEntries = (entries?.length ?? 0) > 0;
 
-  const refresh = () => queryClient.invalidateQueries({ queryKey: [DIARY_KEY] });
+  const refresh = () => invalidateDiary();
 
   return (
     <TabShell>

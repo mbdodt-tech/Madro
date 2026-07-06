@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import type { Tables } from "@madro/core";
+import { queryClient } from "../../lib/queryClient";
 import { supabase } from "../../lib/supabase";
 import type { FoodHit } from "../../scanner/useLookup";
 import type { Meal } from "../scan/logMeal";
@@ -38,6 +39,13 @@ export function dayKey(date: Date): string {
 }
 
 export const DIARY_KEY = "diary";
+export const SUMMARY_KEY = "diary-summary";
+
+/** Invalidér både postlisten og dags-summaryen (triggeren har allerede skrevet den). */
+export function invalidateDiary(): void {
+  void queryClient.invalidateQueries({ queryKey: [DIARY_KEY] });
+  void queryClient.invalidateQueries({ queryKey: [SUMMARY_KEY] });
+}
 
 /** Dagens poster med joined foods, kronologisk. */
 export function useDiaryEntries(day: Date) {
@@ -55,6 +63,28 @@ export function useDiaryEntries(day: Date) {
         .order("consumed_at", { ascending: true });
       if (error) throw error;
       return (data ?? []) as unknown as DiaryEntry[];
+    },
+  });
+}
+
+export type DailySummary = Tables<"daily_summaries">;
+
+/**
+ * Dagens præberegnede summary (skrives af Postgres-triggeren på
+ * log_entries, fase 1.7). Null = ingen poster den dag.
+ */
+export function useDailySummary(day: Date) {
+  const key = dayKey(day);
+  return useQuery<DailySummary | null>({
+    queryKey: [SUMMARY_KEY, key],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("daily_summaries")
+        .select("*")
+        .eq("day", key)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
     },
   });
 }

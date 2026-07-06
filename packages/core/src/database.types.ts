@@ -247,6 +247,7 @@ export type Database = {
           locale: string;
           rda_region: string;
           sex: string | null;
+          timezone: string;
           updated_at: string;
         };
         Insert: {
@@ -261,6 +262,7 @@ export type Database = {
           locale?: string;
           rda_region?: string;
           sex?: string | null;
+          timezone?: string;
           updated_at?: string;
         };
         Update: {
@@ -275,6 +277,7 @@ export type Database = {
           locale?: string;
           rda_region?: string;
           sex?: string | null;
+          timezone?: string;
           updated_at?: string;
         };
         Relationships: [];
@@ -360,7 +363,14 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      madro_local_day: {
+        Args: { p_ts: string; p_user: string };
+        Returns: string;
+      };
+      recompute_daily_summary: {
+        Args: { p_day: string; p_user: string };
+        Returns: undefined;
+      };
     };
     Enums: {
       [_ in never]: never;

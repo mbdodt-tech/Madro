@@ -239,7 +239,10 @@
       "button": "Tilføj",
       "title": "Tilføj måltid",
       "hint": "Søg i hele biblioteket — mærkevarer, råvarer og egne fødevarer.",
-      "searchError": "Søgningen mislykkedes — tjek din forbindelse."
+      "searchError": "Søgningen mislykkedes — tjek din forbindelse.",
+      "tabsLabel": "Måde at tilføje på",
+      "tabSearch": "Søg",
+      "tabWrite": "Skriv"
     },
     "entry": {
       "unknownFood": "Ukendt fødevare",
@@ -248,6 +251,19 @@
       "keep": "Behold",
       "confirmRemove": "Ja, fjern",
       "error": "Kunne ikke gemme — prøv igen."
+    },
+    "write": {
+      "label": "Skriv hvad du spiste",
+      "placeholder": "fx to skiver rugbrød med ost og en banan",
+      "parse": "Fortolk",
+      "parsing": "Fortolker…",
+      "estimate": "Estimat — ret hvis nødvendigt.",
+      "chooseFood": "Vælg fødevare",
+      "removeRow": "Fjern {{name}}",
+      "logAll_one": "Log {{count}} post",
+      "logAll_other": "Log {{count}} poster",
+      "aiNotConfigured": "AI-hjælpen er ikke sat op endnu — brug søgning så længe.",
+      "rateLimited": "Mange forsøg på kort tid — prøv igen om lidt."
     }
   },
   "today": {

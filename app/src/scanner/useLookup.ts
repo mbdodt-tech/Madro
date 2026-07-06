@@ -94,3 +94,44 @@ export async function searchFoods(query: string): Promise<FoodHit[]> {
   if (error) throw error;
   return (data ?? []) as FoodHit[];
 }
+
+/**
+ * Rangeret søgning til NL-matchning (fase 2.1). Substring-søgning alene
+ * rammer midt i ord ("ost" → "T-ost-ada"), og prefiks alene drukner i
+ * andre ord ("ost" → "Ostrich…"). Derfor flere lag, bedste først:
+ * eksakt navn → "q,"/"q " (Fridas navnekonvention: "Ost, fast, 40+")
+ * → prefiks → substring. Dubletter fjernes, lagorden bevares.
+ */
+export async function searchFoodsRanked(query: string): Promise<FoodHit[]> {
+  const q = query.trim();
+  if (q.length < 2) return [];
+
+  const tier = async (pattern: string, limit: number): Promise<FoodHit[]> => {
+    const { data, error } = await supabase
+      .from("foods")
+      .select(FOOD_COLUMNS)
+      .ilike("name", pattern)
+      .order("data_quality", { ascending: false })
+      .limit(limit);
+    if (error) throw error;
+    return (data ?? []) as FoodHit[];
+  };
+
+  const [exact, comma, space, prefix, substring] = await Promise.all([
+    tier(q, 2),
+    tier(`${q},%`, 4),
+    tier(`${q} %`, 4),
+    tier(`${q}%`, 5),
+    searchFoods(q),
+  ]);
+
+  const seen = new Set<string>();
+  const merged: FoodHit[] = [];
+  for (const food of [...exact, ...comma, ...space, ...prefix, ...substring]) {
+    if (!seen.has(food.id)) {
+      seen.add(food.id);
+      merged.push(food);
+    }
+  }
+  return merged;
+}

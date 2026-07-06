@@ -4,7 +4,7 @@ import { X } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { aiClient } from "../../lib/aiClient";
-import { searchFoods, type FoodHit } from "../../scanner/useLookup";
+import { searchFoodsRanked, type FoodHit } from "../../scanner/useLookup";
 import { defaultMeal, logMeal, MEALS, type Meal } from "../scan/logMeal";
 import { isSameDay } from "./useDiary";
 
@@ -22,6 +22,29 @@ interface Row {
 
 function clampGrams(value: number): number {
   return Math.min(2000, Math.max(1, Math.round(value)));
+}
+
+/**
+ * Vælg bedste kandidat til et parset navn. ilike-søgningen matcher
+ * substrings midt i ord ("ost" → "T-ost-ada shells"), så rangér:
+ * eksakt navn > starter med > helt ord > øvrige (søgeordenen bevares
+ * som tie-breaker: verified før crowdsourced).
+ */
+function pickBestMatch(name: string, candidates: FoodHit[]): FoodHit | null {
+  const q = name.trim().toLowerCase();
+  const wordRe = new RegExp(`(^|[^\\p{L}])${q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}([^\\p{L}]|$)`, "iu");
+  const score = (food: FoodHit): number => {
+    const n = food.name.toLowerCase();
+    if (n === q) return 0;
+    // "ost, fast, 40+" slår "ostrich …": prefiks efterfulgt af skilletegn.
+    if (n.startsWith(q) && !/\p{L}/u.test(n.charAt(q.length))) return 1;
+    if (n.startsWith(q)) return 2;
+    if (wordRe.test(food.name)) return 3;
+    return 4;
+  };
+  return [...candidates]
+    .map((food, index) => ({ food, index, s: score(food) }))
+    .sort((a, b) => a.s - b.s || a.index - b.index)[0]?.food ?? null;
 }
 
 /**
@@ -58,7 +81,7 @@ export function WriteMealTab({
         result.items.map(async (item: ParsedMealItem, index: number) => {
           let candidates: FoodHit[] = [];
           try {
-            candidates = await searchFoods(item.name);
+            candidates = await searchFoodsRanked(item.name);
           } catch {
             candidates = [];
           }
@@ -68,7 +91,7 @@ export function WriteMealTab({
             note: item.note,
             grams: clampGrams(item.grams),
             gramsText: String(clampGrams(item.grams)),
-            match: candidates[0] ?? null,
+            match: pickBestMatch(item.name, candidates),
             searching: false,
             candidates,
           } satisfies Row;
@@ -96,7 +119,7 @@ export function WriteMealTab({
 
   const rowSearch = async (key: number, query: string) => {
     try {
-      const hits = await searchFoods(query);
+      const hits = await searchFoodsRanked(query);
       updateRow(key, { candidates: hits });
     } catch {
       updateRow(key, { candidates: [] });

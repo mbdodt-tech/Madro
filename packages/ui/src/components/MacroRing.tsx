@@ -2,7 +2,9 @@ import { motion, useReducedMotion } from "motion/react";
 import { cn } from "./cn";
 import { useCountUp } from "./useCountUp";
 
-const R = 26;
+// Større geometri (telefonfeedback 2026-07-06): tallene indeni må
+// aldrig røre ringen — indre diameter skal rumme "/263 g" i caption-mono.
+const R = 30;
 const CIRC = 2 * Math.PI * R;
 
 export type MacroKind = "protein" | "carb" | "fat";
@@ -37,23 +39,23 @@ export function MacroRing({ macro, value, target, label, className }: MacroRingP
 
   return (
     <div className={cn("flex flex-col items-center gap-1.5", className)}>
-      <div className="relative size-16">
-        <svg viewBox="0 0 64 64" className="size-full -rotate-90" aria-hidden="true">
+      <div className="relative size-19">
+        <svg viewBox="0 0 76 76" className="size-full -rotate-90" aria-hidden="true">
           <circle
-            cx="32"
-            cy="32"
+            cx="38"
+            cy="38"
             r={R}
             fill="none"
-            strokeWidth="5.5"
+            strokeWidth="5"
             className="stroke-panel-track"
           />
           <motion.circle
-            cx="32"
-            cy="32"
+            cx="38"
+            cy="38"
             r={R}
             fill="none"
             stroke="currentColor"
-            strokeWidth="5.5"
+            strokeWidth="5"
             strokeLinecap="round"
             strokeDasharray={CIRC}
             className={cn("glow-reading", colorClass[macro])}

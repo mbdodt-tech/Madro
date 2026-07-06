@@ -13,6 +13,7 @@ import {
 } from "../scanner/useLookup";
 import { invalidateDiary } from "./diary/useDiary";
 import { LabelCaptureStep } from "./scan/LabelCaptureStep";
+import { PhotoMealSheet } from "./scan/PhotoMealSheet";
 import { ResultSheet } from "./scan/ResultSheet";
 
 type Phase =
@@ -22,6 +23,8 @@ type Phase =
   | { kind: "miss"; barcode: string; scanId: string | null }
   /** Fotografér varedeklarationen (fase 2.3) — opretter egen vare. */
   | { kind: "label"; barcode: string; scanId: string | null }
+  /** Måltidsfoto (fase 2.2) — retter uden stregkode. */
+  | { kind: "photo" }
   /** Netværks-/serverfejl — IKKE det samme som et ærligt miss. */
   | { kind: "error"; barcode: string };
 
@@ -169,7 +172,7 @@ export function ScanPage() {
       </div>
 
       {/* Manuel indtastning — fallback for ridsede koder og enheder uden kamera */}
-      <div className="border-t border-bg/10 bg-ink px-5 py-4">
+      <div className="space-y-3 border-t border-bg/10 bg-ink px-5 py-4">
         <form
           className="flex items-end gap-2"
           onSubmit={(e) => {
@@ -192,6 +195,19 @@ export function ScanPage() {
             {t("scan.manualSubmit")}
           </Button>
         </form>
+
+        {/* Anden indfangningsvej (2.2): måltid uden stregkode */}
+        <button
+          type="button"
+          onClick={() => {
+            handledRef.current = true;
+            scannerRef.current?.stop();
+            setPhase({ kind: "photo" });
+          }}
+          className="w-full text-center text-small font-medium text-bg/80 underline-offset-4 hover:text-bg hover:underline focus-visible:outline-2 focus-visible:outline-bg"
+        >
+          {t("scan.photo.openButton")}
+        </button>
       </div>
 
       {/* Slår op … */}
@@ -229,6 +245,26 @@ export function ScanPage() {
           }}
         />
       ) : null}
+
+      {/* Måltidsfoto (2.2) */}
+      <Sheet
+        open={phase.kind === "photo"}
+        onOpenChange={(open) => {
+          if (!open) close();
+        }}
+        title={t("scan.photo.title")}
+        showTitle
+      >
+        {phase.kind === "photo" ? (
+          <PhotoMealSheet
+            onLogged={() => {
+              invalidateDiary();
+              show(t("portion.logged"));
+              close();
+            }}
+          />
+        ) : null}
+      </Sheet>
 
       {/* Fejl (offline/serverfejl) — adskilt fra ærligt miss */}
       <Sheet

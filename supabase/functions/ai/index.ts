@@ -21,17 +21,19 @@ const parseMealPayload = z.object({
   locale: z.enum(["da", "en"]),
 });
 
+const mealItemSchema = z.object({
+  name: z.string().min(1).max(80),
+  grams: z.number().min(1).max(2000),
+  note: z.string().max(120).optional(),
+});
+
 const parseMealResult = z.object({
-  items: z
-    .array(
-      z.object({
-        name: z.string().min(1).max(80),
-        grams: z.number().min(1).max(2000),
-        note: z.string().max(120).optional(),
-      }),
-    )
-    .min(1)
-    .max(8),
+  items: z.array(mealItemSchema).min(1).max(8),
+});
+
+/** Foto-varianten tillader 0 items (= ingen mad genkendt, ærligt svar). */
+const parsePhotoMealResult = z.object({
+  items: z.array(mealItemSchema).max(8),
 });
 
 // ---- parse_label (fase 2.3): foto af varedeklaration → varedata ----
@@ -78,6 +80,17 @@ const PARSE_LABEL_SYSTEM = `Opgave: Aflæs varedeklarationen (ingrediensliste og
   Deklareres kun pr. portion, omregn ikke — udelad feltet.
 - Medtag KUN hvad der faktisk kan læses på billedet. Gæt aldrig.
 - Kan intet af ovenstående læses, returnér {"additives":[],"nutriments":{}}.`;
+
+const PARSE_PHOTO_MEAL_SYSTEM = `Opgave: Genkend maden på billedet (et måltid uden stregkode).
+- Returnér JSON: {"items":[{"name":string,"grams":number,"note":string?}]} — 0-8 poster.
+- "name": ret/fødevare, kort og opslagsvenligt på det angivne sprog
+  (fx "frikadelle", "kogte kartofler", "agurkesalat").
+- "grams": skøn portionen i gram ud fra tallerkenstørrelse og kontekst
+  (typisk hovedret i alt 300-500 g fordelt på komponenterne).
+- "note": kort, fx "2 stk" eller "ca. ½ tallerken".
+- Medtag KUN hvad der faktisk kan ses. Skjult fedtstof, sauce og dressing
+  tilføjer brugeren selv bagefter — gæt ikke på dem.
+- Er der ingen mad på billedet, returnér {"items":[]}.`;
 
 const PARSE_MEAL_SYSTEM = `Opgave: Parsér en måltidsbeskrivelse til enkeltposter.
 - Returnér JSON på formen {"items":[{"name":string,"grams":number,"note":string?}]}.
@@ -126,6 +139,22 @@ const tasks: Record<
         imageMediaType: media_type,
         schema: parseLabelResult,
         maxTokens: 2048,
+      });
+    },
+  },
+  parse_photo_meal: {
+    // Samme payload-form som parse_label; resultatet tillader 0 items.
+    schema: parseLabelPayload,
+    handler: async (payload) => {
+      const { image_base64, media_type, locale } =
+        payload as z.infer<typeof parseLabelPayload>;
+      return askClaude({
+        system: PARSE_PHOTO_MEAL_SYSTEM,
+        user: `Sprog: ${locale}. Genkend maden på billedet.`,
+        imageBase64: image_base64,
+        imageMediaType: media_type,
+        schema: parsePhotoMealResult,
+        maxTokens: 1024,
       });
     },
   },

@@ -122,6 +122,19 @@ describe("callAi", () => {
     ).rejects.toMatchObject({ code: "invalid_result" });
   });
 
+  it("parse_photo_meal accepts zero items (no food recognized)", async () => {
+    const client = createAiClient({
+      ...baseOptions,
+      fetchFn: mockFetch(200, { data: { items: [] } }),
+    });
+    const result = await client.callAi("parse_photo_meal", {
+      image_base64: "x",
+      media_type: "image/jpeg",
+      locale: "da",
+    });
+    expect(result.items).toEqual([]);
+  });
+
   it("rejects malformed success envelopes", async () => {
     const client = createAiClient({
       ...baseOptions,

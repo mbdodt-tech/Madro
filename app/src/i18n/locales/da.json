@@ -177,6 +177,14 @@
       "retake": "Tag nyt billede",
       "saveError": "Kunne ikke gemme varen — prøv igen.",
       "back": "Tilbage til søgning"
+    },
+    "photo": {
+      "openButton": "Fotografér måltidet i stedet",
+      "title": "Fotografér måltidet",
+      "intro": "Tag et billede af tallerkenen — vi genkender maden og skønner portionerne. Du kan rette alt bagefter.",
+      "takePhoto": "Tag billede",
+      "analyzing": "Genkender maden…",
+      "nothingFound": "Vi kunne ikke genkende mad på billedet — prøv igen med hele måltidet i billedet."
     }
   },
   "verdict": {
@@ -281,6 +289,18 @@
       "logAll_other": "Log {{count}} poster",
       "aiNotConfigured": "AI-hjælpen er ikke sat op endnu — brug søgning så længe.",
       "rateLimited": "Mange forsøg på kort tid — prøv igen om lidt."
+    },
+    "editor": {
+      "invisible": "Det kameraet ikke kan se — tilføj selv:",
+      "quick": {
+        "oil": "Olie (1 spsk)",
+        "butter": "Smør",
+        "dressing": "Dressing",
+        "sauce": "Sauce"
+      },
+      "addByText": "Tilføj med tekst",
+      "addByTextPlaceholder": "fx et glas mælk",
+      "add": "Tilføj"
     }
   },
   "today": {

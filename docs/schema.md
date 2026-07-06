@@ -14,6 +14,8 @@ Kilde: `supabase/migrations/20260704072000_core_schema.sql`, anvendt på Supabas
 | `insights` | AI-indsigter pr. periode (Fase 2) | select/insert/delete egen bruger (skrives normalt af service role) |
 | `recommendations` | "Bedre alternativ"-forslag pr. scan/dag (Fase 2) | select/insert/delete egen bruger |
 | `nutrient_references` | RDA/NRV pr. næringsstof × region (DK/EU/US) × køn × aldersinterval — udfyldes i Fase 1.2 | read-only for authenticated; skriv kun service role |
+| `body_metrics` | Vægt pr. dag (PK `(user_id, day)`, 30-300 kg-check); `source` = provider-nøgle ('manual' nu, 'healthkit' m.fl. i Fase 5). Spejles til `profiles.weight_kg` ved log (fase 3.2) | alle operationer egen bruger (RLS-bevis kørt 2026-07-06: fremmed læsning 0 rækker, fremmed skrivning 42501) |
+| `activity_days` | Skridt + aktiv energi pr. dag (PK `(user_id, day)`); aktiv-kcal lægges neutralt oven i dagens energireference på "I dag" | alle operationer egen bruger (samme RLS-bevis) |
 
 Indekser: `foods(barcode)`, unik `foods(source, source_ref)`, trigram-GIN på `foods(name)` (tekstsøgning, Fase 1.5), `scans(user_id, created_at desc)`, `log_entries(user_id, consumed_at desc)`.
 

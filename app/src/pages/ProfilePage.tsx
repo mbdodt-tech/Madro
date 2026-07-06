@@ -4,17 +4,26 @@ import { HeartHandshake } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { persistHideCalories, persistProfileFields, useProfile } from "../auth/useProfile";
 import { useSession } from "../auth/useSession";
 import { LanguageSwitch } from "../components/LanguageSwitch";
 import { TabShell } from "../components/TabShell";
 import { supabase } from "../lib/supabase";
+import {
+  logWeightToday,
+  saveActivityToday,
+  useTodayActivity,
+  useWeightHistory,
+} from "./profile/useBody";
 
-/** Grænser spejler DB-checkene (migration 20260706200000) — ellers afvises skrivningen. */
+/** Grænser spejler DB-checkene (migrationer 20260706200000/210000) — ellers afvises skrivningen. */
 const BOUNDS = {
   birth_year: { min: 1900, max: new Date().getFullYear() },
   height_cm: { min: 100, max: 250 },
   weight_kg: { min: 30, max: 300 },
+  steps: { min: 0, max: 200000 },
+  active_kcal: { min: 0, max: 5000 },
 } as const;
 
 type NumericField = keyof typeof BOUNDS;
@@ -95,7 +104,10 @@ function NumberField({
     const parsed = Number(text.replace(",", "."));
     const { min, max } = BOUNDS[field];
     if (Number.isFinite(parsed) && parsed >= min && parsed <= max) {
-      const rounded = field === "birth_year" ? Math.round(parsed) : Math.round(parsed * 10) / 10;
+      const rounded =
+        field === "birth_year" || field === "steps"
+          ? Math.round(parsed)
+          : Math.round(parsed * 10) / 10;
       if (rounded !== value) onSave(field, rounded);
     } else {
       setText(value == null ? "" : String(value));
@@ -127,6 +139,8 @@ export function ProfilePage() {
   const { show } = useToast();
   const { data: session } = useSession();
   const { data: profile, isLoading } = useProfile();
+  const { data: weightHistory } = useWeightHistory();
+  const { data: activity } = useTodayActivity();
 
   const hideCalories = profile?.hide_calories ?? false;
   const goals = (profile?.goals ?? {}) as Record<string, unknown>;
@@ -135,7 +149,16 @@ export function ProfilePage() {
   const save = (fields: Parameters<typeof persistProfileFields>[0]) => {
     void persistProfileFields(fields).then(() => show(t("profile.saved")));
   };
-  const saveNumber = (field: NumericField, value: number) => save({ [field]: value });
+  const saveNumber = (field: NumericField, value: number) => {
+    if (field === "weight_kg") {
+      // Vægt logges som dagens måling og spejles til profilen (3.2)
+      void logWeightToday(value).then(() => show(t("profile.saved")));
+    } else if (field === "steps" || field === "active_kcal") {
+      void saveActivityToday({ [field]: value }).then(() => show(t("profile.saved")));
+    } else {
+      save({ [field]: value });
+    }
+  };
   const saveDirection = (id: string) =>
     save({ goals: JSON.parse(JSON.stringify({ ...goals, direction: id })) });
 
@@ -218,6 +241,74 @@ export function ProfilePage() {
                       { id: "active", label: t("profile.activityActive") },
                     ]}
                   />
+                </div>
+              </Card>
+            </section>
+
+            {/* Vægt over tid — vises først når der er noget at vise */}
+            {(weightHistory?.length ?? 0) >= 2 ? (
+              <section className="space-y-2">
+                <SectionLabel>{t("profile.weightHistory")}</SectionLabel>
+                <Card>
+                  <div className="h-28">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart
+                        data={weightHistory}
+                        margin={{ top: 8, right: 8, left: 8, bottom: 0 }}
+                      >
+                        <XAxis
+                          dataKey="day"
+                          tickLine={false}
+                          axisLine={false}
+                          tick={{ fill: "var(--text-tertiary)", fontSize: 11 }}
+                          tickFormatter={(d: string) =>
+                            new Intl.DateTimeFormat(
+                              i18n.language === "da" ? "da-DK" : "en-GB",
+                              { day: "numeric", month: "numeric" },
+                            ).format(new Date(d))
+                          }
+                        />
+                        <YAxis hide domain={["dataMin - 1", "dataMax + 1"]} />
+                        <Line
+                          type="monotone"
+                          dataKey="weight_kg"
+                          stroke="var(--brand)"
+                          strokeWidth={2}
+                          dot={{ r: 3, fill: "var(--brand)", strokeWidth: 0 }}
+                          isAnimationActive={false}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </Card>
+              </section>
+            ) : null}
+
+            {/* Aktivitet i dag — frivillig, neutral (3.2) */}
+            <section className="space-y-2">
+              <SectionLabel>{t("profile.activityToday")}</SectionLabel>
+              <Card>
+                <div className="space-y-4">
+                  <p className="text-small text-tertiary">{t("profile.activityNote")}</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <NumberField
+                      id="profile-steps"
+                      field="steps"
+                      label={t("profile.steps")}
+                      value={activity?.steps ?? null}
+                      onSave={saveNumber}
+                    />
+                    {/* Aktiv energi er et kalorietal → respekterer hide_calories */}
+                    {!hideCalories ? (
+                      <NumberField
+                        id="profile-active-kcal"
+                        field="active_kcal"
+                        label={t("profile.activeKcal")}
+                        value={activity?.active_kcal ?? null}
+                        onSave={saveNumber}
+                      />
+                    ) : null}
+                  </div>
                 </div>
               </Card>
             </section>

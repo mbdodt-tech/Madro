@@ -35,6 +35,7 @@ import {
   useDiaryEntries,
   type DiaryEntry,
 } from "./diary/useDiary";
+import { useTodayActivity } from "./profile/useBody";
 
 /** Korte søjle-labels til striben (grundstof-/vitaminforkortelser). */
 const MICRO_LETTERS: Partial<Record<NutrientKey, string>> = {
@@ -128,6 +129,13 @@ export function TodayPage() {
   }));
 
   const kcalNow = Math.round(Number(summary?.kcal ?? 0));
+  // Dagens aktive energi (3.2) lægges neutralt oven i referencen — kun
+  // kcal-linjen; ringene beholder grundreferencen (makrobehov skalerer
+  // ikke lineært med en gåtur). Ingen formaninger, bare et justeret tal.
+  const { data: activity } = useTodayActivity();
+  const activeKcal =
+    activity?.active_kcal != null ? Math.round(Number(activity.active_kcal)) : 0;
+  const kcalTarget = targets.kcal + activeKcal;
   const nf = new Intl.NumberFormat(i18n.language === "da" ? "da-DK" : "en-GB");
 
   const dateLabel = new Intl.DateTimeFormat(
@@ -194,7 +202,7 @@ export function TodayPage() {
                     <strong className="text-h2 font-medium text-panel-ink">
                       {nf.format(kcalNow)}
                     </strong>{" "}
-                    / {nf.format(targets.kcal)} kcal
+                    / {nf.format(kcalTarget)} kcal
                   </span>
                 )}
                 <button

@@ -289,6 +289,7 @@ export type Database = {
         Row: {
           activity_level: string | null;
           birth_year: number | null;
+          consent_at: string | null;
           created_at: string;
           dietary_preferences: string[];
           entitlement: string;
@@ -297,6 +298,7 @@ export type Database = {
           hide_calories: boolean;
           id: string;
           locale: string;
+          onboarded_at: string | null;
           rda_region: string;
           sex: string | null;
           timezone: string;
@@ -306,6 +308,7 @@ export type Database = {
         Insert: {
           activity_level?: string | null;
           birth_year?: number | null;
+          consent_at?: string | null;
           created_at?: string;
           dietary_preferences?: string[];
           entitlement?: string;
@@ -314,6 +317,7 @@ export type Database = {
           hide_calories?: boolean;
           id: string;
           locale?: string;
+          onboarded_at?: string | null;
           rda_region?: string;
           sex?: string | null;
           timezone?: string;
@@ -323,6 +327,7 @@ export type Database = {
         Update: {
           activity_level?: string | null;
           birth_year?: number | null;
+          consent_at?: string | null;
           created_at?: string;
           dietary_preferences?: string[];
           entitlement?: string;
@@ -331,6 +336,7 @@ export type Database = {
           hide_calories?: boolean;
           id?: string;
           locale?: string;
+          onboarded_at?: string | null;
           rda_region?: string;
           sex?: string | null;
           timezone?: string;

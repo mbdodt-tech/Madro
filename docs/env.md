@@ -42,6 +42,11 @@ Playwright-kerneløkke-tests i `app/e2e/` mod en prod-preview (port 4173).
 
 - **Lokalt:** `pnpm e2e` (kræver gitignoret `app/.env.e2e` med `E2E_EMAIL`/`E2E_PASSWORD`
   for den permanente testbruger `madro-e2e@madro.test`).
+- `madro-e2e` har `consent_at`/`onboarded_at` sat i DB, så onboarding-gaten (4.1)
+  ikke rammer e2e-suiten. Engangsbrugeren `madro-onb@madro.test` (samme kodeord)
+  bruges til onboarding-/GDPR-verifikation og kan nulstilles/slettes frit —
+  GoTrue-gotcha ved SQL-oprettede brugere: token-kolonnerne i `auth.users`
+  skal være `''`, ikke `NULL`, ellers fejler login.
 - **CI:** `e2e`-jobbet i `.github/workflows/ci.yml` kører kun når repo-variablen
   `E2E_ENABLED=true` og secret `E2E_PASSWORD` er sat. **Aktiveres manuelt:**
 

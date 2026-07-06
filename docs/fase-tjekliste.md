@@ -174,6 +174,36 @@ Wearable-beslutning: fundament + manuel indtastning nu; HealthKit kobler på sam
 
 **Accept:** simulerede rettelses-runder flytter estimatet i biasens retning (netværksbevis); payload-indhold logges fortsat aldrig.
 
+## Fase 4 — Monetering & polering (trinliste godkendt 2026-07-06)
+
+Betalingsbeslutning: alt bygges færdigt mod en adapter — RevenueCat/Stripe-nøgler kobles på senere uden ombygning. Pris i konfig: 349 kr/år + 14 dages prøve.
+
+### 4.1 Onboarding + aldersgate + samtykke (bygget 2026-07-06)
+
+> Nyt flow på /onboarding: velkomst → aldersgate (min. 13 år, DK GDPR-samtykkealder; venlig stopskærm m. LMS-link) → eksplicit samtykke (consent_at, GDPR-påviselighed) → valgfri grundprofil (køn/aktivitet/kalorietal-valg). RequireOnboarded-gate på alle app-flader; brugere fra før 4.1 ser flowet én gang. Migration: profiles + consent_at/onboarded_at.
+
+**Accept:** ny bruger tvinges gennem gate+samtykke; under-13 stoppes venligt; flowet vises aldrig igen efter gennemførsel; consent_at/onboarded_at sat (SQL-bevis).
+
+### 4.2 GDPR: dataeksport + slet konto
+
+> Profil: "Download mine data" (alle egne rækker → JSON client-side, gratis — GDPR-retten, ikke premium-featuren) og "Slet konto" (ny Edge Function `account` m. CORS: sletter alle rækker + storage + auth-bruger; UI kræver skriv-SLET-bekræftelse).
+
+**Accept:** eksporten indeholder alle brugerens rækker; sletning efterlader 0 rækker overalt (SQL-bevis) og rører ikke andre brugere.
+
+### 4.3 Paywall + entitlements v2 (adapter)
+
+> /premium-side i Instrumentet-design: sløret mikronæringsglimt, funktionsliste, 349 kr/år + 14 dages ærlig prøve, altid tydelig "Fortsæt gratis". useEntitlements v2 bag EntitlementsProvider-adapter (stub aktiv; RevenueCat-skelet klar til nøgler). Teasere linker til /premium.
+
+**Accept:** paywall nås fra alle teasere; premium-flag i DB låser op straks; ingen komponent kender udbyderen.
+
+### 4.4 Bevægelses-finish
+
+> layoutId-overgang scan→detalje, fane-fades, onboarding-spring, reduced-motion-audit af alle flader.
+
+**Accept:** overgangene føles som ét system; reduced motion fjerner al bevægelse uden layoutbrud; e2e 3/3.
+
+---
+
 **⛳ Fase 3 færdig (2026-07-06):** Profil-siden giver rigtige behov (Mifflin-St Jeor), aktivitets-/kropsdatalaget står klar til HealthKit (Fase 5), portioner estimeres efter danske husholdningsmål med synligt tilberedningsfedt, og fotogenkendelsen kalibreres af brugerens egne rettelser. Næste: Fase 4 (RevenueCat, onboarding, aldersgate, GDPR-flows).
 
 ---

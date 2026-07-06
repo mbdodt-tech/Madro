@@ -50,6 +50,20 @@ Playwright-kerneløkke-tests i `app/e2e/` mod en prod-preview (port 4173).
   sletter brugeren helt — genopret ved at klone e2e-brugerens auth-rækker.)
 - Edge Function `account` (4.2): eneste server-side GDPR-operation
   (fuld sletning m. service role); eksport sker client-side via RLS.
+
+## RevenueCat-tilkobling (når kontiene findes)
+
+Paywall og gating er færdige bag adapteren i `app/src/payments/provider.ts`
+(stub læser `profiles.entitlement`). Aktivering:
+
+1. Opret RevenueCat-projekt + Web Billing (Stripe-konto kræves) med
+   entitlement-id `premium` og et årsprodukt til 349 kr m. 14 dages prøve
+   (tallene spejler `app/src/payments/config.ts`).
+2. `pnpm --filter @madro/app add @revenuecat/purchases-js`; læg
+   `VITE_REVENUECAT_KEY` i Vercel-env.
+3. Implementér `revenuecatProvider` (opskrift i provider.ts: configure ved
+   login med auth.uid som appUserId; spejl `entitlements.active["premium"]`).
+4. Skift `activeProvider` til `revenuecatProvider` — ingen andre filer røres.
 - **CI:** `e2e`-jobbet i `.github/workflows/ci.yml` kører kun når repo-variablen
   `E2E_ENABLED=true` og secret `E2E_PASSWORD` er sat. **Aktiveres manuelt:**
 

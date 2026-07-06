@@ -269,7 +269,8 @@
       "loading": "Finder alternativer, der passer til din uge…",
       "none": "Denne vare står sig faktisk godt i sin kategori — vi fandt ikke noget med højere kvalitet.",
       "premiumTitle": "Alternativforslag er en del af Premium",
-      "premiumBody": "Få 2-3 konkrete varer af højere kvalitet, vægtet efter hvad du mangler i ugen."
+      "premiumBody": "Få 2-3 konkrete varer af højere kvalitet, vægtet efter hvad du mangler i ugen.",
+      "seePremium": "Se Premium"
     }
   },
   "portion": {
@@ -396,7 +397,8 @@
     "comingSoon": "kommer snart",
     "logTitle": "Dagens måltider",
     "empty": "Ingen måltider logget endnu i dag.",
-    "activityIncluded": "inkl. +{{active}} kcal fra dagens aktivitet (reference {{base}})"
+    "activityIncluded": "inkl. +{{active}} kcal fra dagens aktivitet (reference {{base}})",
+    "premiumChip": "Premium"
   },
   "insights": {
     "title": "Indsigt",
@@ -413,7 +415,8 @@
     "generated": "Ugens indsigt er klar",
     "premiumTitle": "Ugeindsigter er en del af Premium",
     "premiumBody": "Få en ugentlig fortælling om dine mønstre og konkrete fødevareidéer, der lukker hullerne i din mikronæring.",
-    "premiumChip": "kommer med Premium"
+    "premiumChip": "kommer med Premium",
+    "seePremium": "Se Premium"
   },
   "onboarding": {
     "welcomeTitle": "Velkommen til Madro",
@@ -437,5 +440,27 @@
     "calorieNote": "Nogle har det bedst uden tal. Vælger du at skjule dem, fokuserer appen på kvalitet og balance — og du kan altid skifte mening i profilen.",
     "finish": "Færdig",
     "skip": "Spring over"
+  },
+  "premium": {
+    "title": "Premium",
+    "back": "Tilbage",
+    "glimpseHint": "Mikronæring i dag",
+    "glimpseLabel": "Den fulde mikronæringsdybde",
+    "featuresLabel": "Premium-funktioner",
+    "featInsights": "Ugentlige mønster-indsigter med konkrete fødevareidéer",
+    "featPhoto": "Fotolog dine måltider — tallerkenen bliver til poster",
+    "featText": "Skriv hvad du spiste — resten sker af sig selv",
+    "featAlternatives": "Bedre alternativer, vægtet efter det DU mangler",
+    "featWearables": "Wearable-synkronisering (kommer med appen til iOS/Android)",
+    "featExport": "Rapporter og eksport af dine tendenser",
+    "perYear": "kr/år",
+    "afterTrial": "Efter {{days}} dages gratis prøve",
+    "trialNote": "Vi siger til, inden prøven udløber — ingen skjulte fornyelser.",
+    "cta": "Start {{days}} dages gratis prøve",
+    "betaNote": "Betaling åbner ved lancering — alt andet virker allerede.",
+    "continueFree": "Fortsæt gratis",
+    "freeStays": "Gratis-udgaven forbliver fuldt brugbar",
+    "alreadyTitle": "Du har Premium",
+    "alreadyBody": "Alle funktioner er låst op. Tak fordi du er med."
   }
 }

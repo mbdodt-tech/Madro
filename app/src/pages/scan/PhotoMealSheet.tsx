@@ -1,4 +1,4 @@
-import { AiError } from "@madro/core";
+import { AiError, type CorrectionItem } from "@madro/core";
 import { Button, Skeleton } from "@madro/ui";
 import { Camera } from "lucide-react";
 import { useRef, useState } from "react";
@@ -8,6 +8,7 @@ import { downscaleToJpegBase64 } from "../../lib/image";
 import { recordScan } from "../../scanner/useLookup";
 import { MealDraftEditor } from "../diary/MealDraftEditor";
 import { buildRows, type DraftRow } from "../diary/mealDraft";
+import { fetchCorrectionHints, saveCorrectionPair } from "./corrections";
 
 /**
  * Måltidsfoto (fase 2.2): foto af tallerkenen → AI-genkendte retter som
@@ -23,16 +24,22 @@ export function PhotoMealSheet({ onLogged }: { onLogged: () => void }) {
   const [error, setError] = useState<string | null>(null);
   const [rows, setRows] = useState<DraftRow[] | null>(null);
   const [scanId, setScanId] = useState<string | null>(null);
+  const [aiItems, setAiItems] = useState<CorrectionItem[]>([]);
 
   const analyze = async (file: File) => {
     setAnalyzing(true);
     setError(null);
     try {
+      const locale = i18n.language === "da" ? ("da" as const) : ("en" as const);
+      // Kalibrerings-hints fra brugerens egne tidligere rettelser (3.4) —
+      // ren bonus; tom liste for nye brugere, og fejl blokerer aldrig.
+      const hints = await fetchCorrectionHints(locale);
       const image = await downscaleToJpegBase64(file);
       const result = await aiClient.callAi("parse_photo_meal", {
         image_base64: image,
         media_type: "image/jpeg",
-        locale: i18n.language === "da" ? "da" : "en",
+        locale,
+        ...(hints.length > 0 ? { hints } : {}),
       });
       if (result.items.length === 0) {
         setError(t("scan.photo.nothingFound"));
@@ -40,6 +47,7 @@ export function PhotoMealSheet({ onLogged }: { onLogged: () => void }) {
       }
       const id = await recordScan(null, null, "photo");
       setScanId(id);
+      setAiItems(result.items.map(({ name, grams }) => ({ name, grams })));
       setRows(await buildRows(result.items));
     } catch (err) {
       if (err instanceof AiError && err.code === "missing_anthropic_key") {
@@ -60,7 +68,17 @@ export function PhotoMealSheet({ onLogged }: { onLogged: () => void }) {
         initialRows={rows}
         day={new Date()}
         scanId={scanId}
-        onLogged={onLogged}
+        onLogged={(finalRows) => {
+          // Rettelses-parret gemmes fire-and-forget (aldrig blokerende).
+          if (scanId) {
+            void saveCorrectionPair(
+              scanId,
+              aiItems,
+              finalRows.map((r) => ({ name: r.name, grams: r.grams })),
+            );
+          }
+          onLogged();
+        }}
       />
     );
   }

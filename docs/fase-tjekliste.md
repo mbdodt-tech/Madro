@@ -174,6 +174,8 @@ Wearable-beslutning: fundament + manuel indtastning nu; HealthKit kobler på sam
 
 **Accept:** simulerede rettelses-runder flytter estimatet i biasens retning (netværksbevis); payload-indhold logges fortsat aldrig.
 
+**⛳ Fase 3 færdig (2026-07-06):** Profil-siden giver rigtige behov (Mifflin-St Jeor), aktivitets-/kropsdatalaget står klar til HealthKit (Fase 5), portioner estimeres efter danske husholdningsmål med synligt tilberedningsfedt, og fotogenkendelsen kalibreres af brugerens egne rettelser. Næste: Fase 4 (RevenueCat, onboarding, aldersgate, GDPR-flows).
+
 ---
 
 ## Faste vaner undervejs

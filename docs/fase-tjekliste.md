@@ -196,11 +196,13 @@ Betalingsbeslutning: alt bygges færdigt mod en adapter — RevenueCat/Stripe-n�
 
 **Accept:** paywall nås fra alle teasere; premium-flag i DB låser op straks; ingen komponent kender udbyderen.
 
-### 4.4 Bevægelses-finish
+### 4.4 Bevægelses-finish (bygget 2026-07-06)
 
-> layoutId-overgang scan→detalje, fane-fades, onboarding-spring, reduced-motion-audit af alle flader.
+> layoutId-overgang scan→detalje (fandtes fra 1.4 — verificeret), fane-entrance i TabShell (fade+løft m. spring-præset), onboarding-spring, FAB/knap-fjedre. Reduced-motion-audit: alle motion-komponenter (Button, Sheet, ringe, bue, stepper, count-up, toast via motion-safe, skeleton, TabShell, onboarding) vogter prefers-reduced-motion.
 
-**Accept:** overgangene føles som ét system; reduced motion fjerner al bevægelse uden layoutbrud; e2e 3/3.
+**Accept:** overgangene føles som ét system; reduced motion fjerner al bevægelse uden layoutbrud (headless-bevis: transform none/opacity 1 + intakt indhold); e2e 3/3.
+
+**⛳ Fase 4 færdig (2026-07-06):** onboarding med aldersgate og eksplicit samtykke, GDPR-eksport/sletning, paywall med ærlig prøvetekst bag entitlements-adapteren (RevenueCat kobles på med nøgler — opskrift i env.md), og bevægelsen samlet til ét system. Næste: Fase 5 (Capacitor/native) eller RevenueCat-tilkobling.
 
 ---
 

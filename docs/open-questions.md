@@ -21,7 +21,7 @@ Uafklarede beslutninger fra plan-gennemgangen 2026-07-02. Hvert punkt har en eje
 ## Teknik (kan afgøres når trinnet nås)
 
 - [ ] **PostHog**: står i byggeplanen §4.1 (EU-hosted) men ikke i CLAUDE.md's stak-liste. Med i trin 0.7 eller udskudt?
-- [ ] **`daily_summaries` genberegning** (trin 1.7): Postgres-trigger vs. Edge Function vs. klient-skrivning.
+- [x] **`daily_summaries` genberegning** (afgjort 2026-07-06): Postgres-AFTER-trigger på `log_entries` — konsistens uanset skriver (klient nu, NL-/fotologning i Fase 2), idempotent fuld-dags-genberegning, dagsgrænse via `profiles.timezone`. Se `docs/schema.md`.
 - [ ] **`useEntitlements()`-stub** fra Fase 0: returnerer gratis-tier for alle, indtil RevenueCat kobles på i Fase 4.
 
 ## Afgjort

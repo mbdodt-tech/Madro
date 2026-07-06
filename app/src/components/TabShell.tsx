@@ -7,6 +7,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 const TAB_ROUTES: Record<string, string> = {
   today: "/",
   diary: "/diary",
+  insights: "/insights",
 };
 
 /**

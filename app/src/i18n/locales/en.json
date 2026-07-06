@@ -326,5 +326,22 @@
     "comingSoon": "coming soon",
     "logTitle": "Today's meals",
     "empty": "No meals logged yet today."
+  },
+  "insights": {
+    "title": "Insights",
+    "trendTitle": "Quality this week",
+    "trendNote": "Share of non-ultra-processed food per day (NOVA 1-3).",
+    "daysLogged": "days logged",
+    "avgQuality": "avg. quality",
+    "avgKcal": "avg. kcal",
+    "hidden": "hidden",
+    "tooFewDays": "Log a couple more days and we can draw your weekly pattern.",
+    "generateHint": "Get a short story about this week's patterns and concrete ideas that close the gaps.",
+    "generate": "Create this week's insight",
+    "generating": "Writing this week's insight…",
+    "generated": "This week's insight is ready",
+    "premiumTitle": "Weekly insights are part of Premium",
+    "premiumBody": "Get a weekly story about your patterns and concrete food ideas that close your micronutrient gaps.",
+    "premiumChip": "coming with Premium"
   }
 }

@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { RequireAuth } from "./auth/RequireAuth";
 import { DesignPage } from "./pages/DesignPage";
 import { DiaryPage } from "./pages/DiaryPage";
+import { InsightsPage } from "./pages/InsightsPage";
 import { LoginPage } from "./pages/LoginPage";
 import { ProductPage } from "./pages/ProductPage";
 import { ScanPage } from "./pages/ScanPage";
@@ -24,6 +25,14 @@ export function App() {
           element={
             <RequireAuth>
               <DiaryPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/insights"
+          element={
+            <RequireAuth>
+              <InsightsPage />
             </RequireAuth>
           }
         />

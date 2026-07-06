@@ -54,6 +54,18 @@ export const aiResultSchemas = {
   parse_photo_meal: z.object({
     items: z.array(parsedMealItemSchema).max(8),
   }),
+  /** Ugens fortælling + forslag (fase 2.4). Aldrig moraliserende. */
+  weekly_insight: z.object({
+    narrative: z.string().min(1).max(600),
+    suggestions: z
+      .array(
+        z.object({
+          food: z.string().min(1).max(80),
+          reason: z.string().min(1).max(200),
+        }),
+      )
+      .max(4),
+  }),
 } as const;
 
 export type AiTask = keyof typeof aiResultSchemas;

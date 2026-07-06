@@ -35,6 +35,13 @@ export {
 } from "./rollup/rollup";
 
 export {
+  buildWeeklyStats,
+  type DaySummaryInput,
+  type WeeklyStats,
+  type WeeklyTrendPoint,
+} from "./rollup/weekly";
+
+export {
   computeVerdict,
   verdictLevelFor,
   type VerdictInput,

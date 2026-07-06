@@ -81,6 +81,46 @@ const PARSE_LABEL_SYSTEM = `Opgave: Aflæs varedeklarationen (ingrediensliste og
 - Medtag KUN hvad der faktisk kan læses på billedet. Gæt aldrig.
 - Kan intet af ovenstående læses, returnér {"additives":[],"nutriments":{}}.`;
 
+// ---- weekly_insight (fase 2.4): ugens tal → fortælling + forslag ----
+// Payload er KUN tal/navne fra daily_summaries — aldrig brugerfritekst.
+const weeklyInsightPayload = z.object({
+  locale: z.enum(["da", "en"]),
+  stats: z.object({
+    daysLogged: z.number().int().min(0).max(7),
+    avgKcal: z.number().min(0).max(10000).optional(),
+    avgNovaShare: z.number().min(0).max(100).optional(),
+    avgProteinG: z.number().min(0).max(500).optional(),
+    lowestMicros: z
+      .array(z.object({ name: z.string().min(1).max(60), pct: z.number().min(0).max(500) }))
+      .max(3),
+  }),
+});
+
+const weeklyInsightResult = z.object({
+  narrative: z.string().min(1).max(600),
+  suggestions: z
+    .array(
+      z.object({
+        food: z.string().min(1).max(80),
+        reason: z.string().min(1).max(200),
+      }),
+    )
+    .max(4),
+});
+
+const WEEKLY_INSIGHT_SYSTEM = `Opgave: Skriv ugens kost-indsigt ud fra talgrundlaget.
+- Returnér JSON: {"narrative": string, "suggestions": [{"food","reason"}]}.
+- "narrative": 2-4 korte sætninger i almindeligt sprog på det angivne sprog.
+  Rammen er ALTID "sådan spiser du endnu bedre" — beskriv mønstre neutralt og
+  fremadrettet. ALDRIG bebrejdelse, aldrig "for meget", "du burde", "desværre"
+  eller lignende. Omtal forarbejdningsgrad via NOVA ("andelen af
+  ikke-ultraforarbejdet mad var X %").
+- Nævn KUN kalorier, hvis avgKcal er med i talgrundlaget.
+- "suggestions": 2-4 konkrete fødevarer, der naturligt løfter de laveste
+  mikronæringsstoffer, med en kort, saglig grund (gerne "rig på jern" o.l.).
+- Ved få loggede dage (daysLogged < 3): anerkend roligt at ugen er
+  sparsomt logget, og hold fortællingen kort.`;
+
 const PARSE_PHOTO_MEAL_SYSTEM = `Opgave: Genkend maden på billedet (et måltid uden stregkode).
 - Returnér JSON: {"items":[{"name":string,"grams":number,"note":string?}]} — 0-8 poster.
 - "name": ret/fødevare, kort og opslagsvenligt på det angivne sprog
@@ -154,6 +194,18 @@ const tasks: Record<
         imageBase64: image_base64,
         imageMediaType: media_type,
         schema: parsePhotoMealResult,
+        maxTokens: 1024,
+      });
+    },
+  },
+  weekly_insight: {
+    schema: weeklyInsightPayload,
+    handler: async (payload) => {
+      const { locale, stats } = payload as z.infer<typeof weeklyInsightPayload>;
+      return askClaude({
+        system: WEEKLY_INSIGHT_SYSTEM,
+        user: `Sprog: ${locale}\nTalgrundlag: ${JSON.stringify(stats)}`,
+        schema: weeklyInsightResult,
         maxTokens: 1024,
       });
     },

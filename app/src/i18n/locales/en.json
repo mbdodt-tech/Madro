@@ -60,7 +60,18 @@
     "saved": "Saved",
     "supportTitle": "Need support?",
     "supportBody": "If food and body image are taking up too much space, support organisations are there for you — in Denmark, LMS offers counselling.",
-    "supportLink": "Find support at LMS"
+    "supportLink": "Find support at LMS",
+    "dataTitle": "Data & privacy",
+    "export": "Download",
+    "exportBody": "Get a copy of all your data as a single JSON file.",
+    "exported": "Your data has been downloaded",
+    "delete": "Delete account",
+    "deleteBody": "Delete your account and all data permanently.",
+    "deleteTitle": "Delete your account",
+    "deleteWarning": "Everything is deleted permanently and cannot be recovered: diary, scans, insights, weight history and profile. Consider downloading your data first.",
+    "deleteConfirmLabel": "Type {{word}} to confirm",
+    "deleteWord": "DELETE",
+    "deleteConfirm": "Delete my account permanently"
   },
   "design": {
     "title": "Madro design system",

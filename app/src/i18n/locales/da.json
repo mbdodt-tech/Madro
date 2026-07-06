@@ -60,7 +60,18 @@
     "saved": "Gemt",
     "supportTitle": "Brug for støtte?",
     "supportBody": "Hvis mad og krop fylder for meget, står Landsforeningen mod spiseforstyrrelser og selvskade (LMS) klar med rådgivning.",
-    "supportLink": "Find støtte hos LMS"
+    "supportLink": "Find støtte hos LMS",
+    "dataTitle": "Data & privatliv",
+    "export": "Download",
+    "exportBody": "Hent en kopi af alle dine data som én JSON-fil.",
+    "exported": "Dine data er downloadet",
+    "delete": "Slet konto",
+    "deleteBody": "Slet din konto og alle data permanent.",
+    "deleteTitle": "Slet din konto",
+    "deleteWarning": "Alt slettes permanent og kan ikke gendannes: dagbog, scanninger, indsigter, vægthistorik og profil. Overvej at downloade dine data først.",
+    "deleteConfirmLabel": "Skriv {{word}} for at bekræfte",
+    "deleteWord": "SLET",
+    "deleteConfirm": "Slet min konto permanent"
   },
   "design": {
     "title": "Madro designsystem",

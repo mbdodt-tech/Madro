@@ -31,14 +31,17 @@
   --on-brand: #ffffff;
   --card-edge: transparent; /* lys: skygge løfter, ingen kant */
 
-  /* Instrumentpanelet — signaturen: dyb evergreen i BEGGE tilstande
-     (brugerens valg 2026-07-06 efter salvie-testen: originalen var bedre;
-     sammenhængen sikres af page-hero-wash + tintet mellemkort). */
-  --panel: #0c2b22;
-  --panel-edge: #123528;
-  --panel-ink: #e9f2ed;
-  --panel-dim: #8fa89d;
-  --panel-track: rgba(233, 242, 237, 0.13);
+  /* Instrumentpanelet — signaturen: dyb evergreen med IDENTISK hex i
+     BEGGE tilstande (brugerens valg 2026-07-07: "samme farve på de
+     grønne blokke i lys og mørk"). Værdisættet er det let løftede fra
+     dark-liftet samme dag; sammenhængen i lys tilstand sikres fortsat
+     af page-hero-wash + tintet mellemkort. Defineres kun her — .dark
+     overstyrer bevidst IKKE panel-tokens. */
+  --panel: #123126;
+  --panel-edge: #23473a;
+  --panel-ink: #edf5f0;
+  --panel-dim: #9db5aa;
+  --panel-track: rgba(233, 242, 237, 0.16);
   --panel-haze: rgba(61, 214, 163, 0.09);
   /* Aflæsningsfarver på panelet — lysende, ens i begge tilstande */
   --lume: #3dd6a3;
@@ -89,13 +92,8 @@
   --on-brand: #08130f;
   --card-edge: var(--hairline); /* mørk: fladelyshed + hårlinje, ingen skygge */
 
-  /* Panelet forbliver ankeret: kun let løft, kanten følger med op */
-  --panel: #123126;
-  --panel-edge: #23473a;
-  --panel-ink: #edf5f0;
-  --panel-dim: #9db5aa;
-  --panel-track: rgba(233, 242, 237, 0.16);
-  --panel-haze: rgba(61, 214, 163, 0.09);
+  /* Panel-tokens arves uændret fra :root — samme grønne blok i begge
+     tilstande (brugerens valg 2026-07-07). */
 
   /* Verdikt løftet ca. 8-10 % i lyshed */
   --v-excellent: #3db97d;

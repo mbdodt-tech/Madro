@@ -43,7 +43,11 @@ jobs:
 
       - name: Gradle assembleDebug
         working-directory: native/android
-        run: ./gradlew assembleDebug --no-daemon
+        # chmod som bælte-og-seler: executable-bit kan tabes ved commits
+        # fra Windows (det var netop exit 126 i første kørsel)
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

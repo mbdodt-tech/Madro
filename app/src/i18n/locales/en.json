@@ -20,6 +20,9 @@
     "signIn": "Sign in",
     "error": "That didn't work. Check your details and try again.",
     "rateLimited": "Too many attempts right now — wait a few minutes and try again.",
+    "value1": "Scan a barcode — see the quality instantly",
+    "value2": "Macros and micronutrients in one place",
+    "value3": "Built on NOVA, Nutri-Score and verified sources",
     "tagline": "Understand your food — no guilt, no judgement."
   },
   "home": {
@@ -384,7 +387,7 @@
       "clean": "A clean day so far",
       "mixed": "A mixed day — perfectly fine",
       "processed": "Today leans processed",
-      "empty": "No quality data for today's meals yet"
+      "empty": "The gauge lights up with the day's first log"
     },
     "caloriesHidden": "calories hidden",
     "hideCalories": "Hide calorie numbers",
@@ -399,7 +402,20 @@
     "logTitle": "Today's meals",
     "empty": "No meals logged yet today.",
     "activityIncluded": "incl. +{{active}} kcal from today's activity (reference {{base}})",
-    "premiumChip": "Premium"
+    "premiumChip": "Premium",
+    "hook": {
+      "morningTitle": "Good morning — what's first?",
+      "morningBody": "Scan your breakfast and the day takes shape.",
+      "lunchTitle": "Lunchtime?",
+      "lunchBody": "Scan or log it in ten seconds.",
+      "dinnerTitle": "Dinner time?",
+      "dinnerBody": "Log it while it's still warm.",
+      "quietTitle": "A blank day, ready when you are",
+      "quietBody": "Scan a product or add a meal whenever it suits you.",
+      "scan": "Scan",
+      "add": "Log meal",
+      "yesterday": "Yesterday landed at <pct>{{pct}}%</pct> clean — can you match it?"
+    }
   },
   "insights": {
     "title": "Insights",

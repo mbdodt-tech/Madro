@@ -20,6 +20,9 @@
     "signIn": "Log ind",
     "error": "Det virkede ikke. Tjek dine oplysninger og prøv igen.",
     "rateLimited": "For mange forsøg lige nu — vent et par minutter og prøv igen.",
+    "value1": "Scan en stregkode — se kvaliteten med det samme",
+    "value2": "Makroer og mikronæring ét sted",
+    "value3": "Bygget på NOVA, Nutri-Score og verificerede kilder",
     "tagline": "Forstå din mad — uden skyld og løftede pegefingre."
   },
   "home": {
@@ -384,7 +387,7 @@
       "clean": "En ren dag indtil videre",
       "mixed": "Blandet dag — helt okay",
       "processed": "Dagen er tung på forarbejdet",
-      "empty": "Ingen kvalitetsdata for dagens måltider endnu"
+      "empty": "Måleren vågner, når du logger dagens første"
     },
     "caloriesHidden": "kalorier skjult",
     "hideCalories": "Skjul kalorietal",
@@ -399,7 +402,20 @@
     "logTitle": "Dagens måltider",
     "empty": "Ingen måltider logget endnu i dag.",
     "activityIncluded": "inkl. +{{active}} kcal fra dagens aktivitet (reference {{base}})",
-    "premiumChip": "Premium"
+    "premiumChip": "Premium",
+    "hook": {
+      "morningTitle": "Godmorgen — hvad står den på?",
+      "morningBody": "Scan din morgenmad, så tegner dagen sig.",
+      "lunchTitle": "Frokosttid?",
+      "lunchBody": "Scan eller log på ti sekunder.",
+      "dinnerTitle": "Aftensmad?",
+      "dinnerBody": "Log den, mens den er varm.",
+      "quietTitle": "Dagen er blank — klar når du er",
+      "quietBody": "Scan en vare eller tilføj et måltid, når det passer dig.",
+      "scan": "Scan",
+      "add": "Log måltid",
+      "yesterday": "I går landede du på <pct>{{pct}} %</pct> ren — kan du matche det?"
+    }
   },
   "insights": {
     "title": "Indsigt",

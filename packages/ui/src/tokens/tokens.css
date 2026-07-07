@@ -68,29 +68,33 @@
   --shadow-btn: 0 8px 20px rgba(14, 122, 94, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
-/* ---------- Rå tokens: mørk tilstand (§3.2, førsteklasses) ---------- */
+/* ---------- Rå tokens: mørk tilstand (§3.2, førsteklasses) ----------
+   Løftet 2026-07-07 (telefonfeedback: "for mørk, grønnen drukner"):
+   hele fladehierarkiet op ca. 6-8 % i lyshed med varm grøn-grå undertone —
+   lettere i stilen uden at blive hvidt. Panelet løftes kun let, så det
+   forbliver den dybeste flade (instrumentets anker). */
 .dark {
-  --bg: #0a0f0d;
-  --surface: #131b18;
-  --surface-raised: #1a2420;
-  --ink: #eaf0ec;
-  --text-secondary: #9aa6a0;
-  --text-tertiary: #6e7a74;
-  --brand: #35c495;
-  --brand-raise: #3ecd9d;
-  --brand-hover: #4ad0a4;
-  --brand-tint: #12241e;
+  --bg: #17211c;
+  --surface: #1f2a24;
+  --surface-raised: #27342d;
+  --ink: #edf2ee;
+  --text-secondary: #a7b3ac;
+  --text-tertiary: #7e8a84;
+  --brand: #3ecd9d;
+  --brand-raise: #48d5a6;
+  --brand-hover: #52d9ab;
+  --brand-tint: #24372d;
   --accent: #e8a13a;
-  --hairline: rgba(234, 240, 236, 0.09);
+  --hairline: rgba(234, 240, 236, 0.12);
   --on-brand: #08130f;
   --card-edge: var(--hairline); /* mørk: fladelyshed + hårlinje, ingen skygge */
 
-  /* Panelet smelter sammen med den mørke flade via lysere kant */
-  --panel: #10231c;
-  --panel-edge: #1a3529;
-  --panel-ink: #e9f2ed;
-  --panel-dim: #8fa89d;
-  --panel-track: rgba(233, 242, 237, 0.13);
+  /* Panelet forbliver ankeret: kun let løft, kanten følger med op */
+  --panel: #123126;
+  --panel-edge: #23473a;
+  --panel-ink: #edf5f0;
+  --panel-dim: #9db5aa;
+  --panel-track: rgba(233, 242, 237, 0.16);
   --panel-haze: rgba(61, 214, 163, 0.09);
 
   /* Verdikt løftet ca. 8-10 % i lyshed */
@@ -108,9 +112,9 @@
   /* Mørk: fladelyshed + hårlinjer frem for skygge (§3.4) */
   --shadow-card: 0 0 0 0 transparent;
   --shadow-sheet: 0 -8px 32px rgba(0, 0, 0, 0.5);
-  --shadow-fab: 0 10px 26px rgba(53, 196, 149, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  --shadow-panel: inset 0 1px 0 rgba(233, 242, 237, 0.07), 0 10px 26px rgba(0, 0, 0, 0.5);
-  --shadow-btn: 0 8px 20px rgba(53, 196, 149, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  --shadow-fab: 0 10px 26px rgba(62, 205, 157, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  --shadow-panel: inset 0 1px 0 rgba(233, 242, 237, 0.07), 0 10px 26px rgba(0, 0, 0, 0.4);
+  --shadow-btn: 0 8px 20px rgba(62, 205, 157, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.28);
 
   color-scheme: dark;
 }

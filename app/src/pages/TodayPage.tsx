@@ -19,7 +19,7 @@ import {
 } from "@madro/ui";
 import { Eye, EyeOff, Plus, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { persistHideCalories, useProfile } from "../auth/useProfile";
 import { useSession } from "../auth/useSession";
@@ -30,6 +30,7 @@ import { AddFoodSheet } from "./diary/AddFoodSheet";
 import { EntrySheet } from "./diary/EntrySheet";
 import { MealSections } from "./diary/MealSections";
 import {
+  addDays,
   invalidateDiary,
   useDailySummary,
   useDiaryEntries,
@@ -48,6 +49,26 @@ const MICRO_LETTERS: Partial<Record<NutrientKey, string>> = {
   folate_ug: "Fo",
   zinc_mg: "Zn",
 };
+
+/** Forside-hook (2026-07-07): tidsbevidst handlingskort. Vises når det
+ *  aktuelle måltidsvindue endnu ikke er logget — ellers kun ved helt tom
+ *  dag. Invitation, aldrig formaning (CLAUDE.md: ingen guilt-mekanik). */
+type HookKind = "morning" | "lunch" | "dinner" | "quiet";
+
+const HOOK_COPY: Record<HookKind, { title: string; body: string }> = {
+  morning: { title: "today.hook.morningTitle", body: "today.hook.morningBody" },
+  lunch: { title: "today.hook.lunchTitle", body: "today.hook.lunchBody" },
+  dinner: { title: "today.hook.dinnerTitle", body: "today.hook.dinnerBody" },
+  quiet: { title: "today.hook.quietTitle", body: "today.hook.quietBody" },
+};
+
+function mealHook(hour: number, entries: DiaryEntry[]): HookKind | null {
+  const logged = new Set(entries.map((e) => e.meal));
+  if (hour >= 5 && hour < 10 && !logged.has("breakfast")) return "morning";
+  if (hour >= 11 && hour < 14 && !logged.has("lunch")) return "lunch";
+  if (hour >= 17 && hour < 21 && !logged.has("dinner")) return "dinner";
+  return entries.length === 0 ? "quiet" : null;
+}
 
 function qualityCaptionKey(pct: number | null): string {
   if (pct == null) return "today.quality.empty";
@@ -127,6 +148,16 @@ export function TodayPage() {
         : NUTRIENT_INFO[c.key].labelEn,
     pct: c.pct,
   }));
+
+  // Gårsdags-teaser (hook 2): vises kun mens dagens måler stadig er blank,
+  // og kun når gårsdagen var ren (>= 65) — aldrig som bebrejdelse.
+  const { data: yesterdaySummary } = useDailySummary(addDays(today, -1));
+  const yesterdayPct =
+    yesterdaySummary?.nova_share != null
+      ? Math.round(Number(yesterdaySummary.nova_share))
+      : null;
+  const showYesterdayHook = sharePct == null && yesterdayPct != null && yesterdayPct >= 65;
+  const hook = mealHook(today.getHours(), entries ?? []);
 
   const kcalNow = Math.round(Number(summary?.kcal ?? 0));
   // Dagens aktive energi (3.2) lægges neutralt oven i referencen — kun
@@ -266,6 +297,37 @@ export function TodayPage() {
             </div>
           </Panel>
         )}
+
+        {/* Forside-hook 1: tidsbevidst handlingskort (2026-07-07) */}
+        {!isLoading && !isError && hook ? (
+          <section className="rounded-lg border border-card-edge bg-surface p-4 shadow-1">
+            <h2 className="text-body font-semibold text-ink">
+              {t(HOOK_COPY[hook].title)}
+            </h2>
+            <p className="mt-0.5 text-small text-secondary">{t(HOOK_COPY[hook].body)}</p>
+            <div className="mt-3 flex gap-2">
+              <Button size="sm" onClick={() => navigate("/scan")}>
+                {t("today.hook.scan")}
+              </Button>
+              <Button size="sm" variant="secondary" onClick={() => setAdding(true)}>
+                {t("today.hook.add")}
+              </Button>
+            </div>
+          </section>
+        ) : null}
+
+        {/* Forside-hook 2: gårsdagens kvalitet som nysgerrigheds-krog */}
+        {!isLoading && !isError && showYesterdayHook ? (
+          <p className="rounded-lg border border-card-edge bg-surface px-4 py-3 text-small text-secondary shadow-1">
+            <Trans
+              i18nKey="today.hook.yesterday"
+              values={{ pct: yesterdayPct }}
+              components={{
+                pct: <strong className="font-mono font-medium tabular-nums text-brand" />,
+              }}
+            />
+          </p>
+        ) : null}
 
         {/* Indsigtsteaser — tintet mellemtrin; linker til paywallen (4.3) */}
         <button

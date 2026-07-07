@@ -1,4 +1,5 @@
 import { Button, Card, Input } from "@madro/ui";
+import { Gauge, Leaf, ScanBarcode } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Navigate, useNavigate } from "react-router-dom";
@@ -70,6 +71,23 @@ export function LoginPage() {
           <h1 className="text-display text-ink">{t("auth.title")}</h1>
           <p className="mt-1 text-body text-secondary">{t("auth.subtitle")}</p>
         </div>
+
+        {/* Værdiløfter (2026-07-07): siden var steril — vis hvad man får,
+            før man bliver bedt om sin e-mail. */}
+        <ul className="mb-6 space-y-2.5">
+          <li className="flex items-start gap-3 text-small text-secondary">
+            <ScanBarcode className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden="true" />
+            {t("auth.value1")}
+          </li>
+          <li className="flex items-start gap-3 text-small text-secondary">
+            <Gauge className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden="true" />
+            {t("auth.value2")}
+          </li>
+          <li className="flex items-start gap-3 text-small text-secondary">
+            <Leaf className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden="true" />
+            {t("auth.value3")}
+          </li>
+        </ul>
 
         <Card>
           <form

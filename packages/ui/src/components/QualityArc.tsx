@@ -84,7 +84,24 @@ export function QualityArc({ pct, label, caption, className }: QualityArcProps) 
                 reduceMotion ? { duration: 0 } : { duration: 0.7, ease: [0.2, 0.8, 0.25, 1] }
               }
             />
-          ) : null}
+          ) : (
+            /* Standby-lys: måleren er "klar" frem for tom — inviterer i
+               stedet for at ligne en fejl (forside-hook 2026-07-07). */
+            <motion.circle
+              cx={CX - R}
+              cy={CY}
+              r={4.5}
+              fill="currentColor"
+              className="glow-reading text-lume"
+              initial={false}
+              animate={reduceMotion ? { opacity: 0.85 } : { opacity: [0.45, 0.95, 0.45] }}
+              transition={
+                reduceMotion
+                  ? { duration: 0 }
+                  : { duration: 2.4, repeat: Infinity, ease: "easeInOut" }
+              }
+            />
+          )}
         </svg>
         <div className="absolute inset-x-0 -bottom-1 flex flex-col items-center">
           <span className="font-mono text-reading tabular-nums text-panel-ink">

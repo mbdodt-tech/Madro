@@ -1,4 +1,4 @@
-import type { NutrientMap } from "@madro/core";
+import { isSupplementFood, type NutrientMap } from "@madro/core";
 import { Button } from "@madro/ui";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -19,7 +19,9 @@ export function PortionStep({
 }) {
   const { t } = useTranslation();
 
-  const [grams, setGrams] = useState(100);
+  // Kosttilskud logges i tabletter (1 tablet = 1 g), mad i gram.
+  const tablets = isSupplementFood(food);
+  const [grams, setGrams] = useState(tablets ? 1 : 100);
   const [meal, setMeal] = useState<Meal>(() => defaultMeal(new Date().getHours()));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
@@ -30,7 +32,13 @@ export function PortionStep({
     setBusy(true);
     setError(false);
     try {
-      await logMeal({ foodId: food.id, amountGrams: grams, meal, scanId });
+      await logMeal({
+        foodId: food.id,
+        amountGrams: grams,
+        meal,
+        scanId,
+        unit: tablets ? "tablet" : "g",
+      });
       onLogged();
     } catch {
       setError(true);
@@ -63,6 +71,7 @@ export function PortionStep({
         onGrams={setGrams}
         onMeal={setMeal}
         energyKcalPer100={nutriments.energy_kcal ?? null}
+        tablets={tablets}
       />
 
       {error ? (

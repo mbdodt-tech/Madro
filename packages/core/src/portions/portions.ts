@@ -51,6 +51,10 @@ export const PORTION_UNITS = {
       { match: ["pasta", "spaghetti", "makaroni", "macaroni", "nudler", "noodle"], grams: 180 },
     ],
   },
+  /** Kosttilskud (2026-07-08): konventionen er 1 tablet = 1 g, og
+   *  tilskuds-varer gemmer næringstal pr. 100 g = pr. tablet × 100,
+   *  så rollup-matematikken er uændret. */
+  tablet: { grams: 1 },
 } as const satisfies Record<string, PortionUnit>;
 
 export type PortionUnitId = keyof typeof PORTION_UNITS;

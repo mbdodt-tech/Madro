@@ -242,6 +242,28 @@ Betalingsbeslutning: alt bygges færdigt mod en adapter — RevenueCat/Stripe-n�
 
 ---
 
+## Brugerdrevne forbedringer efter Fase 5
+
+### Verificeret-opslag-kobling (bygget 2026-07-08, blåbær-testfundet)
+
+> Varer uden (mikro)næringstal suppleres fra Frida/USDA, som allerede ligger i foods: deklarationsfotoet foreslår det bedste verificerede match, og dagbogsarket kan reparere egne varer ("Hent fra verificeret opslag"). Egne tal vinder altid; opslaget fylder kun huller (`fillNutrientGaps` i core).
+
+**Accept:** e2e — tom egen vare får Fridas tal og dagen genberegnes; kerneløkken uændret.
+
+### Skift opslag i dagbogsarket (bygget 2026-07-08)
+
+> Delte OFF-varer kan ikke beriges pr. bruger — i stedet kan posten bytte fødevare (fx OFF-skyr uden mikrodata → Fridas pendant) med bevaret mængde og måltid.
+
+**Accept:** e2e — post bytter til "Blåbær, rå", mængden består.
+
+### Vitamintabletter (bygget 2026-07-08)
+
+> Kosttilskud logges i tabletter: tablet-enhed i core (konvention 1 tablet = 1 g; næringstal pr. 100 g = pr. tablet × 100, så alle rollups er uændrede), tabletvælger i scan/tilføj/redigér-flowene, kosttilskudstilstand i deklarationsfotoet (vitamin-/mineralfelter pr. tablet, kategori `en:dietary-supplements`). Ingen dosis-anbefalinger — kun neutral logning (ansvarlighedsreglerne).
+
+**Accept:** e2e — scan af eget kosttilskud viser tabletvælger; 2 tabletter lander i dagbogen som "2 tabletter".
+
+---
+
 ## Faste vaner undervejs
 
 - Én gren/PR pr. trin; små commits med conventional commits.

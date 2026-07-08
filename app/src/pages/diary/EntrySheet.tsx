@@ -1,4 +1,4 @@
-import { hasMicroData, type NutrientMap } from "@madro/core";
+import { hasMicroData, isSupplementFood, type NutrientMap } from "@madro/core";
 import { Button, Input, Sheet } from "@madro/ui";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -219,6 +219,7 @@ export function EntrySheet({
           onGrams={setGrams}
           onMeal={setMeal}
           energyKcalPer100={nutriments.energy_kcal ?? null}
+          tablets={entry.foods != null && isSupplementFood(entry.foods)}
         />
 
         {canEnrich ? (

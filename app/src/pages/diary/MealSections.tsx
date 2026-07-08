@@ -108,7 +108,12 @@ export function MealSections({
                       </span>
                       <span className="shrink-0 text-right">
                         <span className="block font-mono text-small tabular-nums text-secondary">
-                          {Math.round(Number(entry.amount))} {entry.unit}
+                          {Math.round(Number(entry.amount))}{" "}
+                          {entry.unit === "tablet"
+                            ? t("portion.tabletWord", {
+                                count: Math.round(Number(entry.amount)),
+                              })
+                            : entry.unit}
                         </span>
                         {!hideCalories && kcal != null ? (
                           <span className="block font-mono text-caption tabular-nums text-tertiary">

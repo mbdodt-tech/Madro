@@ -64,9 +64,10 @@ export function LoginPage() {
       <div className="relative z-10 mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-6 pb-24">
         {/* Brand-mærke */}
         <div className="mb-8 flex flex-col items-center text-center">
-          {/* Brandmærket som lille instrumentplade — signaturen møder én ved døren */}
+          {/* Brandmærket som lille instrumentplade — OmniBite-O'et med
+              lume-glød (logoets linse-O og cyane åre) møder én ved døren */}
           <div className="panel-surface mb-5 grid size-16 place-items-center rounded-lg shadow-panel">
-            <span className="glow-reading font-mono text-h1 font-semibold text-lume">M</span>
+            <span className="glow-reading font-mono text-h1 font-semibold text-lume">O</span>
           </div>
           <h1 className="text-display text-ink">{t("auth.title")}</h1>
           <p className="mt-1 text-body text-secondary">{t("auth.subtitle")}</p>

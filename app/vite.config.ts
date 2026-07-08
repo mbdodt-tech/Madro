@@ -25,14 +25,14 @@ export default defineConfig({
         runtimeCaching: [],
       },
       manifest: {
-        name: "Madro",
-        short_name: "Madro",
+        name: "OmniBite",
+        short_name: "OmniBite",
         description: "Forstå kvaliteten af det, du spiser",
         lang: "da",
         display: "standalone",
         start_url: "/",
-        theme_color: "#0E7A5E",
-        background_color: "#FBFBF9",
+        theme_color: "#2F7D3D",
+        background_color: "#F4F6F0",
         icons: [
           { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
           { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },

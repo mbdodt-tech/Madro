@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Madro",
+    "appName": "OmniBite",
     "logout": "Log out",
     "language": "Language",
     "loading": "Loading…",
@@ -9,7 +9,7 @@
     "retry": "Try again"
   },
   "auth": {
-    "title": "Welcome to Madro",
+    "title": "Welcome to OmniBite",
     "subtitle": "Understand the quality of what you eat",
     "emailLabel": "Email",
     "emailPlaceholder": "you@example.com",
@@ -77,7 +77,7 @@
     "deleteConfirm": "Delete my account permanently"
   },
   "design": {
-    "title": "Madro design system",
+    "title": "OmniBite design system",
     "subtitle": "build plan §3 · tokens are the only styling source",
     "footer": "Temporary page — replaced when the real app shell takes over.",
     "theme": {
@@ -463,14 +463,14 @@
     "seePremium": "See Premium"
   },
   "onboarding": {
-    "welcomeTitle": "Welcome to Madro",
+    "welcomeTitle": "Welcome to OmniBite",
     "welcomeBody": "Understand the quality of what you eat — processing, nutrition and balance in one place. No guilt.",
     "start": "Get started",
     "next": "Continue",
     "ageTitle": "First: when were you born?",
     "ageBody": "We only use the year for the age limit and your energy reference.",
-    "tooYoungTitle": "Madro isn't for you just yet",
-    "tooYoungBody": "You need to be at least 13 to use Madro. It's nothing about you — apps about food and body simply require a certain age. You're welcome back later.",
+    "tooYoungTitle": "OmniBite isn't for you just yet",
+    "tooYoungBody": "You need to be at least 13 to use OmniBite. It's nothing about you — apps about food and body simply require a certain age. You're welcome back later.",
     "consentTitle": "Your data, your rules",
     "consentData": "What you log about your food is sensitive health data. It is stored in the EU and used ONLY to show you your own overviews and insights — never for ads, and never sold.",
     "consentRights": "You can download all your data or delete your account entirely at any time — both directly from your profile.",

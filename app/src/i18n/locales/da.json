@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Madro",
+    "appName": "OmniBite",
     "logout": "Log ud",
     "language": "Sprog",
     "loading": "Indlæser…",
@@ -9,7 +9,7 @@
     "retry": "Prøv igen"
   },
   "auth": {
-    "title": "Velkommen til Madro",
+    "title": "Velkommen til OmniBite",
     "subtitle": "Forstå kvaliteten af det, du spiser",
     "emailLabel": "E-mail",
     "emailPlaceholder": "dig@eksempel.dk",
@@ -77,7 +77,7 @@
     "deleteConfirm": "Slet min konto permanent"
   },
   "design": {
-    "title": "Madro designsystem",
+    "title": "OmniBite designsystem",
     "subtitle": "byggeplan §3 · tokens er eneste kilde til styling",
     "footer": "Midlertidig side — erstattes når den rigtige app-skal tager over.",
     "theme": {
@@ -463,14 +463,14 @@
     "seePremium": "Se Premium"
   },
   "onboarding": {
-    "welcomeTitle": "Velkommen til Madro",
+    "welcomeTitle": "Velkommen til OmniBite",
     "welcomeBody": "Forstå kvaliteten af det, du spiser — forarbejdning, næring og balance samlet ét sted. Uden skyld.",
     "start": "Kom i gang",
     "next": "Videre",
     "ageTitle": "Først: hvornår er du født?",
     "ageBody": "Vi bruger kun årstallet til aldersgrænsen og din energireference.",
-    "tooYoungTitle": "Madro er ikke til dig endnu",
-    "tooYoungBody": "Man skal være mindst 13 år for at bruge Madro. Det er ikke noget med dig — apps om mad og krop kræver bare en vis alder. Du er velkommen tilbage senere.",
+    "tooYoungTitle": "OmniBite er ikke til dig endnu",
+    "tooYoungBody": "Man skal være mindst 13 år for at bruge OmniBite. Det er ikke noget med dig — apps om mad og krop kræver bare en vis alder. Du er velkommen tilbage senere.",
     "consentTitle": "Dine data, dine regler",
     "consentData": "Det, du logger om din mad, er følsomme helbredsdata. De opbevares i EU og bruges KUN til at vise dig dine egne overblik og indsigter — aldrig til reklamer, og de sælges aldrig.",
     "consentRights": "Du kan til enhver tid downloade alle dine data eller slette din konto helt — begge dele direkte fra din profil.",

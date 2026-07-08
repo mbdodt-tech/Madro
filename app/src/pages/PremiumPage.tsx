@@ -58,7 +58,7 @@ export function PremiumPage() {
           <header className="flex items-start justify-between">
             <div>
               <p className="text-caption font-semibold uppercase tracking-widest text-tertiary">
-                Madro
+                {t("common.appName")}
               </p>
               <h1 className="text-display text-ink">{t("premium.title")}</h1>
             </div>

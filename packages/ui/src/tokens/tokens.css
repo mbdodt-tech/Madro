@@ -1,7 +1,7 @@
 /* ============================================================
-   Madro designtokens — eneste kilde til farver, radius, type og
-   bevægelse. Værdierne er en 1:1-gengivelse af docs/byggeplan.md §3
-   (løftet fra det godkendte oplæg i docs/design/mockup/styles.css).
+   OmniBite designtokens — eneste kilde til farver, radius, type og
+   bevægelse. Grundlag: byggeplan §3 ("Instrumentet") + logo-drevet
+   rebrand 2026-07-08 (bladgrøn/koksgrå/cyan fra Logo Omnibite.jpg).
 
    Regel (CLAUDE.md): ingen komponent må indeholde hex, px-spacing
    eller font-familier — kun utilities/vars defineret her.
@@ -14,105 +14,107 @@
 /* Mørk tilstand via class-strategi (fase-tjekliste 0.2) */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* ---------- Rå tokens: lys tilstand (§3.2 + "Instrumentet" 2026-07-06) ---------- */
+/* ---------- Rå tokens: lys tilstand ----------
+   OmniBite-paletten (2026-07-08, logo-drevet rebrand): bladgrøn brand
+   (#65A558-familien, mørknet til AA), koksgrå ink fra ordmærket, frisk
+   papir med svagt bladskær — og logoets cyane kredsløbs-åre som
+   Instrumentets glød (--lume). */
 :root {
-  --bg: #f4f2ec; /* papir — en anelse dybere, så hvide kort løfter sig */
+  --bg: #f4f6f0; /* frisk papir med svagt bladskær — hvide kort løfter sig */
   --surface: #ffffff;
   --surface-raised: #ffffff;
-  --ink: #14201a;
-  --text-secondary: #56635c;
-  --text-tertiary: #86928b;
-  --brand: #0e7a5e;
-  --brand-raise: #14926f; /* gradient-top på primærknapper/FAB */
-  --brand-hover: #0b6650;
-  --brand-tint: #e7f2ed;
+  --ink: #232b2e; /* ordmærkets koksgrå, mørknet til brødtekst */
+  --text-secondary: #566165;
+  --text-tertiary: #87908f;
+  --brand: #2f7d3d; /* bladgrøn, mørknet så hvid tekst holder AA */
+  --brand-raise: #3f9a4b; /* gradient-top — citerer bladets lys/skygge */
+  --brand-hover: #276a34;
+  --brand-tint: #e9f3e4;
   --accent: #e8a13a;
-  --hairline: rgba(16, 32, 26, 0.1);
+  --hairline: rgba(24, 34, 28, 0.1);
   --on-brand: #ffffff;
   --card-edge: transparent; /* lys: skygge løfter, ingen kant */
 
-  /* Instrumentpanelet — signaturen: dyb evergreen med IDENTISK hex i
-     BEGGE tilstande (brugerens valg 2026-07-07: "samme farve på de
-     grønne blokke i lys og mørk"). Værdisættet er det let løftede fra
-     dark-liftet samme dag; sammenhængen i lys tilstand sikres fortsat
-     af page-hero-wash + tintet mellemkort. Defineres kun her — .dark
+  /* Instrumentpanelet — signaturen: dyb skov-bladgrøn med IDENTISK hex
+     i BEGGE tilstande (brugerens valg 2026-07-07); hue drejet fra
+     evergreen mod logoets blad (2026-07-08). Defineres kun her — .dark
      overstyrer bevidst IKKE panel-tokens. */
-  --panel: #123126;
-  --panel-edge: #23473a;
-  --panel-ink: #edf5f0;
-  --panel-dim: #9db5aa;
-  --panel-track: rgba(233, 242, 237, 0.16);
-  --panel-haze: rgba(61, 214, 163, 0.09);
-  /* Aflæsningsfarver på panelet — lysende, ens i begge tilstande */
-  --lume: #3dd6a3;
+  --panel: #12301d;
+  --panel-edge: #234a2c;
+  --panel-ink: #eef5ee;
+  --panel-dim: #9db8a4;
+  --panel-track: rgba(238, 245, 238, 0.16);
+  --panel-haze: rgba(76, 210, 229, 0.1); /* cyan dis — logoets åre */
+  /* Aflæsningsfarver på panelet — lysende, ens i begge tilstande.
+     Lume = logoets cyane kredsløbs-åre: målerne lyser som bladet. */
+  --lume: #4cd2e5;
   --panel-carb: #e8b05c;
   --panel-fat: #8fa9c9;
   --panel-mid: #e0a63c;
   --panel-low: #e88e6c;
 
-  /* Verdikt-skala (afdæmpet, ikke alarmerende) */
-  --v-excellent: #2fa36b;
-  --v-good: #7fb552;
+  /* Verdikt-skala (afdæmpet, ikke alarmerende) — grønnerne følger bladet */
+  --v-excellent: #3a9a43;
+  --v-good: #85b84a;
   --v-mid: #e0a63c;
   --v-poor: #e27a54;
   --v-bad: #c9503c;
   --v-poor-tint: rgba(226, 122, 84, 0.14);
 
-  /* Makroringe (godkendt i designoplægget) */
-  --macro-protein: #0e7a5e;
+  /* Makroringe */
+  --macro-protein: #2f7d3d;
   --macro-carb: #e8a13a;
   --macro-fat: #6e87a8;
 
   /* Dybde (§3.4): to-lags bløde skygger i lys tilstand */
-  --shadow-card: 0 1px 2px rgba(16, 32, 26, 0.05), 0 6px 18px rgba(16, 32, 26, 0.07);
-  --shadow-sheet: 0 -8px 32px rgba(16, 32, 26, 0.14);
-  --shadow-fab: 0 10px 24px rgba(14, 122, 94, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  --shadow-panel: inset 0 1px 0 rgba(233, 242, 237, 0.08), 0 14px 34px rgba(9, 26, 20, 0.35);
-  --shadow-btn: 0 8px 20px rgba(14, 122, 94, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  --shadow-card: 0 1px 2px rgba(24, 34, 28, 0.05), 0 6px 18px rgba(24, 34, 28, 0.07);
+  --shadow-sheet: 0 -8px 32px rgba(24, 34, 28, 0.14);
+  --shadow-fab: 0 10px 24px rgba(47, 125, 61, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  --shadow-panel: inset 0 1px 0 rgba(238, 245, 238, 0.08), 0 14px 34px rgba(10, 26, 14, 0.35);
+  --shadow-btn: 0 8px 20px rgba(47, 125, 61, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 /* ---------- Rå tokens: mørk tilstand (§3.2, førsteklasses) ----------
-   Løftet 2026-07-07 (telefonfeedback: "for mørk, grønnen drukner"):
-   hele fladehierarkiet op ca. 6-8 % i lyshed med varm grøn-grå undertone —
-   lettere i stilen uden at blive hvidt. Panelet løftes kun let, så det
-   forbliver den dybeste flade (instrumentets anker). */
+   Beholder 2026-07-07-liftet ("lettere i stilen, ikke hvidt") — hue
+   drejet mod OmniBite-bladet 2026-07-08. Panelet forbliver den dybeste
+   flade (instrumentets anker). */
 .dark {
-  --bg: #17211c;
-  --surface: #1f2a24;
-  --surface-raised: #27342d;
-  --ink: #edf2ee;
-  --text-secondary: #a7b3ac;
-  --text-tertiary: #7e8a84;
-  --brand: #3ecd9d;
-  --brand-raise: #48d5a6;
-  --brand-hover: #52d9ab;
-  --brand-tint: #24372d;
+  --bg: #161d17;
+  --surface: #1f2a20;
+  --surface-raised: #27342a;
+  --ink: #edf2ec;
+  --text-secondary: #a8b4a9;
+  --text-tertiary: #7f8b81;
+  --brand: #5cc46a;
+  --brand-raise: #66cc73;
+  --brand-hover: #70d17d;
+  --brand-tint: #233826;
   --accent: #e8a13a;
-  --hairline: rgba(234, 240, 236, 0.12);
-  --on-brand: #08130f;
+  --hairline: rgba(235, 242, 234, 0.12);
+  --on-brand: #0a150c;
   --card-edge: var(--hairline); /* mørk: fladelyshed + hårlinje, ingen skygge */
 
   /* Panel-tokens arves uændret fra :root — samme grønne blok i begge
      tilstande (brugerens valg 2026-07-07). */
 
   /* Verdikt løftet ca. 8-10 % i lyshed */
-  --v-excellent: #3db97d;
-  --v-good: #91c566;
+  --v-excellent: #4cae55;
+  --v-good: #97c561;
   --v-mid: #e7b457;
   --v-poor: #e88e6c;
   --v-bad: #d66a55;
   --v-poor-tint: rgba(232, 142, 108, 0.16);
 
-  --macro-protein: #35c495;
+  --macro-protein: #5cc46a;
   --macro-carb: #e8b05c;
   --macro-fat: #8fa9c9;
 
   /* Mørk: fladelyshed + hårlinjer frem for skygge (§3.4) */
   --shadow-card: 0 0 0 0 transparent;
   --shadow-sheet: 0 -8px 32px rgba(0, 0, 0, 0.5);
-  --shadow-fab: 0 10px 26px rgba(62, 205, 157, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  --shadow-panel: inset 0 1px 0 rgba(233, 242, 237, 0.07), 0 10px 26px rgba(0, 0, 0, 0.4);
-  --shadow-btn: 0 8px 20px rgba(62, 205, 157, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  --shadow-fab: 0 10px 26px rgba(92, 196, 106, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  --shadow-panel: inset 0 1px 0 rgba(238, 245, 238, 0.07), 0 10px 26px rgba(0, 0, 0, 0.4);
+  --shadow-btn: 0 8px 20px rgba(92, 196, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.28);
 
   color-scheme: dark;
 }

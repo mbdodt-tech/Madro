@@ -9,14 +9,15 @@ export const STEP_GRAMS = 25;
 export const MIN_GRAMS = 1;
 export const MAX_GRAMS = 2000;
 
-function clampGrams(value: number): number {
-  return Math.min(MAX_GRAMS, Math.max(MIN_GRAMS, Math.round(value)));
-}
+/** Tabletter (kosttilskud): 1 tablet = 1 g, ±1 pr. tryk, loft ved 20. */
+const MAX_TABLETS = 20;
 
 /**
  * Fælles portionsvælger: gram-felt med fri indtastning + ±25 g-stepper
  * + måltids-chips + kcal-preview. Bruges af både scan-flowet og
  * dagbogens redigering/tilføjelse. Respekterer hide_calories.
+ * `tablets`: kosttilskudstilstand — værdien vises og steppes i tabletter
+ * (1 tablet = 1 g-konventionen gør gram og antal identiske).
  */
 export function PortionForm({
   grams,
@@ -24,16 +25,23 @@ export function PortionForm({
   onGrams,
   onMeal,
   energyKcalPer100,
+  tablets = false,
 }: {
   grams: number;
   meal: Meal;
   onGrams: (grams: number) => void;
   onMeal: (meal: Meal) => void;
   energyKcalPer100?: number | null;
+  tablets?: boolean;
 }) {
   const { t } = useTranslation();
   const { data: profile } = useProfile();
   const hideCalories = profile?.hide_calories ?? false;
+
+  const step = tablets ? 1 : STEP_GRAMS;
+  const max = tablets ? MAX_TABLETS : MAX_GRAMS;
+  const clampGrams = (value: number): number =>
+    Math.min(max, Math.max(MIN_GRAMS, Math.round(value)));
 
   // Tekst-spejl af gram-værdien, så feltet kan stå tomt/halvskrevet
   // under indtastning uden at rykke i den rigtige værdi.
@@ -61,7 +69,7 @@ export function PortionForm({
           <span className="flex items-baseline gap-1">
             <input
               inputMode="numeric"
-              aria-label={t("portion.gramsLabel")}
+              aria-label={t(tablets ? "portion.tabletsLabel" : "portion.gramsLabel")}
               value={text}
               onChange={(e) => {
                 const raw = e.target.value.replace(/[^\d,.]/g, "");
@@ -80,16 +88,20 @@ export function PortionForm({
                 "focus-visible:outline-2 focus-visible:outline-brand",
               )}
             />
-            <span className="font-mono text-h2 font-semibold text-ink">g</span>
+            <span className="font-mono text-h2 font-semibold text-ink">
+              {tablets ? t("portion.tabletWord", { count: grams }) : "g"}
+            </span>
           </span>
         }
-        subLabel={!hideCalories && kcal != null ? `${kcal} kcal` : undefined}
-        onDecrease={() => onGrams(clampGrams(grams - STEP_GRAMS))}
-        onIncrease={() => onGrams(clampGrams(grams + STEP_GRAMS))}
+        subLabel={
+          !tablets && !hideCalories && kcal != null ? `${kcal} kcal` : undefined
+        }
+        onDecrease={() => onGrams(clampGrams(grams - step))}
+        onIncrease={() => onGrams(clampGrams(grams + step))}
         decreaseLabel={t("portion.less")}
         increaseLabel={t("portion.more")}
         decreaseDisabled={grams <= MIN_GRAMS}
-        increaseDisabled={grams >= MAX_GRAMS}
+        increaseDisabled={grams >= max}
       />
 
       <div className="flex flex-wrap gap-2" role="group" aria-label={t("portion.mealLabel")}>

@@ -228,7 +228,9 @@
       "verifiedSuggest": "Fill the missing values from \"{{name}}\" ({{source}} — verified)?",
       "verifiedUse": "Use values",
       "verifiedDismiss": "No thanks",
-      "verifiedApplied": "Missing values filled from \"{{name}}\" — your own numbers stay."
+      "verifiedApplied": "Missing values filled from \"{{name}}\" — your own numbers stay.",
+      "supplementToggle": "Supplement — values per tablet",
+      "perTablet": "Per tablet — as declared"
     },
     "photo": {
       "openButton": "Photograph the meal instead",
@@ -293,7 +295,10 @@
     "log": "Log meal",
     "logged": "Logged in your diary",
     "error": "Couldn't save — try again.",
-    "gramsLabel": "Grams"
+    "gramsLabel": "Grams",
+    "tabletsLabel": "Number of tablets",
+    "tabletWord_one": "tablet",
+    "tabletWord_other": "tablets"
   },
   "product": {
     "back": "Back",
@@ -393,7 +398,8 @@
       "dl": "dl",
       "glass": "glass",
       "handful": "handful",
-      "portion": "portion"
+      "portion": "portion",
+      "tablet": "tablet"
     }
   },
   "today": {

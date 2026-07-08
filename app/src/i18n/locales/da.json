@@ -228,7 +228,9 @@
       "verifiedSuggest": "Suppler de manglende tal fra '{{name}}' ({{source}} — verificeret)?",
       "verifiedUse": "Brug tallene",
       "verifiedDismiss": "Nej tak",
-      "verifiedApplied": "Manglende tal hentet fra '{{name}}' — dine egne tal bevares."
+      "verifiedApplied": "Manglende tal hentet fra '{{name}}' — dine egne tal bevares.",
+      "supplementToggle": "Kosttilskud — tal pr. tablet",
+      "perTablet": "Pr. tablet — som deklareret"
     },
     "photo": {
       "openButton": "Fotografér måltidet i stedet",
@@ -293,7 +295,10 @@
     "log": "Log måltid",
     "logged": "Logget i din dagbog",
     "error": "Kunne ikke gemme — prøv igen.",
-    "gramsLabel": "Gram"
+    "gramsLabel": "Gram",
+    "tabletsLabel": "Antal tabletter",
+    "tabletWord_one": "tablet",
+    "tabletWord_other": "tabletter"
   },
   "product": {
     "back": "Tilbage",
@@ -393,7 +398,8 @@
       "dl": "dl",
       "glass": "glas",
       "handful": "håndfuld",
-      "portion": "portion"
+      "portion": "portion",
+      "tablet": "tablet"
     }
   },
   "today": {

@@ -1,8 +1,12 @@
 import {
   AiError,
   fillNutrientGaps,
+  finalizeNutrients,
+  isSupplementFood,
   NUTRIENT_INFO,
+  NUTRIENT_KEYS,
   roundNutrient,
+  SUPPLEMENT_CATEGORY,
   type NutrientKey,
   type NutrientMap,
   type ParsedLabel,
@@ -28,6 +32,12 @@ const LABEL_FIELDS: NutrientKey[] = [
   "protein_g",
   "salt_g",
 ];
+
+/** Kosttilskud: vitaminer/mineraler, indtastet PR. TABLET (gemmes ×100,
+ *  jf. 1 tablet = 1 g-konventionen i @madro/core). */
+const SUPPLEMENT_FIELDS: NutrientKey[] = NUTRIENT_KEYS.filter(
+  (key) => NUTRIENT_INFO[key].micro,
+);
 
 interface Draft {
   name: string;
@@ -83,6 +93,11 @@ export function LabelCaptureStep({
   const [adopted, setAdopted] = useState<NutrientMap | null>(null);
   const [suggestionDismissed, setSuggestionDismissed] = useState(false);
 
+  // Kosttilskud (2026-07-08): felterne skifter til vitaminer/mineraler
+  // pr. tablet. Verificeret-forslaget slås fra — madopslag pr. 100 g må
+  // aldrig blandes ind i pr.-tablet-tal.
+  const [supplementMode, setSupplementMode] = useState(false);
+
   const analyze = async (file: File) => {
     setAnalyzing(true);
     setError(null);
@@ -106,6 +121,7 @@ export function LabelCaptureStep({
         setSuggestion(null);
         setAdopted(null);
         setSuggestionDismissed(false);
+        setSupplementMode(isSupplementFood({ name: next.name }));
         // Fire-and-forget: forslaget er en bonus og må aldrig blokere.
         if (next.name.trim()) {
           void findVerifiedMatches(next.name)
@@ -135,14 +151,23 @@ export function LabelCaptureStep({
       const userId = session.session?.user.id;
       if (!userId) throw new Error("not_authenticated");
 
+      const fieldKeys = supplementMode ? SUPPLEMENT_FIELDS : LABEL_FIELDS;
       const map: NutrientMap = {};
-      for (const [key, text] of Object.entries(draft.fields)) {
+      for (const key of fieldKeys) {
+        const text = draft.fields[key];
+        if (text == null || text === "") continue;
         const value = Number(String(text).replace(",", "."));
-        if (Number.isFinite(value) && value >= 0) map[key as NutrientKey] = value;
+        if (Number.isFinite(value) && value >= 0) {
+          // Kosttilskud indtastes pr. tablet → pr. 100 g (1 tablet = 1 g).
+          map[key] = supplementMode ? value * 100 : value;
+        }
       }
       // Deklarationsfelterne (brugerens tal) vinder; det adopterede
       // verificerede opslag fylder kun hullerne — typisk alle mikroværdier.
-      const nutriments = fillNutrientGaps(map, adopted ?? {});
+      // Kosttilskud: intet opslags-merge (pr. 100 g-mad ≠ pr. tablet).
+      const nutriments = supplementMode
+        ? finalizeNutrients(map)
+        : fillNutrientGaps(map, adopted ?? {});
 
       const { data, error: insertError } = await supabase
         .from("foods")
@@ -157,6 +182,7 @@ export function LabelCaptureStep({
           additives: draft.additives.map((a) => `en:${a}`),
           nova_group: draft.novaGroup,
           nutriments,
+          categories: supplementMode ? [SUPPLEMENT_CATEGORY] : [],
         })
         .select()
         .single();
@@ -279,8 +305,28 @@ export function LabelCaptureStep({
         ))}
       </div>
 
+      {/* Kosttilskud: felterne skifter til vitaminer/mineraler pr. tablet */}
+      <button
+        type="button"
+        role="switch"
+        aria-checked={supplementMode}
+        onClick={() => {
+          setSupplementMode((v) => !v);
+          setAdopted(null);
+        }}
+        className={cn(
+          "rounded-pill px-4 py-2 text-small font-medium transition-colors",
+          "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
+          supplementMode
+            ? "bg-brand text-on-brand"
+            : "border border-hairline bg-surface text-secondary hover:bg-brand-tint hover:text-brand",
+        )}
+      >
+        {t("scan.label.supplementToggle")}
+      </button>
+
       {/* Verificeret-opslag-forslag: suppler manglende tal fra Frida/USDA */}
-      {suggestion && !suggestionDismissed ? (
+      {!supplementMode && suggestion && !suggestionDismissed ? (
         adopted ? (
           <p className="rounded-md bg-brand-tint px-4 py-3 text-small text-brand" role="status">
             {t("scan.label.verifiedApplied", { name: suggestion.name })}
@@ -309,13 +355,13 @@ export function LabelCaptureStep({
         )
       ) : null}
 
-      {/* Deklarationsfelterne pr. 100 g */}
+      {/* Deklarationsfelterne — pr. 100 g (mad) eller pr. tablet (tilskud) */}
       <div className="overflow-hidden rounded-lg border border-hairline">
         <p className="border-b border-hairline bg-bg px-4 py-2 text-caption text-tertiary">
-          {t("scan.label.per100")}
+          {t(supplementMode ? "scan.label.perTablet" : "scan.label.per100")}
         </p>
         <ul className="divide-y divide-hairline">
-          {LABEL_FIELDS.map((key) => (
+          {(supplementMode ? SUPPLEMENT_FIELDS : LABEL_FIELDS).map((key) => (
             <li key={key} className="flex items-center justify-between gap-3 bg-surface px-4 py-2">
               <span className="text-small text-ink">{NUTRIENT_INFO[key][labelKey]}</span>
               <span className="flex items-baseline gap-1">

@@ -13,7 +13,7 @@ export type DiaryEntry = Pick<
 };
 
 const ENTRY_COLUMNS =
-  "id,amount,unit,meal,consumed_at,foods(id,name,brand,source,data_quality,nova_group,nutriscore,nutriments,image_url,additives)";
+  "id,amount,unit,meal,consumed_at,foods(id,name,brand,source,data_quality,nova_group,nutriscore,nutriments,image_url,additives,categories)";
 
 /** Lokal midnat for en dag — dagbogens dage følger brugerens tidszone. */
 export function startOfDay(date: Date): Date {

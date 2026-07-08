@@ -227,7 +227,13 @@
       "save": "Gem vare",
       "retake": "Tag nyt billede",
       "saveError": "Kunne ikke gemme varen — prøv igen.",
-      "back": "Tilbage til søgning"
+      "back": "Tilbage til søgning",
+      "verifiedSuggest": "Suppler de manglende tal fra '{{name}}' ({{source}} — verificeret)?",
+      "verifiedUse": "Brug tallene",
+      "verifiedDismiss": "Nej tak",
+      "verifiedApplied": "Manglende tal hentet fra '{{name}}' — dine egne tal bevares.",
+      "supplementToggle": "Kosttilskud — tal pr. tablet",
+      "perTablet": "Pr. tablet — som deklareret"
     },
     "photo": {
       "openButton": "Fotografér måltidet i stedet",
@@ -292,7 +298,10 @@
     "log": "Log måltid",
     "logged": "Logget i din dagbog",
     "error": "Kunne ikke gemme — prøv igen.",
-    "gramsLabel": "Gram"
+    "gramsLabel": "Gram",
+    "tabletsLabel": "Antal tabletter",
+    "tabletWord_one": "tablet",
+    "tabletWord_other": "tabletter"
   },
   "product": {
     "back": "Tilbage",
@@ -322,6 +331,23 @@
     "emptyHint": "Scan en vare eller tilføj et måltid med plus-knappen.",
     "updated": "Ændringen er gemt",
     "removed": "Posten er fjernet",
+    "enriched": "Næringstal hentet fra verificeret kilde",
+    "swapped": "Skiftet til andet opslag",
+    "swap": {
+      "button": "Skift til andet opslag",
+      "label": "Søg i biblioteket",
+      "placeholder": "fx skyr",
+      "hint": "Mængde og måltid beholdes.",
+      "none": "Ingen resultater — prøv et andet ord.",
+      "cancel": "Behold nuværende"
+    },
+    "enrich": {
+      "hint": "Varen mangler mikroværdier.",
+      "fetch": "Hent fra verificeret opslag",
+      "choose": "Vælg det nærmeste match — dine egne tal bevares.",
+      "none": "Intet verificeret match fundet.",
+      "error": "Kunne ikke opdatere varen — prøv igen."
+    },
     "add": {
       "button": "Tilføj",
       "title": "Tilføj måltid",
@@ -375,7 +401,8 @@
       "dl": "dl",
       "glass": "glas",
       "handful": "håndfuld",
-      "portion": "portion"
+      "portion": "portion",
+      "tablet": "tablet"
     }
   },
   "today": {

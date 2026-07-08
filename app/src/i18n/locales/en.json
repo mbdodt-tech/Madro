@@ -227,7 +227,13 @@
       "save": "Save product",
       "retake": "Retake photo",
       "saveError": "Couldn't save the product — try again.",
-      "back": "Back to search"
+      "back": "Back to search",
+      "verifiedSuggest": "Fill the missing values from \"{{name}}\" ({{source}} — verified)?",
+      "verifiedUse": "Use values",
+      "verifiedDismiss": "No thanks",
+      "verifiedApplied": "Missing values filled from \"{{name}}\" — your own numbers stay.",
+      "supplementToggle": "Supplement — values per tablet",
+      "perTablet": "Per tablet — as declared"
     },
     "photo": {
       "openButton": "Photograph the meal instead",
@@ -292,7 +298,10 @@
     "log": "Log meal",
     "logged": "Logged in your diary",
     "error": "Couldn't save — try again.",
-    "gramsLabel": "Grams"
+    "gramsLabel": "Grams",
+    "tabletsLabel": "Number of tablets",
+    "tabletWord_one": "tablet",
+    "tabletWord_other": "tablets"
   },
   "product": {
     "back": "Back",
@@ -322,6 +331,23 @@
     "emptyHint": "Scan a product or add a meal with the plus button.",
     "updated": "Change saved",
     "removed": "Entry removed",
+    "enriched": "Nutrition filled from a verified source",
+    "swapped": "Switched to another match",
+    "swap": {
+      "button": "Switch to another match",
+      "label": "Search the library",
+      "placeholder": "e.g. skyr",
+      "hint": "Amount and meal are kept.",
+      "none": "No results — try another word.",
+      "cancel": "Keep current"
+    },
+    "enrich": {
+      "hint": "This food has no micronutrient values yet.",
+      "fetch": "Fill from a verified match",
+      "choose": "Choose the closest match — your own values stay.",
+      "none": "No verified match found.",
+      "error": "Couldn't update the food — try again."
+    },
     "add": {
       "button": "Add",
       "title": "Add meal",
@@ -375,7 +401,8 @@
       "dl": "dl",
       "glass": "glass",
       "handful": "handful",
-      "portion": "portion"
+      "portion": "portion",
+      "tablet": "tablet"
     }
   },
   "today": {

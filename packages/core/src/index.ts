@@ -57,6 +57,8 @@ export {
   type PortionUnitId,
 } from "./portions/portions";
 
+export { isSupplementFood, SUPPLEMENT_CATEGORY } from "./supplements";
+
 export {
   computeVerdict,
   verdictLevelFor,

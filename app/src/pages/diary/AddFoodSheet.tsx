@@ -1,4 +1,4 @@
-import type { NutrientMap } from "@madro/core";
+import { isSupplementFood, type NutrientMap } from "@madro/core";
 import { Button, Chip, Input, Sheet, Tabs } from "@madro/ui";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -72,6 +72,7 @@ export function AddFoodSheet({
         meal,
         scanId: null,
         consumedAt,
+        unit: tablets ? "tablet" : "g",
       });
       onLogged();
     } catch {
@@ -81,6 +82,7 @@ export function AddFoodSheet({
   };
 
   const nutriments = (selected?.nutriments ?? {}) as NutrientMap;
+  const tablets = selected != null && isSupplementFood(selected);
 
   return (
     <Sheet
@@ -116,6 +118,7 @@ export function AddFoodSheet({
             onGrams={setGrams}
             onMeal={setMeal}
             energyKcalPer100={nutriments.energy_kcal ?? null}
+            tablets={tablets}
           />
 
           {error ? (
@@ -155,7 +158,10 @@ export function AddFoodSheet({
                           <li key={food.id}>
                             <button
                               type="button"
-                              onClick={() => setSelected(food)}
+                              onClick={() => {
+                                setSelected(food);
+                                setGrams(isSupplementFood(food) ? 1 : 100);
+                              }}
                               className="flex w-full items-center justify-between gap-3 bg-surface px-4 py-3 text-left hover:bg-brand-tint focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand"
                             >
                               <span className="min-w-0">

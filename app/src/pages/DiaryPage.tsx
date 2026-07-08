@@ -9,6 +9,7 @@ import { EntrySheet } from "./diary/EntrySheet";
 import { MealSections } from "./diary/MealSections";
 import {
   addDays,
+  ENTRY_TOAST_KEY,
   invalidateDiary,
   isSameDay,
   startOfDay,
@@ -106,7 +107,7 @@ export function DiaryPage() {
           onChanged={(kind) => {
             setEditing(null);
             void refresh();
-            show(t(kind === "removed" ? "diary.removed" : "diary.updated"));
+            show(t(ENTRY_TOAST_KEY[kind]));
           }}
         />
       ) : null}

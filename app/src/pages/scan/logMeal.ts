@@ -19,6 +19,9 @@ export interface LogMealInput {
   scanId: string | null;
   /** Sæt ved logning på en anden dag end i dag (dagbogens dato-navigation). */
   consumedAt?: Date;
+  /** Visningsenhed. "tablet" (kosttilskud): 1 tablet = 1 g, så amount
+   *  forbliver gram og rollup-triggeren er uændret. */
+  unit?: "g" | "tablet";
 }
 
 /** Opret dagbogspost og markér scanningen som logget. */
@@ -31,7 +34,7 @@ export async function logMeal(input: LogMealInput): Promise<void> {
     user_id: userId,
     food_id: input.foodId,
     amount: input.amountGrams,
-    unit: "g",
+    unit: input.unit ?? "g",
     meal: input.meal,
     scan_id: input.scanId,
     ...(input.consumedAt ? { consumed_at: input.consumedAt.toISOString() } : {}),

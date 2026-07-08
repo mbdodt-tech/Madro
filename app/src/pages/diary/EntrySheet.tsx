@@ -1,12 +1,17 @@
 import { hasMicroData, type NutrientMap } from "@madro/core";
-import { Button, Sheet } from "@madro/ui";
-import { useState } from "react";
+import { Button, Input, Sheet } from "@madro/ui";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { PortionForm } from "../../components/PortionForm";
-import type { FoodHit } from "../../scanner/useLookup";
+import { searchFoodsRanked, type FoodHit } from "../../scanner/useLookup";
 import type { Meal } from "../scan/logMeal";
 import { adoptVerifiedNutriments, findVerifiedMatches } from "./enrichment";
-import { deleteEntry, updateEntry, type DiaryEntry } from "./useDiary";
+import {
+  deleteEntry,
+  updateEntry,
+  type DiaryEntry,
+  type EntryChangeKind,
+} from "./useDiary";
 
 /**
  * Redigér/slet en dagbogspost: samme PortionForm som scan-flowet,
@@ -20,7 +25,7 @@ export function EntrySheet({
 }: {
   entry: DiaryEntry;
   onClose: () => void;
-  onChanged: (kind: "saved" | "removed" | "enriched") => void;
+  onChanged: (kind: EntryChangeKind) => void;
 }) {
   const { t } = useTranslation();
 
@@ -35,6 +40,51 @@ export function EntrySheet({
   const [candidates, setCandidates] = useState<FoodHit[] | null>(null);
   const [enrichBusy, setEnrichBusy] = useState(false);
   const [enrichError, setEnrichError] = useState(false);
+
+  // Skift opslag (2026-07-08): byt postens fødevare til et andet opslag —
+  // fx en OFF-vare uden mikrodata → Fridas verificerede pendant.
+  // Mængde og måltid beholdes; summaryen genberegnes af triggeren.
+  const [swapping, setSwapping] = useState(false);
+  const [swapQuery, setSwapQuery] = useState("");
+  const [swapResults, setSwapResults] = useState<FoodHit[] | null>(null);
+  const [swapBusy, setSwapBusy] = useState(false);
+
+  useEffect(() => {
+    if (!swapping) return;
+    const q = swapQuery.trim();
+    if (q.length < 2) {
+      setSwapResults(null);
+      return;
+    }
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      searchFoodsRanked(q)
+        .then((hits) => {
+          if (!cancelled) {
+            setSwapResults(hits.filter((f) => f.id !== entry.foods?.id).slice(0, 5));
+          }
+        })
+        .catch(() => {
+          if (!cancelled) setSwapResults([]);
+        });
+    }, 300);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [swapping, swapQuery, entry.foods?.id]);
+
+  const swapTo = async (food: FoodHit) => {
+    setSwapBusy(true);
+    setError(false);
+    try {
+      await updateEntry(entry.id, { amountGrams: grams, meal, foodId: food.id });
+      onChanged("swapped");
+    } catch {
+      setError(true);
+      setSwapBusy(false);
+    }
+  };
 
   const nutriments = (entry.foods?.nutriments ?? {}) as NutrientMap;
   const canEnrich =
@@ -109,6 +159,59 @@ export function EntrySheet({
         {entry.foods?.brand ? (
           <p className="-mt-2 text-small text-secondary">{entry.foods.brand}</p>
         ) : null}
+
+        {/* Skift opslag: samme post, andet opslag i biblioteket */}
+        {swapping ? (
+          <div className="space-y-2 rounded-md border border-hairline bg-bg p-3">
+            <Input
+              id="entry-swap-search"
+              label={t("diary.swap.label")}
+              placeholder={t("diary.swap.placeholder")}
+              value={swapQuery}
+              onChange={(e) => setSwapQuery(e.target.value)}
+            />
+            <p className="text-caption text-tertiary">{t("diary.swap.hint")}</p>
+            {swapResults != null && swapResults.length === 0 ? (
+              <p className="text-small text-tertiary">{t("diary.swap.none")}</p>
+            ) : null}
+            {(swapResults ?? []).map((f) => (
+              <Button
+                key={f.id}
+                size="sm"
+                variant="secondary"
+                className="w-full justify-between"
+                onClick={() => void swapTo(f)}
+                disabled={swapBusy || busy}
+              >
+                <span className="truncate">{f.name}</span>
+                <span className="shrink-0 text-caption text-tertiary">
+                  {t(`scan.source.${f.source}`)}
+                </span>
+              </Button>
+            ))}
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setSwapping(false)}
+              disabled={swapBusy}
+            >
+              {t("diary.swap.cancel")}
+            </Button>
+          </div>
+        ) : (
+          <Button
+            size="sm"
+            variant="ghost"
+            className="-mt-1 self-start"
+            onClick={() => {
+              setSwapQuery(entry.foods?.name ?? "");
+              setSwapping(true);
+            }}
+            disabled={busy}
+          >
+            {t("diary.swap.button")}
+          </Button>
+        )}
 
         <PortionForm
           grams={grams}

@@ -38,6 +38,16 @@ export function dayKey(date: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
+/** Hvad der skete med en post i EntrySheet — styrer forældrenes toast. */
+export type EntryChangeKind = "saved" | "removed" | "enriched" | "swapped";
+
+export const ENTRY_TOAST_KEY: Record<EntryChangeKind, string> = {
+  saved: "diary.updated",
+  removed: "diary.removed",
+  enriched: "diary.enriched",
+  swapped: "diary.swapped",
+};
+
 export const DIARY_KEY = "diary";
 export const SUMMARY_KEY = "diary-summary";
 
@@ -91,11 +101,15 @@ export function useDailySummary(day: Date) {
 
 export async function updateEntry(
   id: string,
-  changes: { amountGrams: number; meal: Meal },
+  changes: { amountGrams: number; meal: Meal; foodId?: string },
 ): Promise<void> {
   const { error } = await supabase
     .from("log_entries")
-    .update({ amount: changes.amountGrams, meal: changes.meal })
+    .update({
+      amount: changes.amountGrams,
+      meal: changes.meal,
+      ...(changes.foodId ? { food_id: changes.foodId } : {}),
+    })
     .eq("id", id);
   if (error) throw error;
 }

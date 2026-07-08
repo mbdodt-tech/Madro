@@ -324,6 +324,15 @@
     "updated": "Ændringen er gemt",
     "removed": "Posten er fjernet",
     "enriched": "Næringstal hentet fra verificeret kilde",
+    "swapped": "Skiftet til andet opslag",
+    "swap": {
+      "button": "Skift til andet opslag",
+      "label": "Søg i biblioteket",
+      "placeholder": "fx skyr",
+      "hint": "Mængde og måltid beholdes.",
+      "none": "Ingen resultater — prøv et andet ord.",
+      "cancel": "Behold nuværende"
+    },
     "enrich": {
       "hint": "Varen mangler mikroværdier.",
       "fetch": "Hent fra verificeret opslag",

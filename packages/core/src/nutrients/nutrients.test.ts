@@ -5,6 +5,7 @@ import {
   scalePer100,
   sodiumMgToSaltG,
 } from "./convert";
+import { fillNutrientGaps, hasMicroData } from "./enrich";
 import { mapOffNutriments } from "./map-off";
 import { mapUsdaNutrients, type UsdaFoodNutrient } from "./map-usda";
 import { mapFridaColumns } from "./map-frida";
@@ -28,6 +29,32 @@ describe("convert", () => {
     expect(scalePer100(46, 250)).toBeCloseTo(115, 5);
     expect(scalePer100(3.5, 125)).toBeCloseTo(4.375, 5);
     expect(scalePer100(46, 0)).toBe(0);
+  });
+});
+
+describe("enrich", () => {
+  it("hasMicroData: kun mikronøgler tæller, 0 er data", () => {
+    expect(hasMicroData({})).toBe(false);
+    expect(hasMicroData({ energy_kcal: 446, protein_g: 17 })).toBe(false);
+    expect(hasMicroData({ calcium_mg: 0 })).toBe(true);
+    expect(hasMicroData({ iron_mg: 7.7 })).toBe(true);
+  });
+
+  it("fillNutrientGaps: egne værdier vinder, opslaget fylder huller", () => {
+    const out = fillNutrientGaps(
+      { energy_kcal: 446, protein_g: 17 },
+      { energy_kcal: 486, protein_g: 16.5, calcium_mg: 631, magnesium_mg: 335 },
+    );
+    expect(out.energy_kcal).toBe(446);
+    expect(out.protein_g).toBe(17);
+    expect(out.calcium_mg).toBe(631);
+    expect(out.magnesium_mg).toBe(335);
+  });
+
+  it("fillNutrientGaps: tom vare adopterer hele opslaget og finaliseres", () => {
+    const out = fillNutrientGaps({}, { energy_kcal: 54.193, sodium_mg: 400 });
+    expect(out.energy_kcal).toBeCloseTo(54.193, 3);
+    expect(out.salt_g).toBeCloseTo(1, 3); // udledt af natrium
   });
 });
 

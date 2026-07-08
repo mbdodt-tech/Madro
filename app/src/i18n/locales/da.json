@@ -224,7 +224,11 @@
       "save": "Gem vare",
       "retake": "Tag nyt billede",
       "saveError": "Kunne ikke gemme varen — prøv igen.",
-      "back": "Tilbage til søgning"
+      "back": "Tilbage til søgning",
+      "verifiedSuggest": "Suppler de manglende tal fra '{{name}}' ({{source}} — verificeret)?",
+      "verifiedUse": "Brug tallene",
+      "verifiedDismiss": "Nej tak",
+      "verifiedApplied": "Manglende tal hentet fra '{{name}}' — dine egne tal bevares."
     },
     "photo": {
       "openButton": "Fotografér måltidet i stedet",
@@ -319,6 +323,14 @@
     "emptyHint": "Scan en vare eller tilføj et måltid med plus-knappen.",
     "updated": "Ændringen er gemt",
     "removed": "Posten er fjernet",
+    "enriched": "Næringstal hentet fra verificeret kilde",
+    "enrich": {
+      "hint": "Varen mangler mikroværdier.",
+      "fetch": "Hent fra verificeret opslag",
+      "choose": "Vælg det nærmeste match — dine egne tal bevares.",
+      "none": "Intet verificeret match fundet.",
+      "error": "Kunne ikke opdatere varen — prøv igen."
+    },
     "add": {
       "button": "Tilføj",
       "title": "Tilføj måltid",

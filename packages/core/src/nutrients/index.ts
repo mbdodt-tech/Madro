@@ -17,6 +17,7 @@ export {
   finalizeNutrients,
   KJ_PER_KCAL,
 } from "./convert";
+export { hasMicroData, fillNutrientGaps } from "./enrich";
 export { mapOffNutriments, OFF_NUTRIMENT_NAMES } from "./map-off";
 export { mapUsdaNutrients, type UsdaFoodNutrient } from "./map-usda";
 export { mapFridaColumns, FRIDA_COLUMN_MAP } from "./map-frida";

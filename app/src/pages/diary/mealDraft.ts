@@ -51,12 +51,16 @@ let rowKeyCounter = 0;
  * Søg med token-fallback: sammensatte navne fra foto-genkendelsen
  * ("kogt spaghetti", "revet parmesan") findes sjældent ordret — falder
  * tilbage på det længste ord (≥4 tegn), så "spaghetti"/"parmesan" rammer.
+ * `accept` filtreres FØR fallback-beslutningen: uden det ville fx en
+ * custom-vare, der matcher sit eget navn, blokere fallbacken, selv om
+ * kalderen kun leder efter verificerede opslag.
  */
-async function searchWithFallback(
+export async function searchWithFallback(
   name: string,
+  accept: (food: FoodHit) => boolean = () => true,
 ): Promise<{ candidates: FoodHit[]; query: string }> {
   try {
-    const direct = await searchFoodsRanked(name);
+    const direct = (await searchFoodsRanked(name)).filter(accept);
     if (direct.length > 0) return { candidates: direct, query: name };
   } catch {
     return { candidates: [], query: name };
@@ -71,7 +75,7 @@ async function searchWithFallback(
   ].sort((a, b) => b.length - a.length);
   for (const token of tokens) {
     try {
-      const hits = await searchFoodsRanked(token);
+      const hits = (await searchFoodsRanked(token)).filter(accept);
       if (hits.length > 0) return { candidates: hits, query: token };
     } catch {
       break;

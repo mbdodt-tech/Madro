@@ -224,7 +224,11 @@
       "save": "Save product",
       "retake": "Retake photo",
       "saveError": "Couldn't save the product — try again.",
-      "back": "Back to search"
+      "back": "Back to search",
+      "verifiedSuggest": "Fill the missing values from \"{{name}}\" ({{source}} — verified)?",
+      "verifiedUse": "Use values",
+      "verifiedDismiss": "No thanks",
+      "verifiedApplied": "Missing values filled from \"{{name}}\" — your own numbers stay."
     },
     "photo": {
       "openButton": "Photograph the meal instead",
@@ -319,6 +323,14 @@
     "emptyHint": "Scan a product or add a meal with the plus button.",
     "updated": "Change saved",
     "removed": "Entry removed",
+    "enriched": "Nutrition filled from a verified source",
+    "enrich": {
+      "hint": "This food has no micronutrient values yet.",
+      "fetch": "Fill from a verified match",
+      "choose": "Choose the closest match — your own values stay.",
+      "none": "No verified match found.",
+      "error": "Couldn't update the food — try again."
+    },
     "add": {
       "button": "Add",
       "title": "Add meal",

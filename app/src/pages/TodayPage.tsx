@@ -314,7 +314,15 @@ export function TodayPage() {
           onChanged={(kind) => {
             setEditing(null);
             void refresh();
-            show(t(kind === "removed" ? "diary.removed" : "diary.updated"));
+            show(
+              t(
+                kind === "removed"
+                  ? "diary.removed"
+                  : kind === "enriched"
+                    ? "diary.enriched"
+                    : "diary.updated",
+              ),
+            );
           }}
         />
       ) : null}

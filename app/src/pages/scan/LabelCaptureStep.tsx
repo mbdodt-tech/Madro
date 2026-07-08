@@ -1,7 +1,8 @@
 import {
   AiError,
-  finalizeNutrients,
+  fillNutrientGaps,
   NUTRIENT_INFO,
+  roundNutrient,
   type NutrientKey,
   type NutrientMap,
   type ParsedLabel,
@@ -14,6 +15,7 @@ import { aiClient } from "../../lib/aiClient";
 import { downscaleToJpegBase64 } from "../../lib/image";
 import { supabase } from "../../lib/supabase";
 import type { FoodHit } from "../../scanner/useLookup";
+import { findVerifiedMatches } from "../diary/enrichment";
 
 /** Deklarationens 8 felter i visningsrækkefølge (EU-mærkningens orden). */
 const LABEL_FIELDS: NutrientKey[] = [
@@ -75,6 +77,12 @@ export function LabelCaptureStep({
   const [draft, setDraft] = useState<Draft | null>(null);
   const [saving, setSaving] = useState(false);
 
+  // Verificeret-opslag-forslag (2026-07-08): friske råvarer har ingen
+  // deklaration på pakken — tilbyd at supplere fra Frida/USDA.
+  const [suggestion, setSuggestion] = useState<FoodHit | null>(null);
+  const [adopted, setAdopted] = useState<NutrientMap | null>(null);
+  const [suggestionDismissed, setSuggestionDismissed] = useState(false);
+
   const analyze = async (file: File) => {
     setAnalyzing(true);
     setError(null);
@@ -95,6 +103,15 @@ export function LabelCaptureStep({
         setError(t("scan.label.nothingFound"));
       } else {
         setDraft(next);
+        setSuggestion(null);
+        setAdopted(null);
+        setSuggestionDismissed(false);
+        // Fire-and-forget: forslaget er en bonus og må aldrig blokere.
+        if (next.name.trim()) {
+          void findVerifiedMatches(next.name)
+            .then((matches) => setSuggestion(matches[0] ?? null))
+            .catch(() => setSuggestion(null));
+        }
       }
     } catch (err) {
       if (err instanceof AiError && err.code === "missing_anthropic_key") {
@@ -123,6 +140,9 @@ export function LabelCaptureStep({
         const value = Number(String(text).replace(",", "."));
         if (Number.isFinite(value) && value >= 0) map[key as NutrientKey] = value;
       }
+      // Deklarationsfelterne (brugerens tal) vinder; det adopterede
+      // verificerede opslag fylder kun hullerne — typisk alle mikroværdier.
+      const nutriments = fillNutrientGaps(map, adopted ?? {});
 
       const { data, error: insertError } = await supabase
         .from("foods")
@@ -136,7 +156,7 @@ export function LabelCaptureStep({
           ingredients_text: draft.ingredients.trim().slice(0, 4000) || null,
           additives: draft.additives.map((a) => `en:${a}`),
           nova_group: draft.novaGroup,
-          nutriments: finalizeNutrients(map),
+          nutriments,
         })
         .select()
         .single();
@@ -152,6 +172,22 @@ export function LabelCaptureStep({
     setDraft((old) =>
       old ? { ...old, fields: { ...old.fields, [key]: value } } : old,
     );
+  };
+
+  const applySuggestion = () => {
+    if (!suggestion) return;
+    const verified = (suggestion.nutriments ?? {}) as NutrientMap;
+    setAdopted(verified);
+    // Forudfyld kun tomme deklarationsfelter — brugerens aflæste tal står.
+    setDraft((old) => {
+      if (!old) return old;
+      const fields = { ...old.fields };
+      for (const key of LABEL_FIELDS) {
+        const value = verified[key];
+        if (!fields[key] && value != null) fields[key] = String(roundNutrient(value));
+      }
+      return { ...old, fields };
+    });
   };
 
   const labelKey = i18n.language === "da" ? "labelDa" : "labelEn";
@@ -242,6 +278,36 @@ export function LabelCaptureStep({
           </span>
         ))}
       </div>
+
+      {/* Verificeret-opslag-forslag: suppler manglende tal fra Frida/USDA */}
+      {suggestion && !suggestionDismissed ? (
+        adopted ? (
+          <p className="rounded-md bg-brand-tint px-4 py-3 text-small text-brand" role="status">
+            {t("scan.label.verifiedApplied", { name: suggestion.name })}
+          </p>
+        ) : (
+          <div className="rounded-md bg-brand-tint px-4 py-3">
+            <p className="text-small text-secondary">
+              {t("scan.label.verifiedSuggest", {
+                name: suggestion.name,
+                source: t(`scan.source.${suggestion.source}`),
+              })}
+            </p>
+            <div className="mt-2 flex gap-2">
+              <Button size="sm" onClick={applySuggestion}>
+                {t("scan.label.verifiedUse")}
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setSuggestionDismissed(true)}
+              >
+                {t("scan.label.verifiedDismiss")}
+              </Button>
+            </div>
+          </div>
+        )
+      ) : null}
 
       {/* Deklarationsfelterne pr. 100 g */}
       <div className="overflow-hidden rounded-lg border border-hairline">

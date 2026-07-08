@@ -324,6 +324,15 @@
     "updated": "Change saved",
     "removed": "Entry removed",
     "enriched": "Nutrition filled from a verified source",
+    "swapped": "Switched to another match",
+    "swap": {
+      "button": "Switch to another match",
+      "label": "Search the library",
+      "placeholder": "e.g. skyr",
+      "hint": "Amount and meal are kept.",
+      "none": "No results — try another word.",
+      "cancel": "Keep current"
+    },
     "enrich": {
       "hint": "This food has no micronutrient values yet.",
       "fetch": "Fill from a verified match",

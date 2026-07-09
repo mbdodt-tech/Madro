@@ -357,6 +357,7 @@
     "removed": "Entry removed",
     "enriched": "Nutrition filled from a verified source",
     "swapped": "Switched to another match",
+    "addToMeal": "Add to {{meal}}",
     "swap": {
       "button": "Switch to another match",
       "label": "Search the library",

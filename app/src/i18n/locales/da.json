@@ -357,6 +357,7 @@
     "removed": "Posten er fjernet",
     "enriched": "Næringstal hentet fra verificeret kilde",
     "swapped": "Skiftet til andet opslag",
+    "addToMeal": "Tilføj til {{meal}}",
     "swap": {
       "button": "Skift til andet opslag",
       "label": "Søg i biblioteket",

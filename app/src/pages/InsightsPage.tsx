@@ -85,6 +85,9 @@ export function InsightsPage() {
 
   const chartData = stats.trend.map((p, i) => ({
     ...p,
+    // Dage uden NOVA-data får en lille grå stub (minPointSize), så alle
+    // dage er synlige og klikbare — null tegnes ellers slet ikke.
+    barValue: p.novaShare ?? 0,
     label: new Intl.DateTimeFormat(intl, { weekday: "short" }).format(
       addDays(weekStart, i),
     ),
@@ -179,10 +182,23 @@ export function InsightsPage() {
                       axisLine={false}
                       tick={{ fill: "var(--text-tertiary)", fontSize: 12 }}
                     />
-                    <Bar dataKey="novaShare" radius={[6, 6, 0, 0]} isAnimationActive={false}>
+                    <Bar
+                      dataKey="barValue"
+                      radius={[6, 6, 0, 0]}
+                      minPointSize={4}
+                      isAnimationActive={false}
+                      onClick={(data: unknown) => {
+                        // Indsigt→dagbog (2026-07-09): et tryk på en dag
+                        // åbner dagbogen på netop den dag.
+                        const bar = data as { payload?: { day?: string }; day?: string };
+                        const day = bar.payload?.day ?? bar.day;
+                        if (day) navigate(`/diary?d=${day}`);
+                      }}
+                    >
                       {chartData.map((p) => (
                         <Cell
                           key={p.day}
+                          cursor="pointer"
                           fill={p.novaShare != null ? barColor(p.novaShare) : "var(--hairline)"}
                         />
                       ))}

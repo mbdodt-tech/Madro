@@ -3,7 +3,6 @@ import {
   micronutrientCoverage,
   NUTRIENT_INFO,
   resolveTargets,
-  type NutrientKey,
   type NutrientMap,
 } from "@madro/core";
 import {
@@ -33,23 +32,12 @@ import {
   addDays,
   ENTRY_TOAST_KEY,
   invalidateDiary,
+  MICRO_LETTERS,
   useDailySummary,
   useDiaryEntries,
   type DiaryEntry,
 } from "./diary/useDiary";
 import { useTodayActivity } from "./profile/useBody";
-
-/** Korte søjle-labels til striben (grundstof-/vitaminforkortelser). */
-const MICRO_LETTERS: Partial<Record<NutrientKey, string>> = {
-  vitamin_d_ug: "D",
-  iron_mg: "Fe",
-  magnesium_mg: "Mg",
-  calcium_mg: "Ca",
-  potassium_mg: "K",
-  vitamin_b12_ug: "B12",
-  folate_ug: "Fo",
-  zinc_mg: "Zn",
-};
 
 /** Forside-hook (2026-07-07): tidsbevidst handlingskort. Vises når det
  *  aktuelle måltidsvindue endnu ikke er logget — ellers kun ved helt tom

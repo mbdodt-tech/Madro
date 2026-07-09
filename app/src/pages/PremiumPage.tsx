@@ -12,6 +12,7 @@ import {
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import mark from "../assets/omnibite-mark.png";
 import { TabShell } from "../components/TabShell";
 import { PREMIUM_PLAN } from "../payments/config";
 import { useEntitlements } from "../payments/useEntitlements";
@@ -57,7 +58,8 @@ export function PremiumPage() {
         <main className="mx-auto flex max-w-md flex-col gap-5 px-6 py-8 font-sans">
           <header className="flex items-start justify-between">
             <div>
-              <p className="text-caption font-semibold uppercase tracking-widest text-tertiary">
+              <p className="flex items-center gap-2 text-caption font-semibold uppercase tracking-widest text-tertiary">
+                <img src={mark} alt="" aria-hidden="true" className="size-5 rounded-sm" />
                 {t("common.appName")}
               </p>
               <h1 className="text-display text-ink">{t("premium.title")}</h1>

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { Tables } from "@madro/core";
+import type { NutrientKey, Tables } from "@madro/core";
 import { queryClient } from "../../lib/queryClient";
 import { supabase } from "../../lib/supabase";
 import type { FoodHit } from "../../scanner/useLookup";
@@ -37,6 +37,18 @@ export function dayKey(date: Date): string {
   const d = startOfDay(date);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
+
+/** Korte søjle-labels til mikrostriben (deles af "I dag" og dagbogen). */
+export const MICRO_LETTERS: Partial<Record<NutrientKey, string>> = {
+  vitamin_d_ug: "D",
+  iron_mg: "Fe",
+  magnesium_mg: "Mg",
+  calcium_mg: "Ca",
+  potassium_mg: "K",
+  vitamin_b12_ug: "B12",
+  folate_ug: "Fo",
+  zinc_mg: "Zn",
+};
 
 /** Hvad der skete med en post i EntrySheet — styrer forældrenes toast. */
 export type EntryChangeKind = "saved" | "removed" | "enriched" | "swapped";

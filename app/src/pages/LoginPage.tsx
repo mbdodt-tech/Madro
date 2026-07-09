@@ -1,5 +1,6 @@
 import { Button, Card, Input } from "@madro/ui";
 import { Gauge, Leaf, ScanBarcode } from "lucide-react";
+import mark from "../assets/omnibite-mark.png";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Navigate, useNavigate } from "react-router-dom";
@@ -64,11 +65,14 @@ export function LoginPage() {
       <div className="relative z-10 mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-6 pb-24">
         {/* Brand-mærke */}
         <div className="mb-8 flex flex-col items-center text-center">
-          {/* Brandmærket som lille instrumentplade — OmniBite-O'et med
-              lume-glød (logoets linse-O og cyane åre) møder én ved døren */}
-          <div className="panel-surface mb-5 grid size-16 place-items-center rounded-lg shadow-panel">
-            <span className="glow-reading font-mono text-h1 font-semibold text-lume">O</span>
-          </div>
+          {/* Selve logomærket møder én ved døren — samme plade som
+              hjemmeskærms-ikonet (brugerønske 2026-07-09: logo i appen) */}
+          <img
+            src={mark}
+            alt=""
+            aria-hidden="true"
+            className="mb-5 size-16 rounded-lg shadow-panel"
+          />
           <h1 className="text-display text-ink">{t("auth.title")}</h1>
           <p className="mt-1 text-body text-secondary">{t("auth.subtitle")}</p>
         </div>

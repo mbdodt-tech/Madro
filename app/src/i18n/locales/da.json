@@ -327,6 +327,11 @@
     "yesterday": "I går",
     "prevDay": "Forrige dag",
     "nextDay": "Næste dag",
+    "summary": {
+      "title": "Dagens overblik",
+      "microHint": "Mikronæring",
+      "lowest": "Mest at hente:"
+    },
     "empty": "Ingen måltider logget denne dag.",
     "emptyHint": "Scan en vare eller tilføj et måltid med plus-knappen.",
     "updated": "Ændringen er gemt",
@@ -447,7 +452,7 @@
   "insights": {
     "title": "Indsigt",
     "trendTitle": "Kvalitet denne uge",
-    "trendNote": "Andel ikke-ultraforarbejdet pr. dag (NOVA 1-3).",
+    "trendNote": "Så stor en del af dagens mad var IKKE ultraforarbejdet — NOVA-gruppe 1-3 på skalaen, hvor gruppe 4 er ultraforarbejdet. Tryk på en dag for at åbne den i dagbogen.",
     "daysLogged": "dage logget",
     "avgQuality": "gns. kvalitet",
     "avgKcal": "gns. kcal",

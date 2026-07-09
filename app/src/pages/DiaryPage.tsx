@@ -2,9 +2,11 @@ import { Button, Skeleton, useToast } from "@madro/ui";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router-dom";
 import { ErrorState } from "../components/ErrorState";
 import { TabShell } from "../components/TabShell";
 import { AddFoodSheet } from "./diary/AddFoodSheet";
+import { DaySummaryCard } from "./diary/DaySummaryCard";
 import { EntrySheet } from "./diary/EntrySheet";
 import { MealSections } from "./diary/MealSections";
 import {
@@ -21,7 +23,19 @@ export function DiaryPage() {
   const { t, i18n } = useTranslation();
   const { show } = useToast();
 
-  const [day, setDay] = useState(() => startOfDay(new Date()));
+  // Indsigt→dagbog-link (2026-07-09): ?d=YYYY-MM-DD åbner direkte på den
+  // dag. Ugyldige/fremtidige datoer falder tilbage på i dag.
+  const [searchParams] = useSearchParams();
+  const [day, setDay] = useState(() => {
+    const param = searchParams.get("d");
+    if (param && /^\d{4}-\d{2}-\d{2}$/.test(param)) {
+      const parsed = new Date(`${param}T12:00:00`);
+      if (!Number.isNaN(parsed.getTime()) && parsed <= new Date()) {
+        return startOfDay(parsed);
+      }
+    }
+    return startOfDay(new Date());
+  });
   const [editing, setEditing] = useState<DiaryEntry | null>(null);
   const [adding, setAdding] = useState(false);
 
@@ -96,7 +110,12 @@ export function DiaryPage() {
             <p className="mt-1 text-small text-tertiary">{t("diary.emptyHint")}</p>
           </div>
         ) : (
-          <MealSections entries={entries ?? []} onEntryClick={setEditing} />
+          <>
+            {/* Dagens overblik (2026-07-09): kvalitet, makroer og
+                mikro-dækning for den viste dag — kompakt instrumentpanel */}
+            <DaySummaryCard day={day} />
+            <MealSections entries={entries ?? []} onEntryClick={setEditing} />
+          </>
         )}
       </main>
 

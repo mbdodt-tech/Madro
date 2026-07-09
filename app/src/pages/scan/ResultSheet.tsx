@@ -1,5 +1,11 @@
-import { computeVerdict, lookupAdditive, type NutrientMap } from "@madro/core";
-import { Button, Chip, Sheet, VerdiktBadge } from "@madro/ui";
+import {
+  computeVerdict,
+  lookupAdditive,
+  verdictLevelFor,
+  type CoreVerdictLevel,
+  type NutrientMap,
+} from "@madro/core";
+import { Button, Chip, Sheet, VerdiktBadge, cn } from "@madro/ui";
 import { motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -11,6 +17,15 @@ import { useEntitlements } from "../../payments/useEntitlements";
 import type { FoodHit } from "../../scanner/useLookup";
 import { AlternativesStep } from "./AlternativesStep";
 import { PortionStep } from "./PortionStep";
+
+/** Faktor-prikker til "Derfor"-rækkerne — verdikt-skalaens farver. */
+const WHY_DOT: Record<CoreVerdictLevel, string> = {
+  excellent: "bg-v-excellent",
+  good: "bg-v-good",
+  mid: "bg-v-mid",
+  poor: "bg-v-poor",
+  bad: "bg-v-bad",
+};
 
 function MacroLine({ nutriments }: { nutriments: NutrientMap }) {
   const { t } = useTranslation();
@@ -143,6 +158,41 @@ export function ResultSheet({
             ) : null}
             <Chip>{t("verdict.additivesChip", { count: additives.length })}</Chip>
           </div>
+
+          {/* "Derfor"-rækkerne (2026-07-09, Yuka-mønsteret neutralt): hver
+              faktor bag scoren med sin egen verdikt-prik — svaret på
+              "NOVA 4, hvad er så problemet?". */}
+          {!verdict.insufficient ? (
+            <div className="space-y-1.5">
+              <h4 className="text-caption font-semibold uppercase tracking-widest text-tertiary">
+                {t("product.whyHeading")}
+              </h4>
+              <ul className="space-y-1.5">
+                {verdict.components.map((c) => (
+                  <li
+                    key={c.key}
+                    className="flex items-center gap-2.5 text-small text-secondary"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        "size-2.5 shrink-0 rounded-pill",
+                        WHY_DOT[verdictLevelFor(c.score)],
+                      )}
+                    />
+                    {c.key === "nutriscore"
+                      ? t("product.whyNutri", {
+                          grade: food.nutriscore?.toUpperCase(),
+                        })
+                      : c.key === "nova"
+                        ? t("product.whyNova", { group: food.nova_group })
+                        : t("product.whyAdditives", { count: additives.length })}
+                  </li>
+                ))}
+              </ul>
+              <p className="text-caption text-tertiary">{t("verdict.unbiased")}</p>
+            </div>
+          ) : null}
 
           {additives.length > 0 ? (
             <p className="text-small text-secondary">

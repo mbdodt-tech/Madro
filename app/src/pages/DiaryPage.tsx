@@ -6,6 +6,7 @@ import { useSearchParams } from "react-router-dom";
 import { ErrorState } from "../components/ErrorState";
 import { TabShell } from "../components/TabShell";
 import { AddFoodSheet } from "./diary/AddFoodSheet";
+import type { Meal } from "./scan/logMeal";
 import { DaySummaryCard } from "./diary/DaySummaryCard";
 import { EntrySheet } from "./diary/EntrySheet";
 import { MealSections } from "./diary/MealSections";
@@ -37,7 +38,8 @@ export function DiaryPage() {
     return startOfDay(new Date());
   });
   const [editing, setEditing] = useState<DiaryEntry | null>(null);
-  const [adding, setAdding] = useState(false);
+  // null = lukket; { meal } = åben, evt. med forudvalgt måltid (sektions-plus)
+  const [adding, setAdding] = useState<{ meal?: Meal } | null>(null);
 
   const { data: entries, isLoading, isError, refetch } = useDiaryEntries(day);
   const isToday = isSameDay(day, new Date());
@@ -64,7 +66,7 @@ export function DiaryPage() {
           <Button
             variant="secondary"
             size="sm"
-            onClick={() => setAdding(true)}
+            onClick={() => setAdding({})}
             aria-label={t("diary.add.title")}
           >
             <Plus className="size-4" aria-hidden="true" />
@@ -114,7 +116,11 @@ export function DiaryPage() {
             {/* Dagens overblik (2026-07-09): kvalitet, makroer og
                 mikro-dækning for den viste dag — kompakt instrumentpanel */}
             <DaySummaryCard day={day} />
-            <MealSections entries={entries ?? []} onEntryClick={setEditing} />
+            <MealSections
+              entries={entries ?? []}
+              onEntryClick={setEditing}
+              onAddToMeal={(meal) => setAdding({ meal })}
+            />
           </>
         )}
       </main>
@@ -134,9 +140,10 @@ export function DiaryPage() {
       {adding ? (
         <AddFoodSheet
           day={day}
-          onClose={() => setAdding(false)}
+          initialMeal={adding.meal}
+          onClose={() => setAdding(null)}
           onLogged={() => {
-            setAdding(false);
+            setAdding(null);
             void refresh();
             show(t("portion.logged"));
           }}

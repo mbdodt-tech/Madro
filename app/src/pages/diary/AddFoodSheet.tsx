@@ -17,10 +17,13 @@ import { WriteMealTab } from "./WriteMealTab";
  */
 export function AddFoodSheet({
   day,
+  initialMeal,
   onClose,
   onLogged,
 }: {
   day: Date;
+  /** Forudvalgt måltid (sektions-plus, 2026-07-09); ellers efter klokkeslæt. */
+  initialMeal?: Meal;
   onClose: () => void;
   onLogged: () => void;
 }) {
@@ -32,7 +35,9 @@ export function AddFoodSheet({
   const [searchFailed, setSearchFailed] = useState(false);
   const [selected, setSelected] = useState<FoodHit | null>(null);
   const [grams, setGrams] = useState(100);
-  const [meal, setMeal] = useState<Meal>(() => defaultMeal(new Date().getHours()));
+  const [meal, setMeal] = useState<Meal>(
+    () => initialMeal ?? defaultMeal(new Date().getHours()),
+  );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
 

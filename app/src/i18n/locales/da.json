@@ -275,6 +275,7 @@
       "bad": "Meget ringe kvalitet"
     },
     "novaChip": "NOVA {{group}}",
+    "unbiased": "Vurderingen bygger kun på navngivne systemer (Nutri-Score, NOVA, EFSA) — ingen betaler for den.",
     "ultraProcessed": "ultraforarbejdet",
     "additivesChip_one": "{{count}} additiv",
     "additivesChip_other": "{{count}} additiver",
@@ -511,6 +512,13 @@
   "premium": {
     "title": "Premium",
     "back": "Tilbage",
+    "timelineLabel": "Sådan forløber prøven",
+    "timelineNowTitle": "I dag",
+    "timelineNowBody": "Fuld adgang til alt i Premium med det samme.",
+    "timelineRemindTitle": "Dag {{day}}",
+    "timelineRemindBody": "Vi minder dig om, at prøven snart udløber.",
+    "timelineEndTitle": "Dag {{day}}",
+    "timelineEndBody": "Prøven udløber. Du fortsætter kun, hvis du selv vælger det.",
     "gateTitle": "En del af Premium",
     "gatePhoto": "Tag et billede af måltidet, og lad AI'en genkende retterne og portionerne for dig.",
     "gateWrite": "Skriv dit måltid med dine egne ord — 'havregrød med banan' — og få det sat på tal.",

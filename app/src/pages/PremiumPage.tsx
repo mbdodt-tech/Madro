@@ -1,12 +1,15 @@
 import { Button, Chip, MicroStrip, Panel, useToast } from "@madro/ui";
 import {
   ArrowLeft,
+  Bell,
   Camera,
+  CalendarCheck,
   FileDown,
   Lock,
   MessageSquareText,
   Repeat,
   Sparkles,
+  Unlock,
   Watch,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
@@ -151,6 +154,44 @@ export function PremiumPage() {
                   {t("premium.featExport")}
                 </FeatureLine>
               </ul>
+
+              {/* Prøve-tidslinjen (2026-07-09, Mobbin-research): sådan
+                  forløber prøven — afdramatiserer tilmeldingen, ærligt. */}
+              <ol className="space-y-3" aria-label={t("premium.timelineLabel")}>
+                {(
+                  [
+                    { icon: Unlock, title: t("premium.timelineNowTitle"), body: t("premium.timelineNowBody") },
+                    {
+                      icon: Bell,
+                      title: t("premium.timelineRemindTitle", {
+                        day: PREMIUM_PLAN.trialDays - 2,
+                      }),
+                      body: t("premium.timelineRemindBody"),
+                    },
+                    {
+                      icon: CalendarCheck,
+                      title: t("premium.timelineEndTitle", {
+                        day: PREMIUM_PLAN.trialDays,
+                      }),
+                      body: t("premium.timelineEndBody"),
+                    },
+                  ] as const
+                ).map(({ icon: Icon, title, body }) => (
+                  <li key={title} className="flex items-start gap-3">
+                    <span className="grid size-8 shrink-0 place-items-center rounded-md bg-brand-tint text-brand">
+                      <Icon className="size-4" aria-hidden="true" />
+                    </span>
+                    <span>
+                      <span className="block text-small font-medium text-ink">
+                        {title}
+                      </span>
+                      <span className="block text-caption text-secondary">
+                        {body}
+                      </span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
 
               {/* Prisen som instrumentaflæsning — ærlig prøvetekst */}
               <div className="panel-surface rounded-md px-4 py-4 text-center shadow-panel">

@@ -29,6 +29,7 @@ import { useReferences } from "../lib/useReferences";
 import { AddFoodSheet } from "./diary/AddFoodSheet";
 import { EntrySheet } from "./diary/EntrySheet";
 import { MealSections } from "./diary/MealSections";
+import type { Meal } from "./scan/logMeal";
 import {
   addDays,
   ENTRY_TOAST_KEY,
@@ -91,7 +92,8 @@ export function TodayPage() {
   const { data: referenceRows } = useReferences(profile?.rda_region ?? undefined);
 
   const [editing, setEditing] = useState<DiaryEntry | null>(null);
-  const [adding, setAdding] = useState(false);
+  // null = lukket; { meal } = åben, evt. med forudvalgt måltid (sektions-plus)
+  const [adding, setAdding] = useState<{ meal?: Meal } | null>(null);
 
   const hideCalories = profile?.hide_calories ?? false;
   const isLoading = entriesLoading || profileLoading || summaryLoading;
@@ -299,7 +301,7 @@ export function TodayPage() {
               <Button size="sm" onClick={() => navigate("/scan")}>
                 {t("today.hook.scan")}
               </Button>
-              <Button size="sm" variant="secondary" onClick={() => setAdding(true)}>
+              <Button size="sm" variant="secondary" onClick={() => setAdding({})}>
                 {t("today.hook.add")}
               </Button>
             </div>
@@ -344,7 +346,7 @@ export function TodayPage() {
           <Button
             variant="secondary"
             size="sm"
-            onClick={() => setAdding(true)}
+            onClick={() => setAdding({})}
             aria-label={t("diary.add.title")}
           >
             <Plus className="size-4" aria-hidden="true" />
@@ -360,7 +362,11 @@ export function TodayPage() {
             <p className="mt-1 text-small text-tertiary">{t("diary.emptyHint")}</p>
           </div>
         ) : (
-          <MealSections entries={entries ?? []} onEntryClick={setEditing} />
+          <MealSections
+            entries={entries ?? []}
+            onEntryClick={setEditing}
+            onAddToMeal={(meal) => setAdding({ meal })}
+          />
         )}
       </main>
       </div>
@@ -380,9 +386,10 @@ export function TodayPage() {
       {adding ? (
         <AddFoodSheet
           day={today}
-          onClose={() => setAdding(false)}
+          initialMeal={adding.meal}
+          onClose={() => setAdding(null)}
           onLogged={() => {
-            setAdding(false);
+            setAdding(null);
             void refresh();
             show(t("portion.logged"));
           }}

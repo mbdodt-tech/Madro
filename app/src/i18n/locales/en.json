@@ -275,6 +275,7 @@
       "bad": "Very poor quality"
     },
     "novaChip": "NOVA {{group}}",
+    "unbiased": "The rating relies only on named systems (Nutri-Score, NOVA, EFSA) — no one pays for it.",
     "ultraProcessed": "ultra-processed",
     "additivesChip_one": "{{count}} additive",
     "additivesChip_other": "{{count}} additives",
@@ -511,6 +512,13 @@
   "premium": {
     "title": "Premium",
     "back": "Back",
+    "timelineLabel": "How the trial works",
+    "timelineNowTitle": "Today",
+    "timelineNowBody": "Full access to everything in Premium right away.",
+    "timelineRemindTitle": "Day {{day}}",
+    "timelineRemindBody": "We remind you that the trial is about to end.",
+    "timelineEndTitle": "Day {{day}}",
+    "timelineEndBody": "The trial ends. You only continue if you choose to.",
     "gateTitle": "Part of Premium",
     "gatePhoto": "Snap a photo of your meal and let AI recognise the dishes and portions for you.",
     "gateWrite": "Describe your meal in your own words — 'oatmeal with banana' — and get it turned into numbers.",

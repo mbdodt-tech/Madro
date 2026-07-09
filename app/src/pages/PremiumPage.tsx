@@ -9,11 +9,12 @@ import {
   Sparkles,
   Watch,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import mark from "../assets/omnibite-mark.png";
 import { TabShell } from "../components/TabShell";
+import { setBetaEntitlement } from "../payments/beta";
 import { PREMIUM_PLAN } from "../payments/config";
 import { useEntitlements } from "../payments/useEntitlements";
 
@@ -52,6 +53,22 @@ export function PremiumPage() {
   const { premium } = useEntitlements();
   const nf = new Intl.NumberFormat(i18n.language === "da" ? "da-DK" : "en-GB");
 
+  // Beta-prøven: CTA'en aktiverer premium direkte (stub-adapterens kilde);
+  // RevenueCat overtager samme knap senere. Fra-knappen gør det nemt at
+  // opleve begge tilstande under beta-testen.
+  const [busy, setBusy] = useState(false);
+  const toggleBeta = async (next: boolean) => {
+    setBusy(true);
+    try {
+      await setBetaEntitlement(next);
+      show(t(next ? "premium.activated" : "premium.deactivated"));
+    } catch {
+      show(t("common.errorBody"));
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <TabShell>
       <div className="page-hero-wash min-h-full">
@@ -75,15 +92,26 @@ export function PremiumPage() {
           </header>
 
           {premium ? (
-            <Panel>
-              <div className="space-y-2 text-center">
-                <Sparkles className="mx-auto size-6 text-lume" aria-hidden="true" />
-                <p className="text-body font-medium text-panel-ink">
-                  {t("premium.alreadyTitle")}
-                </p>
-                <p className="text-small text-panel-dim">{t("premium.alreadyBody")}</p>
-              </div>
-            </Panel>
+            <>
+              <Panel>
+                <div className="space-y-2 text-center">
+                  <Sparkles className="mx-auto size-6 text-lume" aria-hidden="true" />
+                  <p className="text-body font-medium text-panel-ink">
+                    {t("premium.alreadyTitle")}
+                  </p>
+                  <p className="text-small text-panel-dim">{t("premium.alreadyBody")}</p>
+                </div>
+              </Panel>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full"
+                onClick={() => void toggleBeta(false)}
+                disabled={busy}
+              >
+                {t("premium.deactivateBeta")}
+              </Button>
+            </>
           ) : (
             <>
               {/* Glimtet: den fulde mikrodybde, sløret — værdi, ikke pres */}
@@ -139,7 +167,8 @@ export function PremiumPage() {
 
               <Button
                 className="w-full"
-                onClick={() => show(t("premium.betaNote"))}
+                onClick={() => void toggleBeta(true)}
+                disabled={busy}
               >
                 {t("premium.cta", { days: PREMIUM_PLAN.trialDays })}
               </Button>

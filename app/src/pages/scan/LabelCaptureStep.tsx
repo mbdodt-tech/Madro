@@ -332,7 +332,7 @@ export function LabelCaptureStep({
             {t("scan.label.verifiedApplied", { name: suggestion.name })}
           </p>
         ) : (
-          <div className="rounded-md bg-brand-tint px-4 py-3">
+          <div className="rounded-md border border-hairline bg-bg px-4 py-3">
             <p className="text-small text-secondary">
               {t("scan.label.verifiedSuggest", {
                 name: suggestion.name,

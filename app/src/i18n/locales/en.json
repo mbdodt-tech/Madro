@@ -28,6 +28,24 @@
   "home": {
     "designLink": "Design system"
   },
+  "nova": {
+    "open": "What is NOVA?",
+    "title": "What is NOVA?",
+    "intro": "NOVA is an international classification that groups foods by how processed they are — not by their nutrition. The scale runs from 1 to 4.",
+    "thisProduct": "this product",
+    "group1Title": "1 · Unprocessed or minimally processed",
+    "group1Body": "Fruit, vegetables, meat, milk, eggs and grains — raw or e.g. frozen, dried or pasteurised.",
+    "group2Title": "2 · Processed culinary ingredients",
+    "group2Body": "Oil, butter, sugar and salt — the ingredients you cook with.",
+    "group3Title": "3 · Processed foods",
+    "group3Body": "E.g. bread, cheese and canned goods — typically few ingredients and recognisable food.",
+    "group4Title": "4 · Ultra-processed foods",
+    "group4Body": "Industrial products with ingredients rarely found in a home kitchen: modified starches, flavourings, colours and emulsifiers. Research links diets high in group 4 with lower nutritional quality — that's why the gauge shows the share outside group 4.",
+    "additivesTitle": "What about additives?",
+    "additivesBody": "E-numbers are additives approved and continuously reviewed by EFSA, the EU's food safety authority. Many are entirely ordinary — citric acid (E330), for example. NOVA doesn't judge individual additives; their number and type simply serve as a practical marker of industrial processing.",
+    "inThisProduct": "In this product",
+    "sourceNote": "Sources: NOVA (Monteiro et al., FAO) and EFSA."
+  },
   "profile": {
     "title": "Profile",
     "aboutYou": "About you",
@@ -493,6 +511,9 @@
   "premium": {
     "title": "Premium",
     "back": "Back",
+    "gateTitle": "Part of Premium",
+    "gatePhoto": "Snap a photo of your meal and let AI recognise the dishes and portions for you.",
+    "gateWrite": "Describe your meal in your own words — 'oatmeal with banana' — and get it turned into numbers.",
     "glimpseHint": "Micronutrients today",
     "glimpseLabel": "The full micronutrient depth",
     "featuresLabel": "Premium features",

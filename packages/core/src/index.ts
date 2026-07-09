@@ -57,6 +57,8 @@ export {
   type PortionUnitId,
 } from "./portions/portions";
 
+export { ADDITIVE_INFO, lookupAdditive, type AdditiveInfo } from "./additives";
+
 export { isSupplementFood, SUPPLEMENT_CATEGORY } from "./supplements";
 
 export {

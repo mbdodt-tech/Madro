@@ -1,4 +1,4 @@
-import { computeVerdict, type NutrientMap } from "@madro/core";
+import { computeVerdict, lookupAdditive, type NutrientMap } from "@madro/core";
 import { Button, Chip, Sheet, VerdiktBadge } from "@madro/ui";
 import { motion } from "motion/react";
 import { useMemo, useState } from "react";
@@ -6,10 +6,10 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Sparkles } from "lucide-react";
 import { useProfile } from "../../auth/useProfile";
+import { NovaInfoSheet } from "../../components/NovaInfoSheet";
 import { useEntitlements } from "../../payments/useEntitlements";
 import type { FoodHit } from "../../scanner/useLookup";
 import { AlternativesStep } from "./AlternativesStep";
-import { formatAdditive } from "./format";
 import { PortionStep } from "./PortionStep";
 
 function MacroLine({ nutriments }: { nutriments: NutrientMap }) {
@@ -57,11 +57,12 @@ export function ResultSheet({
   /** Åbn et alternativs eget verdikt-ark (fase 2.5). */
   onSwapFood?: (food: FoodHit) => void;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { alternatives: hasAlternatives, ready: entitlementsReady } = useEntitlements();
   const [step, setStep] = useState<"verdict" | "portion" | "alternatives">("verdict");
   const [showPremiumHint, setShowPremiumHint] = useState(false);
+  const [novaOpen, setNovaOpen] = useState(false);
 
   const hasCategories = ((food.categories as string[] | null) ?? []).length > 0;
 
@@ -145,10 +146,33 @@ export function ResultSheet({
 
           {additives.length > 0 ? (
             <p className="text-small text-secondary">
-              {additives.slice(0, 8).map(formatAdditive).join(" · ")}
+              {additives
+                .slice(0, 8)
+                .map((c) => {
+                  const { code, info } = lookupAdditive(c);
+                  return info
+                    ? (i18n.language === "da" ? info.nameDa : info.nameEn)
+                    : code;
+                })
+                .join(" · ")}
               {additives.length > 8 ? " …" : ""}
             </p>
           ) : null}
+
+          {/* NOVA-uddannelseslaget: hvad betyder vurderingen? (2026-07-09) */}
+          <button
+            type="button"
+            onClick={() => setNovaOpen(true)}
+            className="self-start rounded-sm text-small font-medium text-brand hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+          >
+            {t("nova.open")}
+          </button>
+          <NovaInfoSheet
+            open={novaOpen}
+            onClose={() => setNovaOpen(false)}
+            group={food.nova_group}
+            additives={additives}
+          />
 
           <MacroLine nutriments={nutriments} />
 

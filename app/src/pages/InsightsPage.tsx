@@ -20,6 +20,7 @@ import {
 } from "recharts";
 import { useProfile } from "../auth/useProfile";
 import { ErrorState } from "../components/ErrorState";
+import { NovaInfoSheet } from "../components/NovaInfoSheet";
 import { TabShell } from "../components/TabShell";
 import { aiClient } from "../lib/aiClient";
 import { useReferences } from "../lib/useReferences";
@@ -57,6 +58,7 @@ export function InsightsPage() {
 
   const [generating, setGenerating] = useState(false);
   const [genError, setGenError] = useState<string | null>(null);
+  const [novaOpen, setNovaOpen] = useState(false);
 
   const locale = i18n.language === "da" ? "da" : "en";
   const intl = locale === "da" ? "da-DK" : "en-GB";
@@ -164,9 +166,17 @@ export function InsightsPage() {
             {/* Kvalitetstrend (primær) + evt. kcal-linje */}
             <Card>
               <h2 className="mb-1 text-h2 text-ink">{t("insights.trendTitle")}</h2>
-              <p className="mb-3 text-caption text-tertiary">
+              <p className="mb-1 text-caption text-tertiary">
                 {t("insights.trendNote")}
               </p>
+              <button
+                type="button"
+                onClick={() => setNovaOpen(true)}
+                className="mb-3 rounded-sm text-caption font-medium text-brand hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+              >
+                {t("nova.open")}
+              </button>
+              <NovaInfoSheet open={novaOpen} onClose={() => setNovaOpen(false)} />
               <div className="h-44">
                 <ResponsiveContainer width="100%" height="100%">
                   <ComposedChart data={chartData} margin={{ top: 4, right: 0, left: -22, bottom: 0 }}>

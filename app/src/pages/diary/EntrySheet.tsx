@@ -223,7 +223,7 @@ export function EntrySheet({
         />
 
         {canEnrich ? (
-          <div className="rounded-md bg-brand-tint px-4 py-3">
+          <div className="rounded-md border border-hairline bg-bg px-4 py-3">
             <p className="text-small text-secondary">{t("diary.enrich.hint")}</p>
             {candidates == null ? (
               <Button

@@ -28,6 +28,24 @@
   "home": {
     "designLink": "Designsystem"
   },
+  "nova": {
+    "open": "Hvad er NOVA?",
+    "title": "Hvad er NOVA?",
+    "intro": "NOVA er et internationalt klassifikationssystem, der inddeler fødevarer efter, hvor forarbejdede de er — ikke efter deres næringsindhold. Skalaen går fra 1 til 4.",
+    "thisProduct": "dette produkt",
+    "group1Title": "1 · Uforarbejdet eller minimalt forarbejdet",
+    "group1Body": "Frugt, grønt, kød, mælk, æg og gryn — råt eller fx frosset, tørret eller pasteuriseret.",
+    "group2Title": "2 · Forarbejdede køkkeningredienser",
+    "group2Body": "Olie, smør, sukker og salt — ingredienserne man laver mad med.",
+    "group3Title": "3 · Forarbejdede fødevarer",
+    "group3Body": "Fx brød, ost og konserves — typisk få ingredienser og genkendelig mad.",
+    "group4Title": "4 · Ultraforarbejdede fødevarer",
+    "group4Body": "Industrielt fremstillede produkter med ingredienser, man sjældent har i et køkken: modificerede stivelser, smagsstoffer, farvestoffer og emulgatorer. Forskningen forbinder en kost med meget fra gruppe 4 med lavere næringstæthed — derfor viser måleren andelen uden om gruppe 4.",
+    "additivesTitle": "Hvad med tilsætningsstoffer?",
+    "additivesBody": "E-numre er tilsætningsstoffer, der er godkendt og løbende vurderet af EFSA, EU's fødevaresikkerhedsagentur. Mange af dem er helt almindelige — fx citronsyre (E330). NOVA dømmer ikke det enkelte stof; antallet og typen af tilsætningsstoffer er i stedet en praktisk markør for, hvor industrielt forarbejdet et produkt er.",
+    "inThisProduct": "I dette produkt",
+    "sourceNote": "Kilder: NOVA (Monteiro m.fl., FAO) og EFSA."
+  },
   "profile": {
     "title": "Profil",
     "aboutYou": "Om dig",
@@ -493,6 +511,9 @@
   "premium": {
     "title": "Premium",
     "back": "Tilbage",
+    "gateTitle": "En del af Premium",
+    "gatePhoto": "Tag et billede af måltidet, og lad AI'en genkende retterne og portionerne for dig.",
+    "gateWrite": "Skriv dit måltid med dine egne ord — 'havregrød med banan' — og få det sat på tal.",
     "glimpseHint": "Mikronæring i dag",
     "glimpseLabel": "Den fulde mikronæringsdybde",
     "featuresLabel": "Premium-funktioner",

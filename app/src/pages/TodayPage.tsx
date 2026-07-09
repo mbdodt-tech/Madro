@@ -22,6 +22,7 @@ import { Trans, useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { persistHideCalories, useProfile } from "../auth/useProfile";
 import { useSession } from "../auth/useSession";
+import { ActivityQuickCard } from "../components/ActivityQuickCard";
 import { ErrorState } from "../components/ErrorState";
 import { TabShell } from "../components/TabShell";
 import { useReferences } from "../lib/useReferences";
@@ -318,14 +319,20 @@ export function TodayPage() {
           </p>
         ) : null}
 
-        {/* Indsigtsteaser — tintet mellemtrin; linker til paywallen (4.3) */}
+        {/* Aktivitet i dag — skridt/aktiv energi direkte på forsiden (2026-07-09) */}
+        <ActivityQuickCard />
+
+        {/* Indsigtsteaser — hvidt kort m. tint-ikonchip (designidentitet:
+            tint er accent, aldrig hele indholdsblokke); linker til paywallen */}
         <button
           type="button"
           onClick={() => navigate("/premium")}
-          className="rounded-xl bg-brand-tint p-4 text-left transition-[filter] hover:brightness-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+          className="rounded-lg border border-card-edge bg-surface p-4 text-left shadow-1 transition-[filter] hover:brightness-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
         >
           <div className="flex items-center gap-3">
-            <Sparkles className="size-5 shrink-0 text-brand" aria-hidden="true" />
+            <span className="grid size-8 shrink-0 place-items-center rounded-md bg-brand-tint text-brand">
+              <Sparkles className="size-4" aria-hidden="true" />
+            </span>
             <p className="flex-1 text-small text-secondary">{t("today.insightTeaser")}</p>
             <Chip>{t("today.premiumChip")}</Chip>
           </div>

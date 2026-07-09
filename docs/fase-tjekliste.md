@@ -256,6 +256,24 @@ Betalingsbeslutning: alt bygges færdigt mod en adapter — RevenueCat/Stripe-n�
 
 **Accept:** e2e — post bytter til "Blåbær, rå", mængden består.
 
+### Designidentitet "roller, ikke nuancer" (bygget 2026-07-09)
+
+> Hver flade har én betydning: papir = rummet, hvide kort = indhold, det mørke panel = KUN aflæsninger, bladgrøn = handling, cyan glød = levende data. Tint reduceret til ikonchips/status/hover — aldrig hele indholdsblokke. Profilsiden strammet op (sektionsikoner, aktivitet fjernet), aktivitet/skridt flyttet til forsiden (ActivityQuickCard; wearables skriver i samme felter i Fase 5). Dagsoverblik i dagbogen + indsigt→dagbog-link + logomærke i appen (login/premium).
+
+**Accept:** ingen bg-brand-tint på indholdsblokke; e2e 6/6 (login-helper krævede exact-match efter nyt "Aktivitet i dag"-heading).
+
+### NOVA-uddannelseslag (bygget 2026-07-09)
+
+> "Hvad er NOVA?"-ark (fra verdikt-arket og indsigtssiden): de fire grupper forklaret neutralt, produktets gruppe fremhævet, produktets tilsætningsstoffer navngivet via kurateret tabel i core (~35 almindelige E-numre, da+en, funktionskategori). Tone-guardrail: aldrig "farlig" — EFSA/NOVA refereres som navngivne systemer. Verdikt-arkets additivlinje viser nu navne frem for rå koder.
+
+**Accept:** unit tests på opslag/normalisering; ark verificeret i preview.
+
+### Premium-gating af AI-logning (besluttet + bygget 2026-07-09)
+
+> Fotologning og skriv-et-måltid (de dyre AI-kald) er premium bag PremiumTeaser-kortet; scan/søg/dagbog forbliver gratis (fri-niveau-princippet). Alternativer og ugeindsigter var allerede gated. GDPR-eksport forbliver gratis (rettighed, ikke feature).
+
+**Accept:** ikke-premium ser teaser med "Se Premium" i begge flows (verificeret i preview som e2e-bruger); premium-flag i DB låser op straks.
+
 ### Vitamintabletter (bygget 2026-07-08)
 
 > Kosttilskud logges i tabletter: tablet-enhed i core (konvention 1 tablet = 1 g; næringstal pr. 100 g = pr. tablet × 100, så alle rollups er uændrede), tabletvælger i scan/tilføj/redigér-flowene, kosttilskudstilstand i deklarationsfotoet (vitamin-/mineralfelter pr. tablet, kategori `en:dietary-supplements`). Ingen dosis-anbefalinger — kun neutral logning (ansvarlighedsreglerne).

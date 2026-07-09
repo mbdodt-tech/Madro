@@ -11,6 +11,8 @@ import {
   searchFoods,
   type FoodHit,
 } from "../scanner/useLookup";
+import { PremiumTeaser } from "../payments/PremiumTeaser";
+import { useEntitlements } from "../payments/useEntitlements";
 import { invalidateDiary } from "./diary/useDiary";
 import { LabelCaptureStep } from "./scan/LabelCaptureStep";
 import { PhotoMealSheet } from "./scan/PhotoMealSheet";
@@ -32,6 +34,7 @@ export function ScanPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { show } = useToast();
+  const { premium, ready: entitlementsReady } = useEntitlements();
   const reduceMotion = useReducedMotion();
   const videoRef = useRef<HTMLVideoElement>(null);
   const scannerRef = useRef<Scanner | null>(null);
@@ -291,13 +294,21 @@ export function ScanPage() {
         showTitle
       >
         {phase.kind === "photo" ? (
-          <PhotoMealSheet
-            onLogged={() => {
-              invalidateDiary();
-              show(t("portion.logged"));
-              close();
-            }}
-          />
+          // Fotologning er premium (gating-beslutning 2026-07-09) — de
+          // dyre AI-kald bor bag paywallen, gratis-scanning røres ikke.
+          !entitlementsReady ? (
+            <Skeleton className="h-24 w-full" />
+          ) : premium ? (
+            <PhotoMealSheet
+              onLogged={() => {
+                invalidateDiary();
+                show(t("portion.logged"));
+                close();
+              }}
+            />
+          ) : (
+            <PremiumTeaser body={t("premium.gatePhoto")} />
+          )
         ) : null}
       </Sheet>
 

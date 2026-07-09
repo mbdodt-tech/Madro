@@ -122,11 +122,19 @@ export function EntrySheet({
     }
   };
 
+  // Enheden følger detektionen ved gem — retter også poster, der blev
+  // logget i tabletter, mens detektionen var for bred (2026-07-09).
+  const entryTablets = entry.foods != null && isSupplementFood(entry.foods);
+
   const save = async () => {
     setBusy(true);
     setError(false);
     try {
-      await updateEntry(entry.id, { amountGrams: grams, meal });
+      await updateEntry(entry.id, {
+        amountGrams: grams,
+        meal,
+        unit: entryTablets ? "tablet" : "g",
+      });
       onChanged("saved");
     } catch {
       setError(true);
@@ -219,7 +227,7 @@ export function EntrySheet({
           onGrams={setGrams}
           onMeal={setMeal}
           energyKcalPer100={nutriments.energy_kcal ?? null}
-          tablets={entry.foods != null && isSupplementFood(entry.foods)}
+          tablets={entryTablets}
         />
 
         {canEnrich ? (

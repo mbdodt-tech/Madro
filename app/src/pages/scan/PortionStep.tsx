@@ -20,8 +20,11 @@ export function PortionStep({
   const { t } = useTranslation();
 
   // Kosttilskud logges i tabletter (1 tablet = 1 g), mad i gram.
-  const tablets = isSupplementFood(food);
-  const [grams, setGrams] = useState(tablets ? 1 : 100);
+  // Detektionen kan fejle (telefontest 2026-07-09: OFF tagger
+  // proteindrikke som tilskud) — derfor kan brugeren altid skifte til gram.
+  const detectedSupplement = isSupplementFood(food);
+  const [tablets, setTablets] = useState(detectedSupplement);
+  const [grams, setGrams] = useState(detectedSupplement ? 1 : 100);
   const [meal, setMeal] = useState<Meal>(() => defaultMeal(new Date().getHours()));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
@@ -73,6 +76,19 @@ export function PortionStep({
         energyKcalPer100={nutriments.energy_kcal ?? null}
         tablets={tablets}
       />
+
+      {tablets ? (
+        <button
+          type="button"
+          onClick={() => {
+            setTablets(false);
+            setGrams(100);
+          }}
+          className="rounded-sm text-small font-medium text-brand hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+        >
+          {t("portion.useGrams")}
+        </button>
+      ) : null}
 
       {error ? (
         <p className="rounded-md bg-v-poor-tint px-4 py-3 text-small text-v-bad" role="alert">

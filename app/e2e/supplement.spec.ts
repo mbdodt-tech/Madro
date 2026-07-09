@@ -54,7 +54,7 @@ test("kosttilskud: scan → tabletvælger → 2 tabletter i dagbogen", async ({
 
   // --- Scan via manuel stregkode → verdikt-ark → "Jeg spiste det" ---
   await login(page);
-  await page.getByRole("button", { name: /scan/i }).click();
+  await page.getByRole("button", { name: "Scan stregkode" }).click();
   await page.waitForURL("/scan");
   await page.locator("#manual-barcode").fill(TEST_BARCODE);
   await page.getByRole("button", { name: /slå op/i }).click();

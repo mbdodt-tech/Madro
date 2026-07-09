@@ -21,7 +21,8 @@ test("kerneløkken: scan → verdikt → log → dagbog → redigér → i dag �
   await login(page);
 
   // --- Scan via manuel stregkode (kamera findes ikke i headless) ---
-  await page.getByRole("button", { name: /scan/i }).click();
+  // Eksakt FAB-label: forsidens hook-kort har også en "Scan"-knap.
+  await page.getByRole("button", { name: "Scan stregkode" }).click();
   await page.waitForURL("/scan");
   await page.locator("#manual-barcode").fill(KIMS_PEANUTS);
   await page.getByRole("button", { name: /slå op/i }).click();

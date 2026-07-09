@@ -113,7 +113,13 @@ export function useDailySummary(day: Date) {
 
 export async function updateEntry(
   id: string,
-  changes: { amountGrams: number; meal: Meal; foodId?: string },
+  changes: {
+    amountGrams: number;
+    meal: Meal;
+    foodId?: string;
+    /** Ret visningsenheden (fx tablet→g når detektionen var forkert). */
+    unit?: "g" | "tablet";
+  },
 ): Promise<void> {
   const { error } = await supabase
     .from("log_entries")
@@ -121,6 +127,7 @@ export async function updateEntry(
       amount: changes.amountGrams,
       meal: changes.meal,
       ...(changes.foodId ? { food_id: changes.foodId } : {}),
+      ...(changes.unit ? { unit: changes.unit } : {}),
     })
     .eq("id", id);
   if (error) throw error;

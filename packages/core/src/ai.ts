@@ -40,6 +40,13 @@ export const parsedLabelSchema = z.object({
       salt_g: z.number().min(0).max(100).optional(),
     })
     .default({}),
+  /** Kosttilskud (2026-07-09): etiketten er en tilskuds-deklaration. */
+  supplement: z.boolean().default(false),
+  /** Vitaminer/mineraler PR. TABLET i kanoniske nøgler/enheder (µg/mg).
+   *  Løs record — klienten filtrerer med isNutrientKey + micro-flaget. */
+  per_tablet: z
+    .record(z.string().max(40), z.number().min(0).max(100000))
+    .default({}),
 });
 
 export type ParsedLabel = z.infer<typeof parsedLabelSchema>;

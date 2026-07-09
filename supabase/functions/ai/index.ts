@@ -72,11 +72,15 @@ const parseLabelResult = z.object({
       salt_g: z.number().min(0).max(100).optional(),
     })
     .default({}),
+  supplement: z.boolean().default(false),
+  per_tablet: z
+    .record(z.string().max(40), z.number().min(0).max(100000))
+    .default({}),
 });
 
 const PARSE_LABEL_SYSTEM = `Opgave: Aflæs varedeklarationen (ingrediensliste og/eller næringsdeklaration) på billedet.
 - Returnér JSON: { "name"?, "brand"?, "ingredients_text"?, "additives": [..],
-  "nova_group"?, "nutriments": {..} }.
+  "nova_group"?, "nutriments": {..}, "supplement": bool, "per_tablet": {..} }.
 - "additives": alle E-numre fra ingredienslisten, normaliseret småt uden mellemrum
   (fx "e330", "e160a"). Genkend også navngivne tilsætningsstoffer med kendt E-nummer
   (fx "citronsyre" → "e330").
@@ -87,8 +91,21 @@ const PARSE_LABEL_SYSTEM = `Opgave: Aflæs varedeklarationen (ingrediensliste og
 - "nutriments": tallene PR. 100 g præcis som deklareret (energy_kcal, fat_g,
   saturated_fat_g, carbohydrate_g, sugars_g, fiber_g, protein_g, salt_g).
   Deklareres kun pr. portion, omregn ikke — udelad feltet.
+- KOSTTILSKUD: Er etiketten en kosttilskuds-deklaration (fx "1 tablet indeholder",
+  "daglig dosis", "Supplement Facts"), sæt "supplement": true og udfyld
+  "per_tablet" med vitaminer/mineraler PR. TABLET/KAPSEL. Brug PRÆCIS disse
+  nøgler, og omregn selv til nøglens enhed (mg↔µg):
+  vitamin_a_re_ug, vitamin_c_mg, vitamin_d_ug, vitamin_e_mg, thiamin_mg,
+  riboflavin_mg, vitamin_b6_mg, folate_ug, vitamin_b12_ug, calcium_mg,
+  iron_mg, magnesium_mg, potassium_mg, zinc_mg, selenium_ug, iodine_ug,
+  phosphorus_mg.
+  Angiver etiketten dosis pr. 2+ tabletter, omregn til pr. 1 tablet.
+  %-referenceværdier (NRV/DV/RI) er IKKE mængder — brug kun mg/µg-tal.
+  "nova_group" og "nutriments" udelades typisk for kosttilskud.
+  For almindelige fødevarer: "supplement": false og "per_tablet": {}.
 - Medtag KUN hvad der faktisk kan læses på billedet. Gæt aldrig.
-- Kan intet af ovenstående læses, returnér {"additives":[],"nutriments":{}}.`;
+- Kan intet af ovenstående læses, returnér
+  {"additives":[],"nutriments":{},"supplement":false,"per_tablet":{}}.`;
 
 // ---- rank_alternatives (fase 2.5): bedre alternativer m. begrundelse ----
 // Kandidaterne er ALLEREDE filtreret til højere verdikt-score i klienten.

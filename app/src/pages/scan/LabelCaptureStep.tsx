@@ -2,6 +2,7 @@ import {
   AiError,
   fillNutrientGaps,
   finalizeNutrients,
+  isNutrientKey,
   isSupplementFood,
   NUTRIENT_INFO,
   NUTRIENT_KEYS,
@@ -54,6 +55,14 @@ function draftFromParsed(parsed: ParsedLabel): Draft {
   for (const key of LABEL_FIELDS) {
     const value = parsed.nutriments[key as keyof typeof parsed.nutriments];
     if (value != null) fields[key] = String(value);
+  }
+  // Kosttilskud (2026-07-09): AI'ens pr.-tablet-værdier forudfylder
+  // mikro-felterne. Løs record fra modellen → filtrér til kanoniske
+  // mikro-nøgler; alt andet ignoreres.
+  for (const [key, value] of Object.entries(parsed.per_tablet)) {
+    if (isNutrientKey(key) && NUTRIENT_INFO[key].micro) {
+      fields[key] = String(value);
+    }
   }
   return {
     name: parsed.name ?? "",
@@ -124,9 +133,12 @@ export function LabelCaptureStep({
       setSuggestion(null);
       setAdopted(null);
       setSuggestionDismissed(false);
-      setSupplementMode(isSupplementFood({ name: next.name }));
-      // Fire-and-forget: forslaget er en bonus og må aldrig blokere.
-      if (next.name.trim()) {
+      const supplement =
+        parsed.supplement || isSupplementFood({ name: next.name });
+      setSupplementMode(supplement);
+      // Fire-and-forget: forslaget er en bonus og må aldrig blokere —
+      // og springes over for kosttilskud (pr. 100 g-mad ≠ pr. tablet).
+      if (!supplement && next.name.trim()) {
         void findVerifiedMatches(next.name)
           .then((matches) => setSuggestion(matches[0] ?? null))
           .catch(() => setSuggestion(null));

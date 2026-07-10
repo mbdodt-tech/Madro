@@ -69,6 +69,19 @@ export function ProfilePage() {
   };
   const saveDirection = (id: string) =>
     save({ goals: JSON.parse(JSON.stringify({ ...goals, direction: id })) });
+  // Kostprofil + manuelt kalorietal (2026-07-10, brugerønske).
+  const saveMacroProfile = (id: string) =>
+    save({ goals: JSON.parse(JSON.stringify({ ...goals, macro_profile: id })) });
+  const saveKcalGoal = (_field: string, value: number) =>
+    save({ goals: JSON.parse(JSON.stringify({ ...goals, kcal: value })) });
+  const clearKcalGoal = () => {
+    const rest = { ...goals };
+    delete rest.kcal;
+    save({ goals: JSON.parse(JSON.stringify(rest)) });
+  };
+  const macroProfile =
+    typeof goals.macro_profile === "string" ? goals.macro_profile : "standard";
+  const kcalGoal = typeof goals.kcal === "number" ? goals.kcal : null;
 
   const targets = resolveTargets(goals, {
     sex: profile?.sex,
@@ -204,20 +217,57 @@ export function ProfilePage() {
             <section className="space-y-2">
               <SectionLabel icon={Compass}>{t("profile.goalTitle")}</SectionLabel>
               <Card>
-                <div className="space-y-4">
-                  <PillGroup
-                    layout="row"
-                    label={t("profile.goal")}
-                    value={direction}
-                    onChange={saveDirection}
-                    options={[
-                      { id: "maintain", label: t("profile.goalShortMaintain") },
-                      { id: "gentle_deficit", label: t("profile.goalShortDeficit") },
-                      { id: "gentle_surplus", label: t("profile.goalShortSurplus") },
-                    ]}
-                  />
+                <div className="space-y-3">
+                  <div className="divide-y divide-hairline">
+                    <PillGroup
+                      layout="row"
+                      label={t("profile.goal")}
+                      value={direction}
+                      onChange={saveDirection}
+                      options={[
+                        { id: "maintain", label: t("profile.goalShortMaintain") },
+                        { id: "gentle_deficit", label: t("profile.goalShortDeficit") },
+                        { id: "gentle_surplus", label: t("profile.goalShortSurplus") },
+                      ]}
+                    />
+                    {/* Kostprofil (2026-07-10): styrer KUN makro-fordelingen */}
+                    <PillGroup
+                      layout="row"
+                      label={t("profile.dietProfile")}
+                      value={macroProfile}
+                      onChange={saveMacroProfile}
+                      options={[
+                        { id: "standard", label: t("profile.dietStandard") },
+                        { id: "high_protein", label: t("profile.dietHighProtein") },
+                        { id: "low_carb", label: t("profile.dietLowCarb") },
+                        { id: "keto", label: t("profile.dietKeto") },
+                      ]}
+                    />
+                    {/* Manuelt kalorietal — skjules helt med hide_calories */}
+                    {!hideCalories ? (
+                      <NumberField
+                        layout="row"
+                        id="profile-kcal-goal"
+                        field="kcal_goal"
+                        label={t("profile.kcalGoal")}
+                        value={kcalGoal}
+                        onSave={saveKcalGoal}
+                      />
+                    ) : null}
+                  </div>
+                  {!hideCalories && kcalGoal != null ? (
+                    <button
+                      type="button"
+                      onClick={clearKcalGoal}
+                      className="rounded-sm text-caption font-medium text-brand hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+                    >
+                      {t("profile.useComputed")}
+                    </button>
+                  ) : null}
                   <p className="text-small text-tertiary">{t("profile.goalNote")}</p>
-                  {/* Referencen — mini-instrumentaflæsning; respekterer hide_calories */}
+                  <p className="text-caption text-tertiary">{t("profile.dietNote")}</p>
+                  {/* Referencen — mini-instrumentaflæsning; respekterer hide_calories.
+                      Makro-målene viser kostprofilens fordeling med det samme. */}
                   <div className="panel-surface rounded-md px-4 py-3 text-center shadow-panel">
                     <p className="font-mono text-h2 tabular-nums text-panel-ink">
                       {hideCalories
@@ -225,7 +275,16 @@ export function ProfilePage() {
                         : `${nf.format(targets.kcal)} kcal`}
                     </p>
                     <p className="mt-0.5 text-caption font-semibold uppercase tracking-widest text-panel-dim">
-                      {t("profile.reference")}
+                      {kcalGoal != null && !hideCalories
+                        ? t("profile.customGoalLabel")
+                        : t("profile.reference")}
+                    </p>
+                    <p className="mt-2 font-mono text-caption tabular-nums text-panel-dim">
+                      {t("profile.macroSplit", {
+                        protein: targets.protein_g,
+                        carbs: targets.carbohydrate_g,
+                        fat: targets.fat_g,
+                      })}
                     </p>
                   </div>
                   {!bodyComplete ? (

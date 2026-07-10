@@ -83,8 +83,26 @@ export interface MacroTargets {
   fat_g: number;
 }
 
-/** Energiprocent-fordeling for standardmål: 20 % protein, 50 % kulhydrat, 30 % fedt. */
-const ENERGY_SPLIT = { protein: 0.2, carbohydrate: 0.5, fat: 0.3 } as const;
+/**
+ * Kostprofiler (2026-07-10, brugerønske): ændrer KUN energifordelingen
+ * mellem makroerne — kalorie-målet er uafhængigt. Kulhydrat er altid
+ * restenergien, så makro-kcal summer til målet. Splits efter gængse
+ * definitioner (keto ~5 E% kulhydrat). En kostprofil er et VALG, ikke
+ * en anbefaling (ansvarlighedsregler: ingen individuelle kostråd).
+ */
+export const MACRO_PROFILES = {
+  /** 20 % protein · 50 % kulhydrat · 30 % fedt (NNR-standard). */
+  standard: { protein: 0.2, fat: 0.3 },
+  /** 30 % protein · 40 % kulhydrat · 30 % fedt. */
+  high_protein: { protein: 0.3, fat: 0.3 },
+  /** 30 % protein · 25 % kulhydrat · 45 % fedt. */
+  low_carb: { protein: 0.3, fat: 0.45 },
+  /** 25 % protein · ~5 % kulhydrat · 70 % fedt. */
+  keto: { protein: 0.25, fat: 0.7 },
+} as const;
+
+export type MacroProfileId = keyof typeof MACRO_PROFILES;
+
 const KCAL_PER_G = { protein: 4, carbohydrate: 4, fat: 9 } as const;
 
 /** NNR-forenklede default-kcal (godkendt 2026-07-05): neutral reference, ingen vægttabslogik. */
@@ -162,14 +180,18 @@ function kcalFloor(sex: string | null | undefined): number {
   return KCAL_FLOOR[sex ?? ""] ?? KCAL_FLOOR_UNKNOWN;
 }
 
-function targetsFromKcal(kcal: number, weightKg?: number | null): MacroTargets {
+function targetsFromKcal(
+  kcal: number,
+  weightKg?: number | null,
+  split: { protein: number; fat: number } = MACRO_PROFILES.standard,
+): MacroTargets {
   // Protein: mindst 1,2 g/kg (NNR-interval for voksne) når vægten kendes,
-  // dog aldrig under E%-afledningen; fedt 30 E%; kulhydrat = restenergien,
-  // så makro-kcal altid summer til målet.
-  const proteinByEnergy = (kcal * ENERGY_SPLIT.protein) / KCAL_PER_G.protein;
+  // dog aldrig under E%-afledningen; fedt efter kostprofilen; kulhydrat =
+  // restenergien, så makro-kcal altid summer til målet.
+  const proteinByEnergy = (kcal * split.protein) / KCAL_PER_G.protein;
   const proteinByWeight = weightKg != null && weightKg > 0 ? 1.2 * weightKg : 0;
   const proteinRaw = Math.max(proteinByEnergy, proteinByWeight);
-  const fatRaw = (kcal * ENERGY_SPLIT.fat) / KCAL_PER_G.fat;
+  const fatRaw = (kcal * split.fat) / KCAL_PER_G.fat;
   // Resten regnes på de urundede energier, så standardstien (uden vægt)
   // giver præcis den gamle 20/50/30-fordeling.
   const carbohydrate_g = Math.round(
@@ -218,7 +240,14 @@ export function resolveTargets(
     }
   }
 
-  const base = targetsFromKcal(kcal, profile.weightKg);
+  // Kostprofilen styrer fordelingen; ukendt/manglende id → standard.
+  const profileId =
+    typeof goals?.macro_profile === "string" &&
+    goals.macro_profile in MACRO_PROFILES
+      ? (goals.macro_profile as MacroProfileId)
+      : "standard";
+
+  const base = targetsFromKcal(kcal, profile.weightKg, MACRO_PROFILES[profileId]);
   return {
     kcal,
     protein_g: goalNumber("protein_g") ?? base.protein_g,

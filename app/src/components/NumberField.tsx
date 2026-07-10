@@ -8,6 +8,9 @@ export const BOUNDS = {
   weight_kg: { min: 30, max: 300 },
   steps: { min: 0, max: 200000 },
   active_kcal: { min: 0, max: 5000 },
+  /** Manuelt dagligt kalorietal (goals.kcal). Gulvet på 1200 er en
+   *  ansvarligheds-grænse — lavere mål viser vi ikke, punktum. */
+  kcal_goal: { min: 1200, max: 6000 },
 } as const;
 
 export type NumericField = keyof typeof BOUNDS;
@@ -44,7 +47,7 @@ export function NumberField({
     const { min, max } = BOUNDS[field];
     if (Number.isFinite(parsed) && parsed >= min && parsed <= max) {
       const rounded =
-        field === "birth_year" || field === "steps"
+        field === "birth_year" || field === "steps" || field === "kcal_goal"
           ? Math.round(parsed)
           : Math.round(parsed * 10) / 10;
       if (rounded !== value) onSave(field, rounded);

@@ -134,7 +134,7 @@ export function DailyInsightCard({
             disabled={generating}
             className="rounded-sm text-caption font-medium text-brand hover:text-brand-hover disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
           >
-            {generating ? t("insights.generating") : t("diary.insight.regenerate")}
+            {generating ? t("diary.insight.generating") : t("diary.insight.regenerate")}
           </button>
         ) : null}
       </div>
@@ -165,7 +165,7 @@ export function DailyInsightCard({
             onClick={() => void generate()}
             disabled={generating}
           >
-            {generating ? t("insights.generating") : t("diary.insight.generate")}
+            {generating ? t("diary.insight.generating") : t("diary.insight.generate")}
           </Button>
         </div>
       )}

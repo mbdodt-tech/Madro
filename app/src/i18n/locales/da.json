@@ -392,6 +392,7 @@
     "insight": {
       "title": "Dagens indsigt",
       "generate": "Generér dagens indsigt",
+      "generating": "Skriver dagens indsigt…",
       "regenerate": "Generér ny",
       "gateBody": "Få en kort daglig fortælling om, hvordan dagen så ud — gemt under dine måltider."
     },

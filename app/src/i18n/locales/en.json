@@ -392,6 +392,7 @@
     "insight": {
       "title": "Today's insight",
       "generate": "Generate today's insight",
+      "generating": "Writing today's insight…",
       "regenerate": "Generate new",
       "gateBody": "Get a short daily story about how the day went — saved with your meals."
     },

@@ -104,49 +104,54 @@ export function ProfilePage() {
             <section className="space-y-2">
               <SectionLabel icon={UserRound}>{t("profile.aboutYou")}</SectionLabel>
               <Card>
-                <div className="space-y-4">
-                  <p className="text-small text-tertiary">{t("profile.aboutNote")}</p>
+                {/* Kompakte formularrækker ("Lysende instrument", 2026-07-10):
+                    label venstre, værdi højre — hele profilen uden lange strøg. */}
+                <p className="text-small text-tertiary">{t("profile.aboutNote")}</p>
+                <div className="mt-1 divide-y divide-hairline">
                   <PillGroup
+                    layout="row"
                     label={t("profile.sex")}
                     value={profile.sex}
                     onChange={(id) => save({ sex: id })}
                     options={[
                       { id: "female", label: t("profile.sexFemale") },
                       { id: "male", label: t("profile.sexMale") },
-                      { id: "unspecified", label: t("profile.sexUnspecified") },
+                      { id: "unspecified", label: t("profile.sexShort") },
                     ]}
                   />
-                  <div className="grid grid-cols-3 items-end gap-3">
-                    <NumberField
-                      id="profile-birth-year"
-                      field="birth_year"
-                      label={t("profile.birthYear")}
-                      value={profile.birth_year}
-                      onSave={saveNumber}
-                    />
-                    <NumberField
-                      id="profile-height"
-                      field="height_cm"
-                      label={t("profile.heightCm")}
-                      value={profile.height_cm != null ? Number(profile.height_cm) : null}
-                      onSave={saveNumber}
-                    />
-                    <NumberField
-                      id="profile-weight"
-                      field="weight_kg"
-                      label={t("profile.weightKg")}
-                      value={profile.weight_kg != null ? Number(profile.weight_kg) : null}
-                      onSave={saveNumber}
-                    />
-                  </div>
+                  <NumberField
+                    layout="row"
+                    id="profile-birth-year"
+                    field="birth_year"
+                    label={t("profile.birthYear")}
+                    value={profile.birth_year}
+                    onSave={saveNumber}
+                  />
+                  <NumberField
+                    layout="row"
+                    id="profile-height"
+                    field="height_cm"
+                    label={t("profile.heightCm")}
+                    value={profile.height_cm != null ? Number(profile.height_cm) : null}
+                    onSave={saveNumber}
+                  />
+                  <NumberField
+                    layout="row"
+                    id="profile-weight"
+                    field="weight_kg"
+                    label={t("profile.weightKg")}
+                    value={profile.weight_kg != null ? Number(profile.weight_kg) : null}
+                    onSave={saveNumber}
+                  />
                   <PillGroup
+                    layout="row"
                     label={t("profile.activity")}
                     value={profile.activity_level}
                     onChange={(id) => save({ activity_level: id })}
                     options={[
-                      { id: "sedentary", label: t("profile.activitySedentary") },
-                      { id: "moderate", label: t("profile.activityModerate") },
-                      { id: "active", label: t("profile.activityActive") },
+                      { id: "sedentary", label: t("profile.activityShortSedentary") },
+                      { id: "moderate", label: t("profile.activityShortModerate") },
+                      { id: "active", label: t("profile.activityShortActive") },
                     ]}
                   />
                 </div>
@@ -201,13 +206,14 @@ export function ProfilePage() {
               <Card>
                 <div className="space-y-4">
                   <PillGroup
+                    layout="row"
                     label={t("profile.goal")}
                     value={direction}
                     onChange={saveDirection}
                     options={[
-                      { id: "maintain", label: t("profile.goalMaintain") },
-                      { id: "gentle_deficit", label: t("profile.goalDeficit") },
-                      { id: "gentle_surplus", label: t("profile.goalSurplus") },
+                      { id: "maintain", label: t("profile.goalShortMaintain") },
+                      { id: "gentle_deficit", label: t("profile.goalShortDeficit") },
+                      { id: "gentle_surplus", label: t("profile.goalShortSurplus") },
                     ]}
                   />
                   <p className="text-small text-tertiary">{t("profile.goalNote")}</p>

@@ -1,4 +1,4 @@
-import { Button, Skeleton, useToast } from "@madro/ui";
+import { Button, Skeleton, cn, useToast } from "@madro/ui";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -12,6 +12,7 @@ import { EntrySheet } from "./diary/EntrySheet";
 import { MealSections } from "./diary/MealSections";
 import {
   addDays,
+  dayKey,
   ENTRY_TOAST_KEY,
   invalidateDiary,
   isSameDay,
@@ -56,6 +57,10 @@ export function DiaryPage() {
 
   const hasEntries = (entries?.length ?? 0) > 0;
 
+  // Ugestriben: mandag-søndag i den valgte dags uge.
+  const monday = addDays(startOfDay(day), -((day.getDay() + 6) % 7));
+  const weekDays = Array.from({ length: 7 }, (_, i) => addDays(monday, i));
+
   const refresh = () => invalidateDiary();
 
   return (
@@ -74,28 +79,65 @@ export function DiaryPage() {
           </Button>
         </div>
 
-        {/* Dato-navigation — løftet som kort ("Instrumentet": skygge i lys, hårlinje i mørk) */}
-        <div className="flex items-center justify-between rounded-lg border border-card-edge bg-surface px-2 py-1.5 shadow-1">
-          <button
-            type="button"
-            onClick={() => setDay((d) => addDays(d, -1))}
-            aria-label={t("diary.prevDay")}
-            className="grid size-9 place-items-center rounded-pill text-secondary hover:bg-brand-tint hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
-          >
-            <ChevronLeft className="size-5" aria-hidden="true" />
-          </button>
-          <p className="text-body font-medium text-ink first-letter:uppercase" aria-live="polite">
-            {dateLabel}
-          </p>
-          <button
-            type="button"
-            onClick={() => setDay((d) => addDays(d, 1))}
-            disabled={isToday}
-            aria-label={t("diary.nextDay")}
-            className="grid size-9 place-items-center rounded-pill text-secondary hover:bg-brand-tint hover:text-brand focus-visible:outline-2 focus-visible:outline-brand disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-secondary"
-          >
-            <ChevronRight className="size-5" aria-hidden="true" />
-          </button>
+        {/* Ugestriben ("Lysende instrument", 2026-07-10): syv dage med
+            ét-tryks-navigation; pilene hopper en uge. Fremtid deaktiveret. */}
+        <div className="rounded-lg border border-card-edge bg-surface px-2 py-2 shadow-1">
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => setDay((d) => addDays(d, -7))}
+              aria-label={t("diary.prevWeek")}
+              className="grid size-8 place-items-center rounded-pill text-secondary hover:bg-brand-tint hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
+            >
+              <ChevronLeft className="size-4" aria-hidden="true" />
+            </button>
+            <p
+              className="text-small font-medium text-ink first-letter:uppercase"
+              aria-live="polite"
+            >
+              {dateLabel}
+            </p>
+            <button
+              type="button"
+              onClick={() => setDay((d) => (isSameDay(addDays(d, 7), new Date()) || addDays(d, 7) < new Date() ? addDays(d, 7) : startOfDay(new Date())))}
+              disabled={isToday}
+              aria-label={t("diary.nextWeek")}
+              className="grid size-8 place-items-center rounded-pill text-secondary hover:bg-brand-tint hover:text-brand focus-visible:outline-2 focus-visible:outline-brand disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-secondary"
+            >
+              <ChevronRight className="size-4" aria-hidden="true" />
+            </button>
+          </div>
+          <div className="mt-1.5 grid grid-cols-7 gap-1" role="group" aria-label={t("diary.weekLabel")}>
+            {weekDays.map((d) => {
+              const selected = isSameDay(d, day);
+              const future = startOfDay(d) > startOfDay(new Date());
+              return (
+                <button
+                  key={dayKey(d)}
+                  type="button"
+                  disabled={future}
+                  onClick={() => setDay(startOfDay(d))}
+                  aria-pressed={selected}
+                  className={cn(
+                    "flex flex-col items-center rounded-md py-1.5 transition-colors focus-visible:outline-2 focus-visible:outline-brand",
+                    selected
+                      ? "bg-brand text-on-brand"
+                      : future
+                        ? "text-tertiary opacity-40"
+                        : "text-secondary hover:bg-brand-tint hover:text-brand",
+                  )}
+                >
+                  <span className="text-caption font-semibold uppercase">
+                    {new Intl.DateTimeFormat(
+                      i18n.language === "da" ? "da-DK" : "en-GB",
+                      { weekday: "narrow" },
+                    ).format(d)}
+                  </span>
+                  <span className="font-mono text-small tabular-nums">{d.getDate()}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {isLoading ? (

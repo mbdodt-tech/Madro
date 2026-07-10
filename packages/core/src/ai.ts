@@ -85,6 +85,19 @@ export const aiResultSchemas = {
       )
       .max(4),
   }),
+  /** Dagens fortælling (2026-07-10, brugerønske): kortere end ugens,
+   *  fremadrettet ("i morgen kunne…"), aldrig bebrejdende. */
+  daily_insight: z.object({
+    narrative: z.string().min(1).max(450),
+    suggestions: z
+      .array(
+        z.object({
+          food: z.string().min(1).max(80),
+          reason: z.string().min(1).max(200),
+        }),
+      )
+      .max(3),
+  }),
 } as const;
 
 export type AiTask = keyof typeof aiResultSchemas;

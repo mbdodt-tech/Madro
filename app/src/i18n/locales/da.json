@@ -28,6 +28,16 @@
   "home": {
     "designLink": "Designsystem"
   },
+  "activity": {
+    "addButton": "Tilføj aktivitet",
+    "sheetTitle": "Tilføj aktivitet",
+    "typeLabel": "Aktivitet",
+    "durationLabel": "Varighed",
+    "estimateLabel": "Estimat ud fra din vægt",
+    "weightHint": "Udfyld din vægt i profilen, så bliver estimatet mere præcist — lige nu regner vi med 70 kg.",
+    "add": "Læg til dagens aktivitet",
+    "added": "Aktivitet tilføjet — +{{kcal}} kcal"
+  },
   "nova": {
     "open": "Hvad er NOVA?",
     "title": "Hvad er NOVA?",
@@ -369,6 +379,12 @@
     "removed": "Posten er fjernet",
     "enriched": "Næringstal hentet fra verificeret kilde",
     "swapped": "Skiftet til andet opslag",
+    "insight": {
+      "title": "Dagens indsigt",
+      "generate": "Generér dagens indsigt",
+      "regenerate": "Generér ny",
+      "gateBody": "Få en kort daglig fortælling om, hvordan dagen så ud — gemt under dine måltider."
+    },
     "addToMeal": "Tilføj til {{meal}}",
     "swap": {
       "button": "Skift til andet opslag",
@@ -552,6 +568,8 @@
     "activated": "Prøven er aktiv — god fornøjelse",
     "deactivated": "Beta-premium er slået fra",
     "deactivateBeta": "Slå beta-premium fra",
+    "haveTitle": "Det har du nu",
+    "featDailyInsight": "Daglige og ugentlige AI-indsigter om din kost",
     "continueFree": "Fortsæt gratis",
     "freeStays": "Gratis-udgaven forbliver fuldt brugbar",
     "alreadyTitle": "Du har Premium",

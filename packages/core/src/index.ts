@@ -57,6 +57,13 @@ export {
   type PortionUnitId,
 } from "./portions/portions";
 
+export {
+  ACTIVITY_TYPES,
+  activityKcal,
+  DEFAULT_WEIGHT_KG,
+  type ActivityType,
+} from "./activities";
+
 export { ADDITIVE_INFO, lookupAdditive, type AdditiveInfo } from "./additives";
 
 export { isSupplementFood, SUPPLEMENT_CATEGORY } from "./supplements";

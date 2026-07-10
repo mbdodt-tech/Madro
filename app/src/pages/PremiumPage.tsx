@@ -105,6 +105,32 @@ export function PremiumPage() {
                   <p className="text-small text-panel-dim">{t("premium.alreadyBody")}</p>
                 </div>
               </Panel>
+
+              {/* "Det har du nu" (2026-07-10): premium føltes tyndt, fordi
+                  funktionslisten forsvandt efter aktivering — vis den. */}
+              <div className="rounded-lg border border-card-edge bg-surface p-4 shadow-1">
+                <h2 className="mb-3 text-caption font-semibold uppercase tracking-widest text-tertiary">
+                  {t("premium.haveTitle")}
+                </h2>
+                <ul className="space-y-3" aria-label={t("premium.featuresLabel")}>
+                  <FeatureLine icon={<Sparkles className="size-4" aria-hidden="true" />}>
+                    {t("premium.featDailyInsight")}
+                  </FeatureLine>
+                  <FeatureLine icon={<Camera className="size-4" aria-hidden="true" />}>
+                    {t("premium.featPhoto")}
+                  </FeatureLine>
+                  <FeatureLine icon={<MessageSquareText className="size-4" aria-hidden="true" />}>
+                    {t("premium.featText")}
+                  </FeatureLine>
+                  <FeatureLine icon={<Repeat className="size-4" aria-hidden="true" />}>
+                    {t("premium.featAlternatives")}
+                  </FeatureLine>
+                  <FeatureLine icon={<FileDown className="size-4" aria-hidden="true" />}>
+                    {t("premium.featExport")}
+                  </FeatureLine>
+                </ul>
+              </div>
+
               <Button
                 variant="ghost"
                 size="sm"

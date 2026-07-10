@@ -28,6 +28,16 @@
   "home": {
     "designLink": "Design system"
   },
+  "activity": {
+    "addButton": "Add activity",
+    "sheetTitle": "Add activity",
+    "typeLabel": "Activity",
+    "durationLabel": "Duration",
+    "estimateLabel": "Estimate based on your weight",
+    "weightHint": "Add your weight in the profile for a more precise estimate — right now we assume 70 kg.",
+    "add": "Add to today's activity",
+    "added": "Activity added — +{{kcal}} kcal"
+  },
   "nova": {
     "open": "What is NOVA?",
     "title": "What is NOVA?",
@@ -369,6 +379,12 @@
     "removed": "Entry removed",
     "enriched": "Nutrition filled from a verified source",
     "swapped": "Switched to another match",
+    "insight": {
+      "title": "Today's insight",
+      "generate": "Generate today's insight",
+      "regenerate": "Generate new",
+      "gateBody": "Get a short daily story about how the day went — saved with your meals."
+    },
     "addToMeal": "Add to {{meal}}",
     "swap": {
       "button": "Switch to another match",
@@ -552,6 +568,8 @@
     "activated": "Trial active — enjoy",
     "deactivated": "Beta premium turned off",
     "deactivateBeta": "Turn off beta premium",
+    "haveTitle": "What you have now",
+    "featDailyInsight": "Daily and weekly AI insights about your food",
     "continueFree": "Continue for free",
     "freeStays": "The free tier stays fully usable",
     "alreadyTitle": "You have Premium",

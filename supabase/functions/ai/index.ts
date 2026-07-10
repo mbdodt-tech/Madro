@@ -178,6 +178,46 @@ const weeklyInsightResult = z.object({
     .max(4),
 });
 
+// ---- daily_insight (2026-07-10): dagens tal → kort fortælling ----
+// Payload er KUN tal/navne fra daily_summaries — aldrig brugerfritekst.
+const dailyInsightPayload = z.object({
+  locale: z.enum(["da", "en"]),
+  stats: z.object({
+    kcal: z.number().min(0).max(10000).optional(),
+    novaShare: z.number().min(0).max(100).optional(),
+    proteinG: z.number().min(0).max(500).optional(),
+    mealsLogged: z.number().int().min(0).max(30),
+    lowestMicros: z
+      .array(z.object({ name: z.string().min(1).max(60), pct: z.number().min(0).max(500) }))
+      .max(3),
+  }),
+});
+
+const dailyInsightResult = z.object({
+  narrative: z.string().min(1).max(450),
+  suggestions: z
+    .array(
+      z.object({
+        food: z.string().min(1).max(80),
+        reason: z.string().min(1).max(200),
+      }),
+    )
+    .max(3),
+});
+
+const DAILY_INSIGHT_SYSTEM = `Opgave: Skriv DAGENS kost-indsigt ud fra talgrundlaget (én dag).
+- Returnér JSON: {"narrative": string, "suggestions": [{"food","reason"}]}.
+- "narrative": 2-3 KORTE sætninger i almindeligt sprog på det angivne sprog.
+  Beskriv dagen neutralt og peg fremad ("i morgen kunne…", "et godt næste
+  skridt er…"). ALDRIG bebrejdelse, aldrig "for meget", "du burde",
+  "desværre" eller lignende. Omtal forarbejdningsgrad via NOVA
+  ("X % af dagens mad var ikke-ultraforarbejdet").
+- Nævn KUN kalorier, hvis kcal er med i talgrundlaget.
+- "suggestions": 0-3 konkrete fødevarer, der naturligt løfter dagens
+  laveste mikronæringsstoffer, med en kort, saglig grund.
+- Ved få måltider (mealsLogged < 2): hold fortællingen ekstra kort og
+  konstater roligt, at dagen er sparsomt logget.`;
+
 const WEEKLY_INSIGHT_SYSTEM = `Opgave: Skriv ugens kost-indsigt ud fra talgrundlaget.
 - Returnér JSON: {"narrative": string, "suggestions": [{"food","reason"}]}.
 - "narrative": 2-4 korte sætninger i almindeligt sprog på det angivne sprog.
@@ -292,6 +332,18 @@ const tasks: Record<
         system: WEEKLY_INSIGHT_SYSTEM,
         user: `Sprog: ${locale}\nTalgrundlag: ${JSON.stringify(stats)}`,
         schema: weeklyInsightResult,
+        maxTokens: 1024,
+      });
+    },
+  },
+  daily_insight: {
+    schema: dailyInsightPayload,
+    handler: async (payload) => {
+      const { locale, stats } = payload as z.infer<typeof dailyInsightPayload>;
+      return askClaude({
+        system: DAILY_INSIGHT_SYSTEM,
+        user: `Sprog: ${locale}\nTalgrundlag: ${JSON.stringify(stats)}`,
+        schema: dailyInsightResult,
         maxTokens: 1024,
       });
     },

@@ -59,6 +59,56 @@ export interface InsightContent {
   stats: Record<string, unknown>;
 }
 
+/** Dagens persisterede AI-indsigt (kind="daily"; null = ikke genereret). */
+export function useDailyInsight(day: Date) {
+  const key = dayKey(day);
+  return useQuery<InsightRow | null>({
+    queryKey: ["insight-daily", key],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("insights")
+        .select("*")
+        .eq("kind", "daily")
+        .eq("period_start", key)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+/**
+ * Persistér dagens indsigt. "Generér ny" erstatter den gamle for dagen
+ * (delete + insert — tabellen har ingen unik nøgle pr. periode).
+ */
+export async function saveDailyInsight(
+  day: Date,
+  content: InsightContent,
+): Promise<void> {
+  const { data: session } = await supabase.auth.getSession();
+  const userId = session.session?.user.id;
+  if (!userId) throw new Error("not_authenticated");
+  const key = dayKey(day);
+  await supabase
+    .from("insights")
+    .delete()
+    .eq("kind", "daily")
+    .eq("period_start", key);
+  const { data, error } = await supabase
+    .from("insights")
+    .insert({
+      user_id: userId,
+      kind: "daily",
+      period_start: key,
+      period_end: key,
+      content: JSON.parse(JSON.stringify(content)),
+    })
+    .select()
+    .single();
+  if (error) throw error;
+  queryClient.setQueryData(["insight-daily", key], data);
+}
+
 /** Persistér ugens indsigt (RLS: egen bruger) og opdatér cachen. */
 export async function saveWeeklyInsight(
   weekStart: Date,

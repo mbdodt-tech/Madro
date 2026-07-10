@@ -7,6 +7,7 @@ import { ErrorState } from "../components/ErrorState";
 import { TabShell } from "../components/TabShell";
 import { AddFoodSheet } from "./diary/AddFoodSheet";
 import type { Meal } from "./scan/logMeal";
+import { DailyInsightCard } from "./diary/DailyInsightCard";
 import { DaySummaryCard } from "./diary/DaySummaryCard";
 import { EntrySheet } from "./diary/EntrySheet";
 import { MealSections } from "./diary/MealSections";
@@ -158,6 +159,8 @@ export function DiaryPage() {
             {/* Dagens overblik (2026-07-09): kvalitet, makroer og
                 mikro-dækning for den viste dag — kompakt instrumentpanel */}
             <DaySummaryCard day={day} />
+            {/* Dagens AI-indsigt (2026-07-10) — gemmes under dagen */}
+            <DailyInsightCard day={day} mealsLogged={entries?.length ?? 0} />
             <MealSections
               entries={entries ?? []}
               onEntryClick={setEditing}

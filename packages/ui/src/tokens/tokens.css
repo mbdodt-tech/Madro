@@ -27,7 +27,7 @@
   --surface-raised: #ffffff;
   --ink: #23282a;
   --text-secondary: #5d6863;
-  --text-tertiary: #98a09c;
+  --text-tertiary: #767e7a; /* mørkere: klarer WCAG-kontrast på porcelæn (A11Y-1); var #98a09c (2,5:1) */
   --brand: #0f766e; /* dyb teal — handling (grønnen bor nu kun i buen) */
   --brand-raise: #149482; /* gradient-top på primærknapper/FAB */
   --brand-hover: #0b5f58;

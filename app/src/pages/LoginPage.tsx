@@ -163,7 +163,8 @@ export function LoginPage() {
           </form>
         </Card>
 
-        <p className="mt-6 text-center text-caption text-tertiary">
+        {/* Meningsbærende tekst → secondary for WCAG AA-kontrast (A11Y-1). */}
+        <p className="mt-6 text-center text-caption text-secondary">
           {t("auth.tagline")}
         </p>
       </div>

@@ -338,12 +338,17 @@ export function ProfilePage() {
                     ]}
                   />
                   <div className="flex items-center justify-between border-t border-hairline pt-4">
-                    <Link
-                      className="text-small font-medium text-brand hover:text-brand-hover"
-                      to="/design"
-                    >
-                      {t("home.designLink")}
-                    </Link>
+                    {/* Intern specimen-side kun i udvikling — ikke et prod-link (MISC-1). */}
+                    {import.meta.env.DEV ? (
+                      <Link
+                        className="text-small font-medium text-brand hover:text-brand-hover"
+                        to="/design"
+                      >
+                        {t("home.designLink")}
+                      </Link>
+                    ) : (
+                      <span />
+                    )}
                     <Button
                       variant="secondary"
                       size="sm"

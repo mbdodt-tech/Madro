@@ -1321,3 +1321,19 @@ begin
      and f.source_ref = n.source_ref
      and f.nova_group is distinct from n.nova;
 end $$;
+
+-- Genberegn dagsopsummeringer, der rører en Frida-vare, så kvalitetsbuen
+-- opdateres for allerede loggede dage. Uden dette venter nova_share på næste
+-- logning, fordi triggeren kun fyrer på log_entries — ikke på foods.
+do $$
+declare r record;
+begin
+  for r in
+    select distinct le.user_id, public.madro_local_day(le.consumed_at, le.user_id) as day
+    from public.log_entries le
+    join public.foods f on f.id = le.food_id
+    where f.source = 'frida'
+  loop
+    perform public.recompute_daily_summary(r.user_id, r.day);
+  end loop;
+end $$;

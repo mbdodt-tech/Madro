@@ -16,7 +16,7 @@ import { useEntitlements } from "../payments/useEntitlements";
 import { invalidateDiary } from "./diary/useDiary";
 import { LabelCaptureStep } from "./scan/LabelCaptureStep";
 import { PhotoMealSheet } from "./scan/PhotoMealSheet";
-import { ResultSheet } from "./scan/ResultSheet";
+import { ResultView } from "./scan/ResultSheet";
 
 type Phase =
   | { kind: "scanning"; cameraError: boolean }
@@ -142,6 +142,31 @@ export function ScanPage() {
 
   const scanning = phase.kind === "scanning";
 
+  // ÉT fælles Sheet for hele scan-resultatet (audit 2026-07-20, BUG-1):
+  // tidligere havde hver fase sit eget modale Sheet, og et fase-skift lod
+  // to Radix-dialoger overlappe under exit-animationen — det efterlod
+  // document.body med pointer-events: none, så "Jeg spiste det" (og
+  // fallback-inputtet, BUG-2) hang. Nu switcher vi ét Sheet's børn, præcis
+  // som det manuelle "Tilføj måltid"-flow (AddFoodSheet). Titel + synlighed
+  // afhænger af fasen.
+  const sheetHeader: { title: string; show: boolean } =
+    phase.kind === "looking-up"
+      ? {
+          title: phase.deep ? t("scan.lookingUpDeep") : t("scan.lookingUp"),
+          show: false,
+        }
+      : phase.kind === "hit"
+        ? { title: t("verdict.sheetTitle"), show: false }
+        : phase.kind === "miss"
+          ? { title: t("scan.missTitle"), show: true }
+          : phase.kind === "error"
+            ? { title: t("scan.errorTitle"), show: true }
+            : phase.kind === "label"
+              ? { title: t("scan.label.title"), show: true }
+              : phase.kind === "photo"
+                ? { title: t("scan.photo.title"), show: true }
+                : { title: "", show: false };
+
   return (
     <div className="fixed inset-0 z-40 flex flex-col bg-ink font-sans">
       {/* Kamera */}
@@ -245,55 +270,43 @@ export function ScanPage() {
         </button>
       </div>
 
-      {/* Slår op … */}
+      {/* ÉT Sheet for alle scan-faser — se kommentaren ved sheetHeader.
+          Ingen to modale dialoger overlapper længere ved fase-skift. */}
       <Sheet
-        open={phase.kind === "looking-up"}
-        onOpenChange={() => undefined}
-        title={
-          phase.kind === "looking-up" && phase.deep
-            ? t("scan.lookingUpDeep")
-            : t("scan.lookingUp")
-        }
-      >
-        <div className="space-y-3 py-2" aria-live="polite">
-          {phase.kind === "looking-up" && phase.deep ? (
-            <p className="text-small text-secondary">{t("scan.lookingUpDeepBody")}</p>
-          ) : null}
-          <Skeleton className="h-5 w-2/3" />
-          <Skeleton className="h-4 w-1/3" />
-        </div>
-      </Sheet>
-
-      {/* Hit: fuldt verdikt-ark (1.4) */}
-      {phase.kind === "hit" ? (
-        <ResultSheet
-          food={phase.food}
-          scanId={phase.scanId}
-          open
-          onClose={close}
-          onSwapFood={(alternative) =>
-            setPhase({ kind: "hit", food: alternative, scanId: phase.scanId })
-          }
-          onLogged={() => {
-            // Sørg for at Dagbog + "I dag" (summary) er friske ved hjemkomst,
-            // uanset staleTime.
-            invalidateDiary();
-            show(t("portion.logged"));
-            close();
-          }}
-        />
-      ) : null}
-
-      {/* Måltidsfoto (2.2) */}
-      <Sheet
-        open={phase.kind === "photo"}
+        open={!scanning}
         onOpenChange={(open) => {
-          if (!open) close();
+          if (open) return;
+          // Under selve opslaget kan arket ikke afvises (uændret adfærd).
+          if (phase.kind === "looking-up") return;
+          close();
         }}
-        title={t("scan.photo.title")}
-        showTitle
+        title={sheetHeader.title}
+        showTitle={sheetHeader.show}
       >
-        {phase.kind === "photo" ? (
+        {phase.kind === "looking-up" ? (
+          <div className="space-y-3 py-2" aria-live="polite">
+            {phase.deep ? (
+              <p className="text-small text-secondary">{t("scan.lookingUpDeepBody")}</p>
+            ) : null}
+            <Skeleton className="h-5 w-2/3" />
+            <Skeleton className="h-4 w-1/3" />
+          </div>
+        ) : phase.kind === "hit" ? (
+          <ResultView
+            food={phase.food}
+            scanId={phase.scanId}
+            onSwapFood={(alternative) =>
+              setPhase({ kind: "hit", food: alternative, scanId: phase.scanId })
+            }
+            onLogged={() => {
+              // Sørg for at Dagbog + "I dag" (summary) er friske ved
+              // hjemkomst, uanset staleTime.
+              invalidateDiary();
+              show(t("portion.logged"));
+              close();
+            }}
+          />
+        ) : phase.kind === "photo" ? (
           // Fotologning er premium (gating-beslutning 2026-07-09) — de
           // dyre AI-kald bor bag paywallen, gratis-scanning røres ikke.
           !entitlementsReady ? (
@@ -309,38 +322,14 @@ export function ScanPage() {
           ) : (
             <PremiumTeaser body={t("premium.gatePhoto")} />
           )
-        ) : null}
-      </Sheet>
-
-      {/* Fejl (offline/serverfejl) — adskilt fra ærligt miss */}
-      <Sheet
-        open={phase.kind === "error"}
-        onOpenChange={(open) => {
-          if (!open) close();
-        }}
-        title={t("scan.errorTitle")}
-        showTitle
-      >
-        {phase.kind === "error" ? (
+        ) : phase.kind === "error" ? (
           <div className="space-y-4">
             <p className="text-small text-secondary">{t("scan.errorBody")}</p>
             <Button className="w-full" onClick={() => retryLookup(phase.barcode)}>
               {t("common.retry")}
             </Button>
           </div>
-        ) : null}
-      </Sheet>
-
-      {/* Miss */}
-      <Sheet
-        open={phase.kind === "miss"}
-        onOpenChange={(open) => {
-          if (!open) close();
-        }}
-        title={t("scan.missTitle")}
-        showTitle
-      >
-        {phase.kind === "miss" ? (
+        ) : phase.kind === "miss" ? (
           <div className="space-y-4">
             <p className="text-small text-secondary">
               {t("scan.missBody", { barcode: phase.barcode })}
@@ -403,27 +392,13 @@ export function ScanPage() {
               {t("scan.label.openButton")}
             </Button>
           </div>
-        ) : null}
-      </Sheet>
-
-      {/* Deklarationsfoto (2.3) */}
-      <Sheet
-        open={phase.kind === "label"}
-        onOpenChange={(open) => {
-          if (!open) close();
-        }}
-        title={t("scan.label.title")}
-        showTitle
-      >
-        {phase.kind === "label" ? (
+        ) : phase.kind === "label" ? (
           <LabelCaptureStep
             barcode={phase.barcode}
             onBack={() =>
               setPhase({ kind: "miss", barcode: phase.barcode, scanId: phase.scanId })
             }
-            onSaved={(food) =>
-              setPhase({ kind: "hit", food, scanId: phase.scanId })
-            }
+            onSaved={(food) => setPhase({ kind: "hit", food, scanId: phase.scanId })}
           />
         ) : null}
       </Sheet>

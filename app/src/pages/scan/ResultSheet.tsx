@@ -5,7 +5,7 @@ import {
   type CoreVerdictLevel,
   type NutrientMap,
 } from "@madro/core";
-import { Button, Chip, Sheet, VerdiktBadge, cn } from "@madro/ui";
+import { Button, Chip, VerdiktBadge, cn } from "@madro/ui";
 import { motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -56,18 +56,23 @@ function MacroLine({ nutriments }: { nutriments: NutrientMap }) {
   );
 }
 
-export function ResultSheet({
+/**
+ * Verdikt-indholdet (fase 1.4). Renderes som INDHOLD i scan-flowets ene
+ * fælles Sheet — ejer bevidst IKKE sin egen dialog. Tidligere var det et
+ * selvstændigt <Sheet>, hvilket lod to modale Radix-dialoger overlappe
+ * under fase-skift (looking-up → hit) og efterlod document.body med
+ * pointer-events: none, så "Jeg spiste det" hang (audit 2026-07-20,
+ * BUG-1). Nu switcher ScanPage ét Sheet's børn — samme kontrakt som
+ * det manuelle "Tilføj måltid"-flow.
+ */
+export function ResultView({
   food,
   scanId,
-  open,
-  onClose,
   onLogged,
   onSwapFood,
 }: {
   food: FoodHit;
   scanId: string | null;
-  open: boolean;
-  onClose: () => void;
   onLogged: () => void;
   /** Åbn et alternativs eget verdikt-ark (fase 2.5). */
   onSwapFood?: (food: FoodHit) => void;
@@ -94,15 +99,7 @@ export function ResultSheet({
   const additives = (food.additives ?? []) as string[];
   const nutriments = (food.nutriments ?? {}) as NutrientMap;
 
-  return (
-    <Sheet
-      open={open}
-      onOpenChange={(o) => {
-        if (!o) onClose();
-      }}
-      title={t("verdict.sheetTitle")}
-    >
-      {step === "verdict" ? (
+  return step === "verdict" ? (
         <div className="space-y-4">
           <button
             type="button"
@@ -287,7 +284,5 @@ export function ResultSheet({
             onSwapFood?.(alternative);
           }}
         />
-      )}
-    </Sheet>
-  );
+      );
 }

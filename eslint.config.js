@@ -27,6 +27,13 @@ export default tseslint.config(
     },
   },
   {
+    // Node-side maintenance-scripts (fx Frida-NOVA-generatoren) kører under Node.
+    files: ["scripts/**/*.mjs"],
+    languageOptions: {
+      globals: { ...globals.node },
+    },
+  },
+  {
     files: ["app/**/*.{ts,tsx}", "packages/ui/**/*.{ts,tsx}"],
     plugins: {
       "react-hooks": reactHooks,

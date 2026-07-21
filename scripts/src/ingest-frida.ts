@@ -12,7 +12,7 @@
  * 2026), Fødevareinstituttet, DTU". `source='frida'`, `data_quality='verified'`.
  */
 
-import { mapFridaColumns } from "@madro/core";
+import { fridaNovaGroup, mapFridaColumns } from "@madro/core";
 import { DuckDBInstance } from "@duckdb/node-api";
 import "dotenv/config";
 import { createWriteStream } from "node:fs";
@@ -68,13 +68,16 @@ async function main(): Promise<void> {
   const con = await instance.connect();
   await con.run("INSTALL excel; LOAD excel;");
 
-  // FoodID → dansk navn
+  // FoodID → dansk navn + fødevaregruppe (gruppen driver NOVA, se @madro/core).
   const foodSheet = await readSheet(con, "Food");
   const names = new Map<string, string>();
+  const groups = new Map<string, string>();
   for (const row of foodSheet) {
     const id = String(row["FoodID"] ?? "").trim();
     const name = String(row["FødevareNavn"] ?? "").trim();
+    const groupId = String(row["FoodGroupID"] ?? "").trim();
     if (id && name) names.set(id, name);
+    if (id && groupId) groups.set(id, groupId);
   }
   console.info(`Food-ark: ${names.size} fødevarenavne.`);
 
@@ -97,7 +100,10 @@ async function main(): Promise<void> {
       name: name.slice(0, 500),
       brand: null,
       categories: [],
-      nova_group: null,
+      // NOVA udledes af DTU-fødevaregruppen (audit 2026-07-20, DESIGN-1) — så
+      // whole foods indgår i kvalitetsbuen. Backfill af eksisterende rækker
+      // sker i migrationen 20260721091500_frida_nova_backfill.sql.
+      nova_group: fridaNovaGroup(groups.get(id)),
       nutriscore: null,
       additives: [],
       ingredients_text: null,

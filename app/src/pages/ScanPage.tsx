@@ -197,8 +197,10 @@ export function ScanPage() {
           </div>
         ) : null}
 
-        {/* Viewfinder */}
-        <div className="absolute inset-0 grid place-items-center">
+        {/* Viewfinder — rent dekorativt (aria-hidden): må ALDRIG opsnappe
+            pointer-events, så et fejlramt tryk nær inputtet ikke lander på
+            en død overlay-flade (audit 2026-07-20, BUG-2-hærdning). */}
+        <div className="pointer-events-none absolute inset-0 grid place-items-center">
           <div className="relative h-44 w-72">
             {(["tl", "tr", "bl", "br"] as const).map((corner) => (
               <span
@@ -226,7 +228,7 @@ export function ScanPage() {
           </div>
         </div>
 
-        <p className="absolute inset-x-0 bottom-6 text-center text-small text-bg/75">
+        <p className="pointer-events-none absolute inset-x-0 bottom-6 text-center text-small text-bg/75">
           {scanning && phase.cameraError ? t("scan.cameraError") : t("scan.hint")}
         </p>
       </div>

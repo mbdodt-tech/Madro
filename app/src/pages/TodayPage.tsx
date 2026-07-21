@@ -3,7 +3,6 @@ import {
   micronutrientCoverage,
   NUTRIENT_INFO,
   resolveTargets,
-  type NutrientKey,
   type NutrientMap,
 } from "@madro/core";
 import {
@@ -19,36 +18,48 @@ import {
 } from "@madro/ui";
 import { Eye, EyeOff, Plus, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { persistHideCalories, useProfile } from "../auth/useProfile";
 import { useSession } from "../auth/useSession";
+import { ActivityQuickCard } from "../components/ActivityQuickCard";
 import { ErrorState } from "../components/ErrorState";
 import { TabShell } from "../components/TabShell";
 import { useReferences } from "../lib/useReferences";
 import { AddFoodSheet } from "./diary/AddFoodSheet";
 import { EntrySheet } from "./diary/EntrySheet";
 import { MealSections } from "./diary/MealSections";
+import type { Meal } from "./scan/logMeal";
 import {
+  addDays,
   ENTRY_TOAST_KEY,
   invalidateDiary,
+  MICRO_LETTERS,
   useDailySummary,
   useDiaryEntries,
   type DiaryEntry,
 } from "./diary/useDiary";
 import { useTodayActivity } from "./profile/useBody";
 
-/** Korte søjle-labels til striben (grundstof-/vitaminforkortelser). */
-const MICRO_LETTERS: Partial<Record<NutrientKey, string>> = {
-  vitamin_d_ug: "D",
-  iron_mg: "Fe",
-  magnesium_mg: "Mg",
-  calcium_mg: "Ca",
-  potassium_mg: "K",
-  vitamin_b12_ug: "B12",
-  folate_ug: "Fo",
-  zinc_mg: "Zn",
+/** Forside-hook (2026-07-07): tidsbevidst handlingskort. Vises når det
+ *  aktuelle måltidsvindue endnu ikke er logget — ellers kun ved helt tom
+ *  dag. Invitation, aldrig formaning (CLAUDE.md: ingen guilt-mekanik). */
+type HookKind = "morning" | "lunch" | "dinner" | "quiet";
+
+const HOOK_COPY: Record<HookKind, { title: string; body: string }> = {
+  morning: { title: "today.hook.morningTitle", body: "today.hook.morningBody" },
+  lunch: { title: "today.hook.lunchTitle", body: "today.hook.lunchBody" },
+  dinner: { title: "today.hook.dinnerTitle", body: "today.hook.dinnerBody" },
+  quiet: { title: "today.hook.quietTitle", body: "today.hook.quietBody" },
 };
+
+function mealHook(hour: number, entries: DiaryEntry[]): HookKind | null {
+  const logged = new Set(entries.map((e) => e.meal));
+  if (hour >= 5 && hour < 10 && !logged.has("breakfast")) return "morning";
+  if (hour >= 11 && hour < 14 && !logged.has("lunch")) return "lunch";
+  if (hour >= 17 && hour < 21 && !logged.has("dinner")) return "dinner";
+  return entries.length === 0 ? "quiet" : null;
+}
 
 function qualityCaptionKey(pct: number | null): string {
   if (pct == null) return "today.quality.empty";
@@ -81,7 +92,8 @@ export function TodayPage() {
   const { data: referenceRows } = useReferences(profile?.rda_region ?? undefined);
 
   const [editing, setEditing] = useState<DiaryEntry | null>(null);
-  const [adding, setAdding] = useState(false);
+  // null = lukket; { meal } = åben, evt. med forudvalgt måltid (sektions-plus)
+  const [adding, setAdding] = useState<{ meal?: Meal } | null>(null);
 
   const hideCalories = profile?.hide_calories ?? false;
   const isLoading = entriesLoading || profileLoading || summaryLoading;
@@ -128,6 +140,16 @@ export function TodayPage() {
         : NUTRIENT_INFO[c.key].labelEn,
     pct: c.pct,
   }));
+
+  // Gårsdags-teaser (hook 2): vises kun mens dagens måler stadig er blank,
+  // og kun når gårsdagen var ren (>= 65) — aldrig som bebrejdelse.
+  const { data: yesterdaySummary } = useDailySummary(addDays(today, -1));
+  const yesterdayPct =
+    yesterdaySummary?.nova_share != null
+      ? Math.round(Number(yesterdaySummary.nova_share))
+      : null;
+  const showYesterdayHook = sharePct == null && yesterdayPct != null && yesterdayPct >= 65;
+  const hook = mealHook(today.getHours(), entries ?? []);
 
   const kcalNow = Math.round(Number(summary?.kcal ?? 0));
   // Dagens aktive energi (3.2) lægges neutralt oven i referencen — kun
@@ -268,14 +290,51 @@ export function TodayPage() {
           </Panel>
         )}
 
-        {/* Indsigtsteaser — tintet mellemtrin; linker til paywallen (4.3) */}
+        {/* Forside-hook 1: tidsbevidst handlingskort (2026-07-07) */}
+        {!isLoading && !isError && hook ? (
+          <section className="rounded-lg border border-card-edge bg-surface p-4 shadow-1">
+            <h2 className="text-body font-semibold text-ink">
+              {t(HOOK_COPY[hook].title)}
+            </h2>
+            <p className="mt-0.5 text-small text-secondary">{t(HOOK_COPY[hook].body)}</p>
+            <div className="mt-3 flex gap-2">
+              <Button size="sm" onClick={() => navigate("/scan")}>
+                {t("today.hook.scan")}
+              </Button>
+              <Button size="sm" variant="secondary" onClick={() => setAdding({})}>
+                {t("today.hook.add")}
+              </Button>
+            </div>
+          </section>
+        ) : null}
+
+        {/* Forside-hook 2: gårsdagens kvalitet som nysgerrigheds-krog */}
+        {!isLoading && !isError && showYesterdayHook ? (
+          <p className="rounded-lg border border-card-edge bg-surface px-4 py-3 text-small text-secondary shadow-1">
+            <Trans
+              i18nKey="today.hook.yesterday"
+              values={{ pct: yesterdayPct }}
+              components={{
+                pct: <strong className="font-mono font-medium tabular-nums text-brand" />,
+              }}
+            />
+          </p>
+        ) : null}
+
+        {/* Aktivitet i dag — skridt/aktiv energi direkte på forsiden (2026-07-09) */}
+        <ActivityQuickCard />
+
+        {/* Indsigtsteaser — hvidt kort m. tint-ikonchip (designidentitet:
+            tint er accent, aldrig hele indholdsblokke); linker til paywallen */}
         <button
           type="button"
           onClick={() => navigate("/premium")}
-          className="rounded-xl bg-brand-tint p-4 text-left transition-[filter] hover:brightness-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+          className="rounded-lg border border-card-edge bg-surface p-4 text-left shadow-1 transition-[filter] hover:brightness-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
         >
           <div className="flex items-center gap-3">
-            <Sparkles className="size-5 shrink-0 text-brand" aria-hidden="true" />
+            <span className="grid size-8 shrink-0 place-items-center rounded-md bg-brand-tint text-brand">
+              <Sparkles className="size-4" aria-hidden="true" />
+            </span>
             <p className="flex-1 text-small text-secondary">{t("today.insightTeaser")}</p>
             <Chip>{t("today.premiumChip")}</Chip>
           </div>
@@ -287,7 +346,7 @@ export function TodayPage() {
           <Button
             variant="secondary"
             size="sm"
-            onClick={() => setAdding(true)}
+            onClick={() => setAdding({})}
             aria-label={t("diary.add.title")}
           >
             <Plus className="size-4" aria-hidden="true" />
@@ -303,7 +362,11 @@ export function TodayPage() {
             <p className="mt-1 text-small text-tertiary">{t("diary.emptyHint")}</p>
           </div>
         ) : (
-          <MealSections entries={entries ?? []} onEntryClick={setEditing} />
+          <MealSections
+            entries={entries ?? []}
+            onEntryClick={setEditing}
+            onAddToMeal={(meal) => setAdding({ meal })}
+          />
         )}
       </main>
       </div>
@@ -323,9 +386,10 @@ export function TodayPage() {
       {adding ? (
         <AddFoodSheet
           day={today}
-          onClose={() => setAdding(false)}
+          initialMeal={adding.meal}
+          onClose={() => setAdding(null)}
           onLogged={() => {
-            setAdding(false);
+            setAdding(null);
             void refresh();
             show(t("portion.logged"));
           }}

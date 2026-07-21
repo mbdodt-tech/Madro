@@ -110,6 +110,46 @@ describe("callAi", () => {
     expect(result.nutriments.energy_kcal).toBe(380);
   });
 
+  it("parse_label: kosttilskud med pr.-tablet-værdier (2026-07-09)", async () => {
+    const client = createAiClient({
+      ...baseOptions,
+      fetchFn: mockFetch(200, {
+        data: {
+          name: "D3-vitamin",
+          additives: [],
+          nutriments: {},
+          supplement: true,
+          per_tablet: { vitamin_d_ug: 38, ukendt_noegle: 5 },
+        },
+      }),
+    });
+    const result = await client.callAi("parse_label", {
+      image_base64: "x",
+      media_type: "image/jpeg",
+      locale: "da",
+    });
+    expect(result.supplement).toBe(true);
+    expect(result.per_tablet.vitamin_d_ug).toBe(38);
+    // Løs record: ukendte nøgler passerer skemaet — klienten filtrerer.
+    expect(result.per_tablet.ukendt_noegle).toBe(5);
+  });
+
+  it("parse_label: supplement/per_tablet har trygge defaults", async () => {
+    const client = createAiClient({
+      ...baseOptions,
+      fetchFn: mockFetch(200, {
+        data: { additives: [], nutriments: {} },
+      }),
+    });
+    const result = await client.callAi("parse_label", {
+      image_base64: "x",
+      media_type: "image/jpeg",
+      locale: "da",
+    });
+    expect(result.supplement).toBe(false);
+    expect(result.per_tablet).toEqual({});
+  });
+
   it("rejects parse_label with malformed additive codes", async () => {
     const client = createAiClient({
       ...baseOptions,

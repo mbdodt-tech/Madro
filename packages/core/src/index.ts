@@ -27,7 +27,9 @@ export {
   novaShare,
   resolveTargets,
   micronutrientCoverage,
+  MACRO_PROFILES,
   MICRO_STRIP_KEYS,
+  type MacroProfileId,
   type TargetsProfile,
   type RollupEntry,
   type NovaShare,
@@ -56,6 +58,15 @@ export {
   type PortionUnit,
   type PortionUnitId,
 } from "./portions/portions";
+
+export {
+  ACTIVITY_TYPES,
+  activityKcal,
+  DEFAULT_WEIGHT_KG,
+  type ActivityType,
+} from "./activities";
+
+export { ADDITIVE_INFO, lookupAdditive, type AdditiveInfo } from "./additives";
 
 export { isSupplementFood, SUPPLEMENT_CATEGORY } from "./supplements";
 

@@ -53,7 +53,8 @@ test("offline: scan-opslag viser fejl (ikke miss), og dagbogen viser fejlkort (i
     page.getByText(/ingen måltider|noget gik galt/i).first(),
   ).toBeVisible({ timeout: 15_000 });
   await context.setOffline(true);
-  await page.getByRole("button", { name: /forrige dag/i }).click();
+  // Ugestriben (2026-07-10) afløste dag-pilene — hop en uge tilbage.
+  await page.getByRole("button", { name: /forrige uge/i }).click();
   await expect(page.getByText(/noget gik galt/i)).toBeVisible({ timeout: 15_000 });
   await expect(page.getByText(/ingen måltider logget/i)).toBeHidden();
 

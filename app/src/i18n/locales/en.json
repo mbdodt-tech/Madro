@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Madro",
+    "appName": "OmniBite",
     "logout": "Log out",
     "language": "Language",
     "loading": "Loading…",
@@ -9,7 +9,7 @@
     "retry": "Try again"
   },
   "auth": {
-    "title": "Welcome to Madro",
+    "title": "Welcome to OmniBite",
     "subtitle": "Understand the quality of what you eat",
     "emailLabel": "Email",
     "emailPlaceholder": "you@example.com",
@@ -20,10 +20,41 @@
     "signIn": "Sign in",
     "error": "That didn't work. Check your details and try again.",
     "rateLimited": "Too many attempts right now — wait a few minutes and try again.",
+    "value1": "Scan a barcode — see the quality instantly",
+    "value2": "Macros and micronutrients in one place",
+    "value3": "Built on NOVA, Nutri-Score and verified sources",
     "tagline": "Understand your food — no guilt, no judgement."
   },
   "home": {
     "designLink": "Design system"
+  },
+  "activity": {
+    "addButton": "Add activity",
+    "sheetTitle": "Add activity",
+    "typeLabel": "Activity",
+    "durationLabel": "Duration",
+    "estimateLabel": "Estimate based on your weight",
+    "weightHint": "Add your weight in the profile for a more precise estimate — right now we assume 70 kg.",
+    "add": "Add to today's activity",
+    "added": "Activity added — +{{kcal}} kcal"
+  },
+  "nova": {
+    "open": "What is NOVA?",
+    "title": "What is NOVA?",
+    "intro": "NOVA is an international classification that groups foods by how processed they are — not by their nutrition. The scale runs from 1 to 4.",
+    "thisProduct": "this product",
+    "group1Title": "1 · Unprocessed or minimally processed",
+    "group1Body": "Fruit, vegetables, meat, milk, eggs and grains — raw or e.g. frozen, dried or pasteurised.",
+    "group2Title": "2 · Processed culinary ingredients",
+    "group2Body": "Oil, butter, sugar and salt — the ingredients you cook with.",
+    "group3Title": "3 · Processed foods",
+    "group3Body": "E.g. bread, cheese and canned goods — typically few ingredients and recognisable food.",
+    "group4Title": "4 · Ultra-processed foods",
+    "group4Body": "Industrial products with ingredients rarely found in a home kitchen: modified starches, flavourings, colours and emulsifiers. Research links diets high in group 4 with lower nutritional quality — that's why the gauge shows the share outside group 4.",
+    "additivesTitle": "What about additives?",
+    "additivesBody": "E-numbers are additives approved and continuously reviewed by EFSA, the EU's food safety authority. Many are entirely ordinary — citric acid (E330), for example. NOVA doesn't judge individual additives; their number and type simply serve as a practical marker of industrial processing.",
+    "inThisProduct": "In this product",
+    "sourceNote": "Sources: NOVA (Monteiro et al., FAO) and EFSA."
   },
   "profile": {
     "title": "Profile",
@@ -33,6 +64,13 @@
     "sexFemale": "Female",
     "sexMale": "Male",
     "sexUnspecified": "Prefer not to say",
+    "sexShort": "Not specified",
+    "activityShortSedentary": "Low",
+    "activityShortModerate": "Moderate",
+    "activityShortActive": "High",
+    "goalShortMaintain": "Maintain",
+    "goalShortDeficit": "A bit less",
+    "goalShortSurplus": "A bit more",
     "birthYear": "Birth year",
     "heightCm": "Height (cm)",
     "weightKg": "Weight (kg)",
@@ -46,6 +84,16 @@
     "goalDeficit": "A little less energy",
     "goalSurplus": "A little more energy",
     "goalNote": "The reference is a neutral guide — not a grade. Adjustments are deliberately gentle.",
+    "dietProfile": "Diet profile",
+    "dietStandard": "Standard",
+    "dietHighProtein": "High protein",
+    "dietLowCarb": "Low carb",
+    "dietKeto": "Keto",
+    "dietNote": "The diet profile only shapes the split between protein, carbs and fat — it's a choice, not a recommendation.",
+    "kcalGoal": "Daily calorie target",
+    "useComputed": "Use the calculated reference instead",
+    "customGoalLabel": "Your daily target",
+    "macroSplit": "{{protein}} P · {{carbs}} C · {{fat}} F (grams)",
     "reference": "Your daily reference",
     "referenceProtein": "{{grams}} g protein",
     "referenceHint": "Add your birth year, height and weight if you want a reference calculated from your profile.",
@@ -74,7 +122,7 @@
     "deleteConfirm": "Delete my account permanently"
   },
   "design": {
-    "title": "Madro design system",
+    "title": "OmniBite design system",
     "subtitle": "build plan §3 · tokens are the only styling source",
     "footer": "Temporary page — replaced when the real app shell takes over.",
     "theme": {
@@ -230,7 +278,8 @@
       "verifiedDismiss": "No thanks",
       "verifiedApplied": "Missing values filled from \"{{name}}\" — your own numbers stay.",
       "supplementToggle": "Supplement — values per tablet",
-      "perTablet": "Per tablet — as declared"
+      "perTablet": "Per tablet — as declared",
+      "manualFallback": "The label couldn't be read automatically — fill in the name and numbers yourself. For a supplement, switch on 'values per tablet'."
     },
     "photo": {
       "openButton": "Photograph the meal instead",
@@ -254,6 +303,7 @@
       "bad": "Very poor quality"
     },
     "novaChip": "NOVA {{group}}",
+    "unbiased": "The rating relies only on named systems (Nutri-Score, NOVA, EFSA) — no one pays for it.",
     "ultraProcessed": "ultra-processed",
     "additivesChip_one": "{{count}} additive",
     "additivesChip_other": "{{count}} additives",
@@ -296,6 +346,7 @@
     "logged": "Logged in your diary",
     "error": "Couldn't save — try again.",
     "gramsLabel": "Grams",
+    "useGrams": "Enter grams instead",
     "tabletsLabel": "Number of tablets",
     "tabletWord_one": "tablet",
     "tabletWord_other": "tablets"
@@ -324,12 +375,28 @@
     "yesterday": "Yesterday",
     "prevDay": "Previous day",
     "nextDay": "Next day",
+    "prevWeek": "Previous week",
+    "nextWeek": "Next week",
+    "weekLabel": "Pick a day in the week",
+    "summary": {
+      "title": "Day overview",
+      "microHint": "Micronutrients",
+      "lowest": "Most to gain:"
+    },
     "empty": "No meals logged this day.",
     "emptyHint": "Scan a product or add a meal with the plus button.",
     "updated": "Change saved",
     "removed": "Entry removed",
     "enriched": "Nutrition filled from a verified source",
     "swapped": "Switched to another match",
+    "insight": {
+      "title": "Today's insight",
+      "generate": "Generate today's insight",
+      "generating": "Writing today's insight…",
+      "regenerate": "Generate new",
+      "gateBody": "Get a short daily story about how the day went — saved with your meals."
+    },
+    "addToMeal": "Add to {{meal}}",
     "swap": {
       "button": "Switch to another match",
       "label": "Search the library",
@@ -411,7 +478,7 @@
       "clean": "A clean day so far",
       "mixed": "A mixed day — perfectly fine",
       "processed": "Today leans processed",
-      "empty": "No quality data for today's meals yet"
+      "empty": "The gauge lights up with the day's first log"
     },
     "caloriesHidden": "calories hidden",
     "hideCalories": "Hide calorie numbers",
@@ -426,12 +493,25 @@
     "logTitle": "Today's meals",
     "empty": "No meals logged yet today.",
     "activityIncluded": "incl. +{{active}} kcal from today's activity (reference {{base}})",
-    "premiumChip": "Premium"
+    "premiumChip": "Premium",
+    "hook": {
+      "morningTitle": "Good morning — what's first?",
+      "morningBody": "Scan your breakfast and the day takes shape.",
+      "lunchTitle": "Lunchtime?",
+      "lunchBody": "Scan or log it in ten seconds.",
+      "dinnerTitle": "Dinner time?",
+      "dinnerBody": "Log it while it's still warm.",
+      "quietTitle": "A blank day, ready when you are",
+      "quietBody": "Scan a product or add a meal whenever it suits you.",
+      "scan": "Scan",
+      "add": "Log meal",
+      "yesterday": "Yesterday landed at <pct>{{pct}}%</pct> clean — can you match it?"
+    }
   },
   "insights": {
     "title": "Insights",
     "trendTitle": "Quality this week",
-    "trendNote": "Share of non-ultra-processed food per day (NOVA 1-3).",
+    "trendNote": "How much of each day's food was NOT ultra-processed — NOVA groups 1-3 of the 4-point scale, where group 4 is ultra-processed. Tap a day to open it in the diary.",
     "daysLogged": "days logged",
     "avgQuality": "avg. quality",
     "avgKcal": "avg. kcal",
@@ -447,14 +527,14 @@
     "seePremium": "See Premium"
   },
   "onboarding": {
-    "welcomeTitle": "Welcome to Madro",
+    "welcomeTitle": "Welcome to OmniBite",
     "welcomeBody": "Understand the quality of what you eat — processing, nutrition and balance in one place. No guilt.",
     "start": "Get started",
     "next": "Continue",
     "ageTitle": "First: when were you born?",
     "ageBody": "We only use the year for the age limit and your energy reference.",
-    "tooYoungTitle": "Madro isn't for you just yet",
-    "tooYoungBody": "You need to be at least 13 to use Madro. It's nothing about you — apps about food and body simply require a certain age. You're welcome back later.",
+    "tooYoungTitle": "OmniBite isn't for you just yet",
+    "tooYoungBody": "You need to be at least 13 to use OmniBite. It's nothing about you — apps about food and body simply require a certain age. You're welcome back later.",
     "consentTitle": "Your data, your rules",
     "consentData": "What you log about your food is sensitive health data. It is stored in the EU and used ONLY to show you your own overviews and insights — never for ads, and never sold.",
     "consentRights": "You can download all your data or delete your account entirely at any time — both directly from your profile.",
@@ -472,6 +552,16 @@
   "premium": {
     "title": "Premium",
     "back": "Back",
+    "timelineLabel": "How the trial works",
+    "timelineNowTitle": "Today",
+    "timelineNowBody": "Full access to everything in Premium right away.",
+    "timelineRemindTitle": "Day {{day}}",
+    "timelineRemindBody": "We remind you that the trial is about to end.",
+    "timelineEndTitle": "Day {{day}}",
+    "timelineEndBody": "The trial ends. You only continue if you choose to.",
+    "gateTitle": "Part of Premium",
+    "gatePhoto": "Snap a photo of your meal and let AI recognise the dishes and portions for you.",
+    "gateWrite": "Describe your meal in your own words — 'oatmeal with banana' — and get it turned into numbers.",
     "glimpseHint": "Micronutrients today",
     "glimpseLabel": "The full micronutrient depth",
     "featuresLabel": "Premium features",
@@ -486,6 +576,11 @@
     "trialNote": "We'll let you know before the trial ends — no hidden renewals.",
     "cta": "Start {{days}}-day free trial",
     "betaNote": "Payments open at launch — everything else already works.",
+    "activated": "Trial active — enjoy",
+    "deactivated": "Beta premium turned off",
+    "deactivateBeta": "Turn off beta premium",
+    "haveTitle": "What you have now",
+    "featDailyInsight": "Daily and weekly AI insights about your food",
     "continueFree": "Continue for free",
     "freeStays": "The free tier stays fully usable",
     "alreadyTitle": "You have Premium",

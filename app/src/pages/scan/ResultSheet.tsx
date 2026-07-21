@@ -1,16 +1,31 @@
-import { computeVerdict, type NutrientMap } from "@madro/core";
-import { Button, Chip, Sheet, VerdiktBadge } from "@madro/ui";
+import {
+  computeVerdict,
+  lookupAdditive,
+  verdictLevelFor,
+  type CoreVerdictLevel,
+  type NutrientMap,
+} from "@madro/core";
+import { Button, Chip, VerdiktBadge, cn } from "@madro/ui";
 import { motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Sparkles } from "lucide-react";
 import { useProfile } from "../../auth/useProfile";
+import { NovaInfoSheet } from "../../components/NovaInfoSheet";
 import { useEntitlements } from "../../payments/useEntitlements";
 import type { FoodHit } from "../../scanner/useLookup";
 import { AlternativesStep } from "./AlternativesStep";
-import { formatAdditive } from "./format";
 import { PortionStep } from "./PortionStep";
+
+/** Faktor-prikker til "Derfor"-rækkerne — verdikt-skalaens farver. */
+const WHY_DOT: Record<CoreVerdictLevel, string> = {
+  excellent: "bg-v-excellent",
+  good: "bg-v-good",
+  mid: "bg-v-mid",
+  poor: "bg-v-poor",
+  bad: "bg-v-bad",
+};
 
 function MacroLine({ nutriments }: { nutriments: NutrientMap }) {
   const { t } = useTranslation();
@@ -41,27 +56,33 @@ function MacroLine({ nutriments }: { nutriments: NutrientMap }) {
   );
 }
 
-export function ResultSheet({
+/**
+ * Verdikt-indholdet (fase 1.4). Renderes som INDHOLD i scan-flowets ene
+ * fælles Sheet — ejer bevidst IKKE sin egen dialog. Tidligere var det et
+ * selvstændigt <Sheet>, hvilket lod to modale Radix-dialoger overlappe
+ * under fase-skift (looking-up → hit) og efterlod document.body med
+ * pointer-events: none, så "Jeg spiste det" hang (audit 2026-07-20,
+ * BUG-1). Nu switcher ScanPage ét Sheet's børn — samme kontrakt som
+ * det manuelle "Tilføj måltid"-flow.
+ */
+export function ResultView({
   food,
   scanId,
-  open,
-  onClose,
   onLogged,
   onSwapFood,
 }: {
   food: FoodHit;
   scanId: string | null;
-  open: boolean;
-  onClose: () => void;
   onLogged: () => void;
   /** Åbn et alternativs eget verdikt-ark (fase 2.5). */
   onSwapFood?: (food: FoodHit) => void;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { alternatives: hasAlternatives, ready: entitlementsReady } = useEntitlements();
   const [step, setStep] = useState<"verdict" | "portion" | "alternatives">("verdict");
   const [showPremiumHint, setShowPremiumHint] = useState(false);
+  const [novaOpen, setNovaOpen] = useState(false);
 
   const hasCategories = ((food.categories as string[] | null) ?? []).length > 0;
 
@@ -78,15 +99,7 @@ export function ResultSheet({
   const additives = (food.additives ?? []) as string[];
   const nutriments = (food.nutriments ?? {}) as NutrientMap;
 
-  return (
-    <Sheet
-      open={open}
-      onOpenChange={(o) => {
-        if (!o) onClose();
-      }}
-      title={t("verdict.sheetTitle")}
-    >
-      {step === "verdict" ? (
+  return step === "verdict" ? (
         <div className="space-y-4">
           <button
             type="button"
@@ -143,12 +156,70 @@ export function ResultSheet({
             <Chip>{t("verdict.additivesChip", { count: additives.length })}</Chip>
           </div>
 
+          {/* "Derfor"-rækkerne (2026-07-09, Yuka-mønsteret neutralt): hver
+              faktor bag scoren med sin egen verdikt-prik — svaret på
+              "NOVA 4, hvad er så problemet?". */}
+          {!verdict.insufficient ? (
+            <div className="space-y-1.5">
+              <h4 className="text-caption font-semibold uppercase tracking-widest text-tertiary">
+                {t("product.whyHeading")}
+              </h4>
+              <ul className="space-y-1.5">
+                {verdict.components.map((c) => (
+                  <li
+                    key={c.key}
+                    className="flex items-center gap-2.5 text-small text-secondary"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        "size-2.5 shrink-0 rounded-pill",
+                        WHY_DOT[verdictLevelFor(c.score)],
+                      )}
+                    />
+                    {c.key === "nutriscore"
+                      ? t("product.whyNutri", {
+                          grade: food.nutriscore?.toUpperCase(),
+                        })
+                      : c.key === "nova"
+                        ? t("product.whyNova", { group: food.nova_group })
+                        : t("product.whyAdditives", { count: additives.length })}
+                  </li>
+                ))}
+              </ul>
+              <p className="text-caption text-tertiary">{t("verdict.unbiased")}</p>
+            </div>
+          ) : null}
+
           {additives.length > 0 ? (
             <p className="text-small text-secondary">
-              {additives.slice(0, 8).map(formatAdditive).join(" · ")}
+              {additives
+                .slice(0, 8)
+                .map((c) => {
+                  const { code, info } = lookupAdditive(c);
+                  return info
+                    ? (i18n.language === "da" ? info.nameDa : info.nameEn)
+                    : code;
+                })
+                .join(" · ")}
               {additives.length > 8 ? " …" : ""}
             </p>
           ) : null}
+
+          {/* NOVA-uddannelseslaget: hvad betyder vurderingen? (2026-07-09) */}
+          <button
+            type="button"
+            onClick={() => setNovaOpen(true)}
+            className="self-start rounded-sm text-small font-medium text-brand hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+          >
+            {t("nova.open")}
+          </button>
+          <NovaInfoSheet
+            open={novaOpen}
+            onClose={() => setNovaOpen(false)}
+            group={food.nova_group}
+            additives={additives}
+          />
 
           <MacroLine nutriments={nutriments} />
 
@@ -213,7 +284,5 @@ export function ResultSheet({
             onSwapFood?.(alternative);
           }}
         />
-      )}
-    </Sheet>
-  );
+      );
 }

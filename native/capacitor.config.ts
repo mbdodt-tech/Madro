@@ -6,13 +6,15 @@ import type { CapacitorConfig } from "@capacitor/cli";
  * det kan ikke ændres efter første indsendelse.
  */
 const config: CapacitorConfig = {
+  // appId er App Store-identiteten og BEHOLDES (kan ikke ændres efter
+  // første indsendelse) — kun det synlige navn skifter til OmniBite.
   appId: "dk.madro.app",
-  appName: "Madro",
+  appName: "OmniBite",
   webDir: "../app/dist",
   plugins: {
     SplashScreen: {
-      // Dyb evergreen — instrumentpanelets farve (tokens: --panel)
-      backgroundColor: "#0c2b22",
+      // Dyb skov-bladgrøn — instrumentpanelets farve (tokens: --panel)
+      backgroundColor: "#12301d",
       launchShowDuration: 800,
       launchAutoHide: true,
       showSpinner: false,

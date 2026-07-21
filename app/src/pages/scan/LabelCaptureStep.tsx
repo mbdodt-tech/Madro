@@ -2,6 +2,7 @@ import {
   AiError,
   fillNutrientGaps,
   finalizeNutrients,
+  isNutrientKey,
   isSupplementFood,
   NUTRIENT_INFO,
   NUTRIENT_KEYS,
@@ -55,6 +56,14 @@ function draftFromParsed(parsed: ParsedLabel): Draft {
     const value = parsed.nutriments[key as keyof typeof parsed.nutriments];
     if (value != null) fields[key] = String(value);
   }
+  // Kosttilskud (2026-07-09): AI'ens pr.-tablet-værdier forudfylder
+  // mikro-felterne. Løs record fra modellen → filtrér til kanoniske
+  // mikro-nøgler; alt andet ignoreres.
+  for (const [key, value] of Object.entries(parsed.per_tablet)) {
+    if (isNutrientKey(key) && NUTRIENT_INFO[key].micro) {
+      fields[key] = String(value);
+    }
+  }
   return {
     name: parsed.name ?? "",
     brand: parsed.brand ?? "",
@@ -98,6 +107,9 @@ export function LabelCaptureStep({
   // aldrig blandes ind i pr.-tablet-tal.
   const [supplementMode, setSupplementMode] = useState(false);
 
+  // AI'en læste ingenting — vis formularen alligevel med en forklaring.
+  const [parseEmpty, setParseEmpty] = useState(false);
+
   const analyze = async (file: File) => {
     setAnalyzing(true);
     setError(null);
@@ -114,20 +126,22 @@ export function LabelCaptureStep({
         !next.ingredients &&
         next.additives.length === 0 &&
         Object.keys(next.fields).length === 0;
-      if (empty) {
-        setError(t("scan.label.nothingFound"));
-      } else {
-        setDraft(next);
-        setSuggestion(null);
-        setAdopted(null);
-        setSuggestionDismissed(false);
-        setSupplementMode(isSupplementFood({ name: next.name }));
-        // Fire-and-forget: forslaget er en bonus og må aldrig blokere.
-        if (next.name.trim()) {
-          void findVerifiedMatches(next.name)
-            .then((matches) => setSuggestion(matches[0] ?? null))
-            .catch(() => setSuggestion(null));
-        }
+      // Kunne AI'en intet læse (fx kosttilskuds-etiketter, telefontest
+      // 2026-07-09), blokerer vi IKKE — formularen ER den manuelle vej.
+      setDraft(next);
+      setParseEmpty(empty);
+      setSuggestion(null);
+      setAdopted(null);
+      setSuggestionDismissed(false);
+      const supplement =
+        parsed.supplement || isSupplementFood({ name: next.name });
+      setSupplementMode(supplement);
+      // Fire-and-forget: forslaget er en bonus og må aldrig blokere —
+      // og springes over for kosttilskud (pr. 100 g-mad ≠ pr. tablet).
+      if (!supplement && next.name.trim()) {
+        void findVerifiedMatches(next.name)
+          .then((matches) => setSuggestion(matches[0] ?? null))
+          .catch(() => setSuggestion(null));
       }
     } catch (err) {
       if (err instanceof AiError && err.code === "missing_anthropic_key") {
@@ -264,6 +278,15 @@ export function LabelCaptureStep({
     <div className="space-y-4">
       <p className="text-caption text-tertiary">{t("diary.write.estimate")}</p>
 
+      {parseEmpty ? (
+        <p
+          className="rounded-md border border-hairline bg-bg px-4 py-3 text-small text-secondary"
+          role="status"
+        >
+          {t("scan.label.manualFallback")}
+        </p>
+      ) : null}
+
       <Input
         id="label-name"
         label={t("scan.label.nameLabel")}
@@ -332,7 +355,7 @@ export function LabelCaptureStep({
             {t("scan.label.verifiedApplied", { name: suggestion.name })}
           </p>
         ) : (
-          <div className="rounded-md bg-brand-tint px-4 py-3">
+          <div className="rounded-md border border-hairline bg-bg px-4 py-3">
             <p className="text-small text-secondary">
               {t("scan.label.verifiedSuggest", {
                 name: suggestion.name,

@@ -1,92 +1,37 @@
 import { resolveTargets } from "@madro/core";
 import { Button, Card, Input, Sheet, Skeleton, cn, useToast } from "@madro/ui";
-import { Download, HeartHandshake, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  Compass,
+  Download,
+  HeartHandshake,
+  Settings2,
+  ShieldCheck,
+  Trash2,
+  TrendingUp,
+  UserRound,
+  type LucideIcon,
+} from "lucide-react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { persistHideCalories, persistProfileFields, useProfile } from "../auth/useProfile";
 import { useSession } from "../auth/useSession";
 import { LanguageSwitch } from "../components/LanguageSwitch";
+import { NumberField, type NumericField } from "../components/NumberField";
 import { PillGroup } from "../components/PillGroup";
 import { TabShell } from "../components/TabShell";
 import { supabase } from "../lib/supabase";
-import {
-  logWeightToday,
-  saveActivityToday,
-  useTodayActivity,
-  useWeightHistory,
-} from "./profile/useBody";
+import { logWeightToday, useWeightHistory } from "./profile/useBody";
 import { deleteAccount, downloadMyData } from "./profile/dataRights";
 
-/** Grænser spejler DB-checkene (migrationer 20260706200000/210000) — ellers afvises skrivningen. */
-const BOUNDS = {
-  birth_year: { min: 1900, max: new Date().getFullYear() },
-  height_cm: { min: 100, max: 250 },
-  weight_kg: { min: 30, max: 300 },
-  steps: { min: 0, max: 200000 },
-  active_kcal: { min: 0, max: 5000 },
-} as const;
-
-type NumericField = keyof typeof BOUNDS;
-
-/** Graveret sektionslabel ("Instrumentet"). */
-function SectionLabel({ children }: { children: string }) {
+/** Graveret sektionslabel med ikon — scanbarhed uden ekstra vægt. */
+function SectionLabel({ icon: Icon, children }: { icon: LucideIcon; children: string }) {
   return (
-    <p className="text-caption font-semibold uppercase tracking-widest text-tertiary">
+    <p className="flex items-center gap-1.5 text-caption font-semibold uppercase tracking-widest text-tertiary">
+      <Icon className="size-3.5 text-brand" aria-hidden="true" />
       {children}
     </p>
-  );
-}
-
-/**
- * Talfelt med tekst-spejl (mønster fra PortionForm): gemmer på blur når
- * værdien er gyldig inden for grænserne; ellers rulles feltet tilbage.
- */
-function NumberField({
-  id,
-  field,
-  label,
-  value,
-  onSave,
-}: {
-  id: string;
-  field: NumericField;
-  label: string;
-  value: number | null;
-  onSave: (field: NumericField, value: number) => void;
-}) {
-  const [text, setText] = useState(value == null ? "" : String(value));
-  useEffect(() => {
-    setText(value == null ? "" : String(value));
-  }, [value]);
-
-  const commit = () => {
-    const parsed = Number(text.replace(",", "."));
-    const { min, max } = BOUNDS[field];
-    if (Number.isFinite(parsed) && parsed >= min && parsed <= max) {
-      const rounded =
-        field === "birth_year" || field === "steps"
-          ? Math.round(parsed)
-          : Math.round(parsed * 10) / 10;
-      if (rounded !== value) onSave(field, rounded);
-    } else {
-      setText(value == null ? "" : String(value));
-    }
-  };
-
-  return (
-    <Input
-      id={id}
-      label={label}
-      inputMode="decimal"
-      value={text}
-      onChange={(e) => setText(e.target.value)}
-      onBlur={commit}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-      }}
-    />
   );
 }
 
@@ -101,7 +46,6 @@ export function ProfilePage() {
   const { data: session } = useSession();
   const { data: profile, isLoading } = useProfile();
   const { data: weightHistory } = useWeightHistory();
-  const { data: activity } = useTodayActivity();
 
   const [deleteSheet, setDeleteSheet] = useState(false);
   const [deleteText, setDeleteText] = useState("");
@@ -119,14 +63,25 @@ export function ProfilePage() {
     if (field === "weight_kg") {
       // Vægt logges som dagens måling og spejles til profilen (3.2)
       void logWeightToday(value).then(() => show(t("profile.saved")));
-    } else if (field === "steps" || field === "active_kcal") {
-      void saveActivityToday({ [field]: value }).then(() => show(t("profile.saved")));
     } else {
       save({ [field]: value });
     }
   };
   const saveDirection = (id: string) =>
     save({ goals: JSON.parse(JSON.stringify({ ...goals, direction: id })) });
+  // Kostprofil + manuelt kalorietal (2026-07-10, brugerønske).
+  const saveMacroProfile = (id: string) =>
+    save({ goals: JSON.parse(JSON.stringify({ ...goals, macro_profile: id })) });
+  const saveKcalGoal = (_field: string, value: number) =>
+    save({ goals: JSON.parse(JSON.stringify({ ...goals, kcal: value })) });
+  const clearKcalGoal = () => {
+    const rest = { ...goals };
+    delete rest.kcal;
+    save({ goals: JSON.parse(JSON.stringify(rest)) });
+  };
+  const macroProfile =
+    typeof goals.macro_profile === "string" ? goals.macro_profile : "standard";
+  const kcalGoal = typeof goals.kcal === "number" ? goals.kcal : null;
 
   const targets = resolveTargets(goals, {
     sex: profile?.sex,
@@ -160,51 +115,56 @@ export function ProfilePage() {
           <>
             {/* Om dig — grundlaget for energireferencen */}
             <section className="space-y-2">
-              <SectionLabel>{t("profile.aboutYou")}</SectionLabel>
+              <SectionLabel icon={UserRound}>{t("profile.aboutYou")}</SectionLabel>
               <Card>
-                <div className="space-y-4">
-                  <p className="text-small text-tertiary">{t("profile.aboutNote")}</p>
+                {/* Kompakte formularrækker ("Lysende instrument", 2026-07-10):
+                    label venstre, værdi højre — hele profilen uden lange strøg. */}
+                <p className="text-small text-tertiary">{t("profile.aboutNote")}</p>
+                <div className="mt-1 divide-y divide-hairline">
                   <PillGroup
+                    layout="row"
                     label={t("profile.sex")}
                     value={profile.sex}
                     onChange={(id) => save({ sex: id })}
                     options={[
                       { id: "female", label: t("profile.sexFemale") },
                       { id: "male", label: t("profile.sexMale") },
-                      { id: "unspecified", label: t("profile.sexUnspecified") },
+                      { id: "unspecified", label: t("profile.sexShort") },
                     ]}
                   />
-                  <div className="grid grid-cols-3 items-end gap-3">
-                    <NumberField
-                      id="profile-birth-year"
-                      field="birth_year"
-                      label={t("profile.birthYear")}
-                      value={profile.birth_year}
-                      onSave={saveNumber}
-                    />
-                    <NumberField
-                      id="profile-height"
-                      field="height_cm"
-                      label={t("profile.heightCm")}
-                      value={profile.height_cm != null ? Number(profile.height_cm) : null}
-                      onSave={saveNumber}
-                    />
-                    <NumberField
-                      id="profile-weight"
-                      field="weight_kg"
-                      label={t("profile.weightKg")}
-                      value={profile.weight_kg != null ? Number(profile.weight_kg) : null}
-                      onSave={saveNumber}
-                    />
-                  </div>
+                  <NumberField
+                    layout="row"
+                    id="profile-birth-year"
+                    field="birth_year"
+                    label={t("profile.birthYear")}
+                    value={profile.birth_year}
+                    onSave={saveNumber}
+                  />
+                  <NumberField
+                    layout="row"
+                    id="profile-height"
+                    field="height_cm"
+                    label={t("profile.heightCm")}
+                    value={profile.height_cm != null ? Number(profile.height_cm) : null}
+                    onSave={saveNumber}
+                  />
+                  <NumberField
+                    layout="row"
+                    id="profile-weight"
+                    field="weight_kg"
+                    label={t("profile.weightKg")}
+                    value={profile.weight_kg != null ? Number(profile.weight_kg) : null}
+                    onSave={saveNumber}
+                  />
                   <PillGroup
+                    layout="row"
                     label={t("profile.activity")}
                     value={profile.activity_level}
                     onChange={(id) => save({ activity_level: id })}
                     options={[
-                      { id: "sedentary", label: t("profile.activitySedentary") },
-                      { id: "moderate", label: t("profile.activityModerate") },
-                      { id: "active", label: t("profile.activityActive") },
+                      { id: "sedentary", label: t("profile.activityShortSedentary") },
+                      { id: "moderate", label: t("profile.activityShortModerate") },
+                      { id: "active", label: t("profile.activityShortActive") },
                     ]}
                   />
                 </div>
@@ -214,7 +174,7 @@ export function ProfilePage() {
             {/* Vægt over tid — vises først når der er noget at vise */}
             {(weightHistory?.length ?? 0) >= 2 ? (
               <section className="space-y-2">
-                <SectionLabel>{t("profile.weightHistory")}</SectionLabel>
+                <SectionLabel icon={TrendingUp}>{t("profile.weightHistory")}</SectionLabel>
                 <Card>
                   <div className="h-28">
                     <ResponsiveContainer width="100%" height="100%">
@@ -250,53 +210,64 @@ export function ProfilePage() {
               </section>
             ) : null}
 
-            {/* Aktivitet i dag — frivillig, neutral (3.2) */}
-            <section className="space-y-2">
-              <SectionLabel>{t("profile.activityToday")}</SectionLabel>
-              <Card>
-                <div className="space-y-4">
-                  <p className="text-small text-tertiary">{t("profile.activityNote")}</p>
-                  {/* items-end: toliniet label må ikke skubbe felterne skævt */}
-                  <div className="grid grid-cols-2 items-end gap-3">
-                    <NumberField
-                      id="profile-steps"
-                      field="steps"
-                      label={t("profile.steps")}
-                      value={activity?.steps ?? null}
-                      onSave={saveNumber}
-                    />
-                    {/* Aktiv energi er et kalorietal → respekterer hide_calories */}
-                    {!hideCalories ? (
-                      <NumberField
-                        id="profile-active-kcal"
-                        field="active_kcal"
-                        label={t("profile.activeKcal")}
-                        value={activity?.active_kcal ?? null}
-                        onSave={saveNumber}
-                      />
-                    ) : null}
-                  </div>
-                </div>
-              </Card>
-            </section>
+            {/* Aktivitet i dag bor nu på forsiden (ActivityQuickCard,
+                2026-07-09) — kortere profil, bedre overblik. */}
 
             {/* Mål — kun blide retninger, neutral copy */}
             <section className="space-y-2">
-              <SectionLabel>{t("profile.goalTitle")}</SectionLabel>
+              <SectionLabel icon={Compass}>{t("profile.goalTitle")}</SectionLabel>
               <Card>
-                <div className="space-y-4">
-                  <PillGroup
-                    label={t("profile.goal")}
-                    value={direction}
-                    onChange={saveDirection}
-                    options={[
-                      { id: "maintain", label: t("profile.goalMaintain") },
-                      { id: "gentle_deficit", label: t("profile.goalDeficit") },
-                      { id: "gentle_surplus", label: t("profile.goalSurplus") },
-                    ]}
-                  />
+                <div className="space-y-3">
+                  <div className="divide-y divide-hairline">
+                    <PillGroup
+                      layout="row"
+                      label={t("profile.goal")}
+                      value={direction}
+                      onChange={saveDirection}
+                      options={[
+                        { id: "maintain", label: t("profile.goalShortMaintain") },
+                        { id: "gentle_deficit", label: t("profile.goalShortDeficit") },
+                        { id: "gentle_surplus", label: t("profile.goalShortSurplus") },
+                      ]}
+                    />
+                    {/* Kostprofil (2026-07-10): styrer KUN makro-fordelingen */}
+                    <PillGroup
+                      layout="row"
+                      label={t("profile.dietProfile")}
+                      value={macroProfile}
+                      onChange={saveMacroProfile}
+                      options={[
+                        { id: "standard", label: t("profile.dietStandard") },
+                        { id: "high_protein", label: t("profile.dietHighProtein") },
+                        { id: "low_carb", label: t("profile.dietLowCarb") },
+                        { id: "keto", label: t("profile.dietKeto") },
+                      ]}
+                    />
+                    {/* Manuelt kalorietal — skjules helt med hide_calories */}
+                    {!hideCalories ? (
+                      <NumberField
+                        layout="row"
+                        id="profile-kcal-goal"
+                        field="kcal_goal"
+                        label={t("profile.kcalGoal")}
+                        value={kcalGoal}
+                        onSave={saveKcalGoal}
+                      />
+                    ) : null}
+                  </div>
+                  {!hideCalories && kcalGoal != null ? (
+                    <button
+                      type="button"
+                      onClick={clearKcalGoal}
+                      className="rounded-sm text-caption font-medium text-brand hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+                    >
+                      {t("profile.useComputed")}
+                    </button>
+                  ) : null}
                   <p className="text-small text-tertiary">{t("profile.goalNote")}</p>
-                  {/* Referencen — mini-instrumentaflæsning; respekterer hide_calories */}
+                  <p className="text-caption text-tertiary">{t("profile.dietNote")}</p>
+                  {/* Referencen — mini-instrumentaflæsning; respekterer hide_calories.
+                      Makro-målene viser kostprofilens fordeling med det samme. */}
                   <div className="panel-surface rounded-md px-4 py-3 text-center shadow-panel">
                     <p className="font-mono text-h2 tabular-nums text-panel-ink">
                       {hideCalories
@@ -304,7 +275,16 @@ export function ProfilePage() {
                         : `${nf.format(targets.kcal)} kcal`}
                     </p>
                     <p className="mt-0.5 text-caption font-semibold uppercase tracking-widest text-panel-dim">
-                      {t("profile.reference")}
+                      {kcalGoal != null && !hideCalories
+                        ? t("profile.customGoalLabel")
+                        : t("profile.reference")}
+                    </p>
+                    <p className="mt-2 font-mono text-caption tabular-nums text-panel-dim">
+                      {t("profile.macroSplit", {
+                        protein: targets.protein_g,
+                        carbs: targets.carbohydrate_g,
+                        fat: targets.fat_g,
+                      })}
                     </p>
                   </div>
                   {!bodyComplete ? (
@@ -316,7 +296,7 @@ export function ProfilePage() {
 
             {/* Indstillinger */}
             <section className="space-y-2">
-              <SectionLabel>{t("profile.settings")}</SectionLabel>
+              <SectionLabel icon={Settings2}>{t("profile.settings")}</SectionLabel>
               <Card>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
@@ -358,12 +338,17 @@ export function ProfilePage() {
                     ]}
                   />
                   <div className="flex items-center justify-between border-t border-hairline pt-4">
-                    <Link
-                      className="text-small font-medium text-brand hover:text-brand-hover"
-                      to="/design"
-                    >
-                      {t("home.designLink")}
-                    </Link>
+                    {/* Intern specimen-side kun i udvikling — ikke et prod-link (MISC-1). */}
+                    {import.meta.env.DEV ? (
+                      <Link
+                        className="text-small font-medium text-brand hover:text-brand-hover"
+                        to="/design"
+                      >
+                        {t("home.designLink")}
+                      </Link>
+                    ) : (
+                      <span />
+                    )}
                     <Button
                       variant="secondary"
                       size="sm"
@@ -378,7 +363,7 @@ export function ProfilePage() {
 
             {/* Data & privatliv — GDPR-rettighederne (fase 4.2) */}
             <section className="space-y-2">
-              <SectionLabel>{t("profile.dataTitle")}</SectionLabel>
+              <SectionLabel icon={ShieldCheck}>{t("profile.dataTitle")}</SectionLabel>
               <Card>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between gap-3">
@@ -413,10 +398,13 @@ export function ProfilePage() {
               </Card>
             </section>
 
-            {/* Støtte — altid tilgængelig fra indstillinger (ansvarlighedsregel) */}
-            <div className="rounded-xl bg-brand-tint p-4">
+            {/* Støtte — altid tilgængelig fra indstillinger (ansvarlighedsregel).
+                Hvidt kort m. tint-ikonchip (designidentitet). */}
+            <div className="rounded-lg border border-card-edge bg-surface p-4 shadow-1">
               <div className="flex items-start gap-3">
-                <HeartHandshake className="mt-0.5 size-5 shrink-0 text-brand" aria-hidden="true" />
+                <span className="grid size-8 shrink-0 place-items-center rounded-md bg-brand-tint text-brand">
+                  <HeartHandshake className="size-4" aria-hidden="true" />
+                </span>
                 <div className="space-y-1">
                   <p className="text-body font-medium text-ink">{t("profile.supportTitle")}</p>
                   <p className="text-small text-secondary">{t("profile.supportBody")}</p>

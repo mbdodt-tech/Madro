@@ -4,6 +4,7 @@ import {
   type NutrientMap,
 } from "@madro/core";
 import { cn } from "@madro/ui";
+import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useProfile } from "../../auth/useProfile";
 import { MEALS, type Meal } from "../scan/logMeal";
@@ -43,9 +44,12 @@ function entryKcal(entry: DiaryEntry): number | null {
 export function MealSections({
   entries,
   onEntryClick,
+  onAddToMeal,
 }: {
   entries: DiaryEntry[];
   onEntryClick: (entry: DiaryEntry) => void;
+  /** Kontekst-plus på sektionen: log direkte ind i det måltid (2026-07-09). */
+  onAddToMeal?: (meal: Meal) => void;
 }) {
   const { t } = useTranslation();
   const { data: profile } = useProfile();
@@ -69,15 +73,29 @@ export function MealSections({
         }, null);
         return (
           <section key={meal} aria-label={t(`portion.meal.${meal}`)}>
-            <div className="mb-2 flex items-baseline justify-between">
+            <div className="mb-2 flex items-center justify-between">
               <h2 className="text-caption font-semibold uppercase tracking-widest text-tertiary">
                 {t(`portion.meal.${meal}`)}
               </h2>
-              {!hideCalories && subtotal != null ? (
-                <span className="font-mono text-caption tabular-nums text-tertiary">
-                  {subtotal} kcal
-                </span>
-              ) : null}
+              <span className="flex items-center gap-2">
+                {!hideCalories && subtotal != null ? (
+                  <span className="font-mono text-caption tabular-nums text-tertiary">
+                    {subtotal} kcal
+                  </span>
+                ) : null}
+                {onAddToMeal ? (
+                  <button
+                    type="button"
+                    onClick={() => onAddToMeal(meal)}
+                    aria-label={t("diary.addToMeal", {
+                      meal: t(`portion.meal.${meal}`),
+                    })}
+                    className="grid size-6 place-items-center rounded-pill text-tertiary hover:bg-brand-tint hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
+                  >
+                    <Plus className="size-4" aria-hidden="true" />
+                  </button>
+                ) : null}
+              </span>
             </div>
             <ul className="divide-y divide-hairline overflow-hidden rounded-lg border border-card-edge shadow-1">
               {mealEntries.map((entry) => {

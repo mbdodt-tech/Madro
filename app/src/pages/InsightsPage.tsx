@@ -20,6 +20,7 @@ import {
 } from "recharts";
 import { useProfile } from "../auth/useProfile";
 import { ErrorState } from "../components/ErrorState";
+import { NovaInfoSheet } from "../components/NovaInfoSheet";
 import { TabShell } from "../components/TabShell";
 import { aiClient } from "../lib/aiClient";
 import { useReferences } from "../lib/useReferences";
@@ -57,6 +58,7 @@ export function InsightsPage() {
 
   const [generating, setGenerating] = useState(false);
   const [genError, setGenError] = useState<string | null>(null);
+  const [novaOpen, setNovaOpen] = useState(false);
 
   const locale = i18n.language === "da" ? "da" : "en";
   const intl = locale === "da" ? "da-DK" : "en-GB";
@@ -85,6 +87,9 @@ export function InsightsPage() {
 
   const chartData = stats.trend.map((p, i) => ({
     ...p,
+    // Dage uden NOVA-data får en lille grå stub (minPointSize), så alle
+    // dage er synlige og klikbare — null tegnes ellers slet ikke.
+    barValue: p.novaShare ?? 0,
     label: new Intl.DateTimeFormat(intl, { weekday: "short" }).format(
       addDays(weekStart, i),
     ),
@@ -161,9 +166,17 @@ export function InsightsPage() {
             {/* Kvalitetstrend (primær) + evt. kcal-linje */}
             <Card>
               <h2 className="mb-1 text-h2 text-ink">{t("insights.trendTitle")}</h2>
-              <p className="mb-3 text-caption text-tertiary">
+              <p className="mb-1 text-caption text-tertiary">
                 {t("insights.trendNote")}
               </p>
+              <button
+                type="button"
+                onClick={() => setNovaOpen(true)}
+                className="mb-3 rounded-sm text-caption font-medium text-brand hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+              >
+                {t("nova.open")}
+              </button>
+              <NovaInfoSheet open={novaOpen} onClose={() => setNovaOpen(false)} />
               <div className="h-44">
                 <ResponsiveContainer width="100%" height="100%">
                   <ComposedChart data={chartData} margin={{ top: 4, right: 0, left: -22, bottom: 0 }}>
@@ -179,10 +192,23 @@ export function InsightsPage() {
                       axisLine={false}
                       tick={{ fill: "var(--text-tertiary)", fontSize: 12 }}
                     />
-                    <Bar dataKey="novaShare" radius={[6, 6, 0, 0]} isAnimationActive={false}>
+                    <Bar
+                      dataKey="barValue"
+                      radius={[6, 6, 0, 0]}
+                      minPointSize={4}
+                      isAnimationActive={false}
+                      onClick={(data: unknown) => {
+                        // Indsigt→dagbog (2026-07-09): et tryk på en dag
+                        // åbner dagbogen på netop den dag.
+                        const bar = data as { payload?: { day?: string }; day?: string };
+                        const day = bar.payload?.day ?? bar.day;
+                        if (day) navigate(`/diary?d=${day}`);
+                      }}
+                    >
                       {chartData.map((p) => (
                         <Cell
                           key={p.day}
+                          cursor="pointer"
                           fill={p.novaShare != null ? barColor(p.novaShare) : "var(--hairline)"}
                         />
                       ))}

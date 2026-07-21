@@ -1,14 +1,19 @@
-import { Button, Skeleton, useToast } from "@madro/ui";
+import { Button, Skeleton, cn, useToast } from "@madro/ui";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router-dom";
 import { ErrorState } from "../components/ErrorState";
 import { TabShell } from "../components/TabShell";
 import { AddFoodSheet } from "./diary/AddFoodSheet";
+import type { Meal } from "./scan/logMeal";
+import { DailyInsightCard } from "./diary/DailyInsightCard";
+import { DaySummaryCard } from "./diary/DaySummaryCard";
 import { EntrySheet } from "./diary/EntrySheet";
 import { MealSections } from "./diary/MealSections";
 import {
   addDays,
+  dayKey,
   ENTRY_TOAST_KEY,
   invalidateDiary,
   isSameDay,
@@ -21,9 +26,22 @@ export function DiaryPage() {
   const { t, i18n } = useTranslation();
   const { show } = useToast();
 
-  const [day, setDay] = useState(() => startOfDay(new Date()));
+  // Indsigt→dagbog-link (2026-07-09): ?d=YYYY-MM-DD åbner direkte på den
+  // dag. Ugyldige/fremtidige datoer falder tilbage på i dag.
+  const [searchParams] = useSearchParams();
+  const [day, setDay] = useState(() => {
+    const param = searchParams.get("d");
+    if (param && /^\d{4}-\d{2}-\d{2}$/.test(param)) {
+      const parsed = new Date(`${param}T12:00:00`);
+      if (!Number.isNaN(parsed.getTime()) && parsed <= new Date()) {
+        return startOfDay(parsed);
+      }
+    }
+    return startOfDay(new Date());
+  });
   const [editing, setEditing] = useState<DiaryEntry | null>(null);
-  const [adding, setAdding] = useState(false);
+  // null = lukket; { meal } = åben, evt. med forudvalgt måltid (sektions-plus)
+  const [adding, setAdding] = useState<{ meal?: Meal } | null>(null);
 
   const { data: entries, isLoading, isError, refetch } = useDiaryEntries(day);
   const isToday = isSameDay(day, new Date());
@@ -40,6 +58,10 @@ export function DiaryPage() {
 
   const hasEntries = (entries?.length ?? 0) > 0;
 
+  // Ugestriben: mandag-søndag i den valgte dags uge.
+  const monday = addDays(startOfDay(day), -((day.getDay() + 6) % 7));
+  const weekDays = Array.from({ length: 7 }, (_, i) => addDays(monday, i));
+
   const refresh = () => invalidateDiary();
 
   return (
@@ -50,7 +72,7 @@ export function DiaryPage() {
           <Button
             variant="secondary"
             size="sm"
-            onClick={() => setAdding(true)}
+            onClick={() => setAdding({})}
             aria-label={t("diary.add.title")}
           >
             <Plus className="size-4" aria-hidden="true" />
@@ -58,28 +80,65 @@ export function DiaryPage() {
           </Button>
         </div>
 
-        {/* Dato-navigation — løftet som kort ("Instrumentet": skygge i lys, hårlinje i mørk) */}
-        <div className="flex items-center justify-between rounded-lg border border-card-edge bg-surface px-2 py-1.5 shadow-1">
-          <button
-            type="button"
-            onClick={() => setDay((d) => addDays(d, -1))}
-            aria-label={t("diary.prevDay")}
-            className="grid size-9 place-items-center rounded-pill text-secondary hover:bg-brand-tint hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
-          >
-            <ChevronLeft className="size-5" aria-hidden="true" />
-          </button>
-          <p className="text-body font-medium text-ink first-letter:uppercase" aria-live="polite">
-            {dateLabel}
-          </p>
-          <button
-            type="button"
-            onClick={() => setDay((d) => addDays(d, 1))}
-            disabled={isToday}
-            aria-label={t("diary.nextDay")}
-            className="grid size-9 place-items-center rounded-pill text-secondary hover:bg-brand-tint hover:text-brand focus-visible:outline-2 focus-visible:outline-brand disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-secondary"
-          >
-            <ChevronRight className="size-5" aria-hidden="true" />
-          </button>
+        {/* Ugestriben ("Lysende instrument", 2026-07-10): syv dage med
+            ét-tryks-navigation; pilene hopper en uge. Fremtid deaktiveret. */}
+        <div className="rounded-lg border border-card-edge bg-surface px-2 py-2 shadow-1">
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => setDay((d) => addDays(d, -7))}
+              aria-label={t("diary.prevWeek")}
+              className="grid size-8 place-items-center rounded-pill text-secondary hover:bg-brand-tint hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
+            >
+              <ChevronLeft className="size-4" aria-hidden="true" />
+            </button>
+            <p
+              className="text-small font-medium text-ink first-letter:uppercase"
+              aria-live="polite"
+            >
+              {dateLabel}
+            </p>
+            <button
+              type="button"
+              onClick={() => setDay((d) => (isSameDay(addDays(d, 7), new Date()) || addDays(d, 7) < new Date() ? addDays(d, 7) : startOfDay(new Date())))}
+              disabled={isToday}
+              aria-label={t("diary.nextWeek")}
+              className="grid size-8 place-items-center rounded-pill text-secondary hover:bg-brand-tint hover:text-brand focus-visible:outline-2 focus-visible:outline-brand disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-secondary"
+            >
+              <ChevronRight className="size-4" aria-hidden="true" />
+            </button>
+          </div>
+          <div className="mt-1.5 grid grid-cols-7 gap-1" role="group" aria-label={t("diary.weekLabel")}>
+            {weekDays.map((d) => {
+              const selected = isSameDay(d, day);
+              const future = startOfDay(d) > startOfDay(new Date());
+              return (
+                <button
+                  key={dayKey(d)}
+                  type="button"
+                  disabled={future}
+                  onClick={() => setDay(startOfDay(d))}
+                  aria-pressed={selected}
+                  className={cn(
+                    "flex flex-col items-center rounded-md py-1.5 transition-colors focus-visible:outline-2 focus-visible:outline-brand",
+                    selected
+                      ? "bg-brand text-on-brand"
+                      : future
+                        ? "text-tertiary opacity-40"
+                        : "text-secondary hover:bg-brand-tint hover:text-brand",
+                  )}
+                >
+                  <span className="text-caption font-semibold uppercase">
+                    {new Intl.DateTimeFormat(
+                      i18n.language === "da" ? "da-DK" : "en-GB",
+                      { weekday: "narrow" },
+                    ).format(d)}
+                  </span>
+                  <span className="font-mono text-small tabular-nums">{d.getDate()}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {isLoading ? (
@@ -96,7 +155,18 @@ export function DiaryPage() {
             <p className="mt-1 text-small text-tertiary">{t("diary.emptyHint")}</p>
           </div>
         ) : (
-          <MealSections entries={entries ?? []} onEntryClick={setEditing} />
+          <>
+            {/* Dagens overblik (2026-07-09): kvalitet, makroer og
+                mikro-dækning for den viste dag — kompakt instrumentpanel */}
+            <DaySummaryCard day={day} />
+            {/* Dagens AI-indsigt (2026-07-10) — gemmes under dagen */}
+            <DailyInsightCard day={day} mealsLogged={entries?.length ?? 0} />
+            <MealSections
+              entries={entries ?? []}
+              onEntryClick={setEditing}
+              onAddToMeal={(meal) => setAdding({ meal })}
+            />
+          </>
         )}
       </main>
 
@@ -115,9 +185,10 @@ export function DiaryPage() {
       {adding ? (
         <AddFoodSheet
           day={day}
-          onClose={() => setAdding(false)}
+          initialMeal={adding.meal}
+          onClose={() => setAdding(null)}
           onLogged={() => {
-            setAdding(false);
+            setAdding(null);
             void refresh();
             show(t("portion.logged"));
           }}

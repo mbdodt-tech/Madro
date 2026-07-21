@@ -117,6 +117,27 @@ describe("resolveTargets — NNR-forenklede defaults + goals-overstyring", () =>
   it("ugyldige goals-værdier ignoreres", () => {
     expect(resolveTargets({ kcal: -5, protein_g: "hej" }, { sex: "female" }).kcal).toBe(2000);
   });
+
+  it("kostprofiler ændrer fordelingen (2026-07-10): keto ved 2000 kcal", () => {
+    const t = resolveTargets({ kcal: 2000, macro_profile: "keto" }, {});
+    // protein 25 E% = 125 g · fedt 70 E% = 155,6→156 g · kulhydrat = resten ≈ 25 g
+    expect(t.protein_g).toBe(125);
+    expect(t.fat_g).toBe(156);
+    expect(t.carbohydrate_g).toBe(25);
+  });
+
+  it("kostprofil low_carb: 30/25/45-fordeling", () => {
+    const t = resolveTargets({ kcal: 2000, macro_profile: "low_carb" }, {});
+    expect(t.protein_g).toBe(150); // 30 E%
+    expect(t.fat_g).toBe(100); // 45 E%
+    expect(t.carbohydrate_g).toBe(125); // resten = 25 E%
+  });
+
+  it("ukendt kostprofil falder tilbage på standard", () => {
+    expect(resolveTargets({ kcal: 2000, macro_profile: "carnivore" }, {})).toEqual(
+      resolveTargets({ kcal: 2000 }, {}),
+    );
+  });
 });
 
 describe("resolveTargets v2 — Mifflin-St Jeor × aktivitetsfaktor (fase 3.1)", () => {

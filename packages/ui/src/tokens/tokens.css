@@ -1,7 +1,7 @@
 /* ============================================================
-   Madro designtokens — eneste kilde til farver, radius, type og
-   bevægelse. Værdierne er en 1:1-gengivelse af docs/byggeplan.md §3
-   (løftet fra det godkendte oplæg i docs/design/mockup/styles.css).
+   OmniBite designtokens — eneste kilde til farver, radius, type og
+   bevægelse. Grundlag: byggeplan §3 ("Instrumentet") + logo-drevet
+   rebrand 2026-07-08 (bladgrøn/koksgrå/cyan fra Logo Omnibite.jpg).
 
    Regel (CLAUDE.md): ingen komponent må indeholde hex, px-spacing
    eller font-familier — kun utilities/vars defineret her.
@@ -14,103 +14,121 @@
 /* Mørk tilstand via class-strategi (fase-tjekliste 0.2) */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* ---------- Rå tokens: lys tilstand (§3.2 + "Instrumentet" 2026-07-06) ---------- */
+/* ---------- Rå tokens: lys tilstand ----------
+   "LYSENDE INSTRUMENT" (2026-07-10, brugerens valg af retning 1):
+   porcelænshvid grund, LYS glas-målerflade med lysende grøn→cyan-bue
+   (logoets blad og åre), og farven kommer fra aflæsningerne — koral,
+   rav, skifer, cyan — ikke fra fladerne. Handling = dyb teal.
+   Afløser dark-evergreen-panelet; panelet følger nu tilstanden
+   (lyst glas i lys, mørkt glas i mørk — buen gløder ens i begge). */
 :root {
-  --bg: #f4f2ec; /* papir — en anelse dybere, så hvide kort løfter sig */
+  --bg: #faf8f3; /* porcelæn — varmt, aldrig sterilt */
   --surface: #ffffff;
   --surface-raised: #ffffff;
-  --ink: #14201a;
-  --text-secondary: #56635c;
-  --text-tertiary: #86928b;
-  --brand: #0e7a5e;
-  --brand-raise: #14926f; /* gradient-top på primærknapper/FAB */
-  --brand-hover: #0b6650;
-  --brand-tint: #e7f2ed;
+  --ink: #23282a;
+  --text-secondary: #5d6863;
+  --text-tertiary: #767e7a; /* mørkere: klarer WCAG-kontrast på porcelæn (A11Y-1); var #98a09c (2,5:1) */
+  --brand: #0f766e; /* dyb teal — handling (grønnen bor nu kun i buen) */
+  --brand-raise: #149482; /* gradient-top på primærknapper/FAB */
+  --brand-hover: #0b5f58;
+  --brand-tint: #e2f2ee;
   --accent: #e8a13a;
-  --hairline: rgba(16, 32, 26, 0.1);
+  --hairline: rgba(35, 40, 42, 0.1);
   --on-brand: #ffffff;
-  --card-edge: transparent; /* lys: skygge løfter, ingen kant */
+  --card-edge: rgba(35, 40, 42, 0.07); /* lys: fin kant + blød skygge */
 
-  /* Instrumentpanelet — signaturen: dyb evergreen i BEGGE tilstande
-     (brugerens valg 2026-07-06 efter salvie-testen: originalen var bedre;
-     sammenhængen sikres af page-hero-wash + tintet mellemkort). */
-  --panel: #0c2b22;
-  --panel-edge: #123528;
-  --panel-ink: #e9f2ed;
-  --panel-dim: #8fa89d;
-  --panel-track: rgba(233, 242, 237, 0.13);
-  --panel-haze: rgba(61, 214, 163, 0.09);
-  /* Aflæsningsfarver på panelet — lysende, ens i begge tilstande */
-  --lume: #3dd6a3;
-  --panel-carb: #e8b05c;
-  --panel-fat: #8fa9c9;
-  --panel-mid: #e0a63c;
-  --panel-low: #e88e6c;
+  /* Målerfladen — lyst glas: hvid→porcelæn-gradient med cyan dis */
+  --panel: #f3f5f0;
+  --panel-edge: #ffffff;
+  --panel-ink: #23282a;
+  --panel-dim: #8ba095;
+  --panel-track: rgba(35, 40, 42, 0.09);
+  --panel-haze: rgba(49, 200, 222, 0.12); /* logoets åre som dis */
+  /* Lume-buen: gradient fra blad til åre (bruges i QualityArc) */
+  --lume-a: #59b83c;
+  --lume-b: #22b3cc;
+  --lume: #128fa3; /* enkeltfarve-aflæsninger (dots, standby) — AA-grafik */
+  /* Aflæsningsfarver: koral/rav/skifer — livet kommer fra dataene */
+  --panel-protein: #e0654a;
+  --panel-carb: #d0912e;
+  --panel-fat: #6d88ad;
+  --panel-mid: #d0912e;
+  --panel-low: #dd6a48;
 
   /* Verdikt-skala (afdæmpet, ikke alarmerende) */
-  --v-excellent: #2fa36b;
-  --v-good: #7fb552;
+  --v-excellent: #3a9a43;
+  --v-good: #85b84a;
   --v-mid: #e0a63c;
   --v-poor: #e27a54;
   --v-bad: #c9503c;
   --v-poor-tint: rgba(226, 122, 84, 0.14);
 
-  /* Makroringe (godkendt i designoplægget) */
-  --macro-protein: #0e7a5e;
-  --macro-carb: #e8a13a;
-  --macro-fat: #6e87a8;
+  /* Makrofarver (grafer m.m.) — følger aflæsningsfarverne */
+  --macro-protein: #d95b3f;
+  --macro-carb: #c8882a;
+  --macro-fat: #6d88ad;
 
-  /* Dybde (§3.4): to-lags bløde skygger i lys tilstand */
-  --shadow-card: 0 1px 2px rgba(16, 32, 26, 0.05), 0 6px 18px rgba(16, 32, 26, 0.07);
-  --shadow-sheet: 0 -8px 32px rgba(16, 32, 26, 0.14);
-  --shadow-fab: 0 10px 24px rgba(14, 122, 94, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  --shadow-panel: inset 0 1px 0 rgba(233, 242, 237, 0.08), 0 14px 34px rgba(9, 26, 20, 0.35);
-  --shadow-btn: 0 8px 20px rgba(14, 122, 94, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  /* Dybde: bløde, svagt grønlige skygger — glasset "svæver" på porcelænet */
+  --shadow-card: 0 1px 2px rgba(35, 40, 42, 0.04), 0 6px 18px rgba(96, 130, 110, 0.1);
+  --shadow-sheet: 0 -8px 32px rgba(35, 40, 42, 0.14);
+  --shadow-fab: 0 10px 24px rgba(15, 118, 110, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  --shadow-panel: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 10px 30px rgba(96, 130, 110, 0.16);
+  --shadow-btn: 0 8px 20px rgba(15, 118, 110, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
-/* ---------- Rå tokens: mørk tilstand (§3.2, førsteklasses) ---------- */
+/* ---------- Rå tokens: mørk tilstand (§3.2, førsteklasses) ----------
+   "Lysende instrument" i mørke: kul-neutrale flader (ikke grønne),
+   mørkt glas-panel — og buens glød træder naturligt frem. */
 .dark {
-  --bg: #0a0f0d;
-  --surface: #131b18;
-  --surface-raised: #1a2420;
-  --ink: #eaf0ec;
-  --text-secondary: #9aa6a0;
-  --text-tertiary: #6e7a74;
-  --brand: #35c495;
-  --brand-raise: #3ecd9d;
-  --brand-hover: #4ad0a4;
-  --brand-tint: #12241e;
+  --bg: #16191a;
+  --surface: #1f2324;
+  --surface-raised: #272c2d;
+  --ink: #edf0ef;
+  --text-secondary: #a7b0ad;
+  --text-tertiary: #7e8784;
+  --brand: #2fc0ac;
+  --brand-raise: #3ac9b5;
+  --brand-hover: #45d1be;
+  --brand-tint: #1d3330;
   --accent: #e8a13a;
-  --hairline: rgba(234, 240, 236, 0.09);
-  --on-brand: #08130f;
+  --hairline: rgba(237, 240, 239, 0.12);
+  --on-brand: #06211d;
   --card-edge: var(--hairline); /* mørk: fladelyshed + hårlinje, ingen skygge */
 
-  /* Panelet smelter sammen med den mørke flade via lysere kant */
-  --panel: #10231c;
-  --panel-edge: #1a3529;
-  --panel-ink: #e9f2ed;
-  --panel-dim: #8fa89d;
-  --panel-track: rgba(233, 242, 237, 0.13);
-  --panel-haze: rgba(61, 214, 163, 0.09);
+  /* Mørkt glas-panel — buen gløder ens i begge tilstande */
+  --panel: #212627;
+  --panel-edge: #2c3233;
+  --panel-ink: #eef2f0;
+  --panel-dim: #94a09c;
+  --panel-track: rgba(238, 242, 240, 0.13);
+  --panel-haze: rgba(63, 210, 230, 0.1);
+  --lume-a: #6cc04d;
+  --lume-b: #31c8de;
+  --lume: #3fd2e6;
+  --panel-protein: #ff8a70;
+  --panel-carb: #f0b04c;
+  --panel-fat: #8ca6c6;
+  --panel-mid: #e7b457;
+  --panel-low: #e88e6c;
 
   /* Verdikt løftet ca. 8-10 % i lyshed */
-  --v-excellent: #3db97d;
-  --v-good: #91c566;
+  --v-excellent: #4cae55;
+  --v-good: #97c561;
   --v-mid: #e7b457;
   --v-poor: #e88e6c;
   --v-bad: #d66a55;
   --v-poor-tint: rgba(232, 142, 108, 0.16);
 
-  --macro-protein: #35c495;
+  --macro-protein: #ff8a70;
   --macro-carb: #e8b05c;
   --macro-fat: #8fa9c9;
 
   /* Mørk: fladelyshed + hårlinjer frem for skygge (§3.4) */
   --shadow-card: 0 0 0 0 transparent;
   --shadow-sheet: 0 -8px 32px rgba(0, 0, 0, 0.5);
-  --shadow-fab: 0 10px 26px rgba(53, 196, 149, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  --shadow-panel: inset 0 1px 0 rgba(233, 242, 237, 0.07), 0 10px 26px rgba(0, 0, 0, 0.5);
-  --shadow-btn: 0 8px 20px rgba(53, 196, 149, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  --shadow-fab: 0 10px 26px rgba(47, 192, 172, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  --shadow-panel: inset 0 1px 0 rgba(238, 242, 240, 0.07), 0 10px 26px rgba(0, 0, 0, 0.4);
+  --shadow-btn: 0 8px 20px rgba(47, 192, 172, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.28);
 
   color-scheme: dark;
 }
@@ -209,6 +227,7 @@
   --color-panel-dim: var(--panel-dim);
   --color-panel-track: var(--panel-track);
   --color-lume: var(--lume);
+  --color-panel-protein: var(--panel-protein);
   --color-panel-carb: var(--panel-carb);
   --color-panel-fat: var(--panel-fat);
   --color-panel-mid: var(--panel-mid);
@@ -254,6 +273,11 @@
   /* Glød på aflæsninger — currentColor-baseret, følger elementets farve */
   .glow-reading {
     filter: drop-shadow(0 0 6px color-mix(in srgb, currentColor 50%, transparent));
+  }
+
+  /* Glød til lume-gradienten (gradient-strøg har ingen currentColor) */
+  .glow-lume {
+    filter: drop-shadow(0 0 7px color-mix(in srgb, var(--lume-b) 55%, transparent));
   }
 }
 

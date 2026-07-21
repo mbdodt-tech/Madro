@@ -9,9 +9,9 @@ const CIRC = 2 * Math.PI * R;
 
 export type MacroKind = "protein" | "carb" | "fat";
 
-/** Aflæsningsfarver på panelet — lysende, ens i begge tilstande. */
+/** Aflæsningsfarver på panelet — koral/rav/skifer ("Lysende instrument"). */
 const colorClass: Record<MacroKind, string> = {
-  protein: "text-lume",
+  protein: "text-panel-protein",
   carb: "text-panel-carb",
   fat: "text-panel-fat",
 };

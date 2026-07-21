@@ -1,4 +1,6 @@
 import { Button, Card, Input } from "@madro/ui";
+import { Gauge, Leaf, ScanBarcode } from "lucide-react";
+import mark from "../assets/omnibite-mark.png";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Navigate, useNavigate } from "react-router-dom";
@@ -63,13 +65,34 @@ export function LoginPage() {
       <div className="relative z-10 mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-6 pb-24">
         {/* Brand-mærke */}
         <div className="mb-8 flex flex-col items-center text-center">
-          {/* Brandmærket som lille instrumentplade — signaturen møder én ved døren */}
-          <div className="panel-surface mb-5 grid size-16 place-items-center rounded-lg shadow-panel">
-            <span className="glow-reading font-mono text-h1 font-semibold text-lume">M</span>
-          </div>
+          {/* Selve logomærket møder én ved døren — samme plade som
+              hjemmeskærms-ikonet (brugerønske 2026-07-09: logo i appen) */}
+          <img
+            src={mark}
+            alt=""
+            aria-hidden="true"
+            className="mb-5 size-16 rounded-lg shadow-panel"
+          />
           <h1 className="text-display text-ink">{t("auth.title")}</h1>
           <p className="mt-1 text-body text-secondary">{t("auth.subtitle")}</p>
         </div>
+
+        {/* Værdiløfter (2026-07-07): siden var steril — vis hvad man får,
+            før man bliver bedt om sin e-mail. */}
+        <ul className="mb-6 space-y-2.5">
+          <li className="flex items-start gap-3 text-small text-secondary">
+            <ScanBarcode className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden="true" />
+            {t("auth.value1")}
+          </li>
+          <li className="flex items-start gap-3 text-small text-secondary">
+            <Gauge className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden="true" />
+            {t("auth.value2")}
+          </li>
+          <li className="flex items-start gap-3 text-small text-secondary">
+            <Leaf className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden="true" />
+            {t("auth.value3")}
+          </li>
+        </ul>
 
         <Card>
           <form
@@ -140,7 +163,8 @@ export function LoginPage() {
           </form>
         </Card>
 
-        <p className="mt-6 text-center text-caption text-tertiary">
+        {/* Meningsbærende tekst → secondary for WCAG AA-kontrast (A11Y-1). */}
+        <p className="mt-6 text-center text-caption text-secondary">
           {t("auth.tagline")}
         </p>
       </div>

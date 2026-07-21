@@ -1,8 +1,10 @@
 import { isSupplementFood, type NutrientMap } from "@madro/core";
-import { Button, Chip, Input, Sheet, Tabs } from "@madro/ui";
+import { Button, Chip, Input, Sheet, Skeleton, Tabs } from "@madro/ui";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { PortionForm } from "../../components/PortionForm";
+import { PremiumTeaser } from "../../payments/PremiumTeaser";
+import { useEntitlements } from "../../payments/useEntitlements";
 import { searchFoods, type FoodHit } from "../../scanner/useLookup";
 import { defaultMeal, logMeal, type Meal } from "../scan/logMeal";
 import { isSameDay } from "./useDiary";
@@ -15,21 +17,27 @@ import { WriteMealTab } from "./WriteMealTab";
  */
 export function AddFoodSheet({
   day,
+  initialMeal,
   onClose,
   onLogged,
 }: {
   day: Date;
+  /** Forudvalgt måltid (sektions-plus, 2026-07-09); ellers efter klokkeslæt. */
+  initialMeal?: Meal;
   onClose: () => void;
   onLogged: () => void;
 }) {
   const { t } = useTranslation();
+  const { premium, ready: entitlementsReady } = useEntitlements();
 
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<FoodHit[] | null>(null);
   const [searchFailed, setSearchFailed] = useState(false);
   const [selected, setSelected] = useState<FoodHit | null>(null);
   const [grams, setGrams] = useState(100);
-  const [meal, setMeal] = useState<Meal>(() => defaultMeal(new Date().getHours()));
+  const [meal, setMeal] = useState<Meal>(
+    () => initialMeal ?? defaultMeal(new Date().getHours()),
+  );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
 
@@ -191,7 +199,15 @@ export function AddFoodSheet({
             {
               value: "write",
               label: t("diary.add.tabWrite"),
-              content: <WriteMealTab day={day} onLogged={onLogged} />,
+              // Skriv-et-måltid er premium (gating 2026-07-09): AI-kaldene
+              // bor bag paywallen; søge-fanen er altid gratis.
+              content: !entitlementsReady ? (
+                <Skeleton className="h-24 w-full" />
+              ) : premium ? (
+                <WriteMealTab day={day} onLogged={onLogged} />
+              ) : (
+                <PremiumTeaser body={t("premium.gateWrite")} />
+              ),
             },
           ]}
         />

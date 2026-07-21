@@ -9,9 +9,8 @@ const R = 84;
 const ARC_PATH = `M ${CX - R} ${CY} A ${R} ${R} 0 0 1 ${CX + R} ${CY}`;
 const ARC_LEN = Math.PI * R;
 
-/** Aflæsningsfarve på panelet (lysende sæt — ens i begge tilstande). */
+/** Aflæsningsfarve for mellem/lave niveauer; ≥65 bruger lume-gradienten. */
 function arcColorClass(pct: number): string {
-  if (pct >= 65) return "text-lume";
   if (pct >= 45) return "text-panel-mid";
   return "text-panel-low";
 }
@@ -61,6 +60,14 @@ export function QualityArc({ pct, label, caption, className }: QualityArcProps) 
     <div className={cn("flex flex-col items-center", className)}>
       <div className="relative w-56">
         <svg viewBox="0 0 224 118" className="w-full" aria-hidden="true">
+          <defs>
+            {/* Lume-gradienten: logoets blad→åre ("Lysende instrument").
+                Stop-farverne er tokens, så begge tilstande følger med. */}
+            <linearGradient id="arc-lume" x1="0" y1="1" x2="1" y2="0">
+              <stop offset="0" stopColor="var(--lume-a)" />
+              <stop offset="1" stopColor="var(--lume-b)" />
+            </linearGradient>
+          </defs>
           <Ticks />
           <path
             d={ARC_PATH}
@@ -73,18 +80,35 @@ export function QualityArc({ pct, label, caption, className }: QualityArcProps) 
             <motion.path
               d={ARC_PATH}
               fill="none"
-              stroke="currentColor"
+              stroke={pct >= 65 ? "url(#arc-lume)" : "currentColor"}
               strokeWidth="9"
               strokeLinecap="round"
               strokeDasharray={ARC_LEN}
-              className={cn("glow-reading", arcColorClass(pct))}
+              className={cn(pct >= 65 ? "glow-lume" : cn("glow-reading", arcColorClass(pct)))}
               initial={reduceMotion ? false : { strokeDashoffset: ARC_LEN }}
               animate={{ strokeDashoffset: offset }}
               transition={
                 reduceMotion ? { duration: 0 } : { duration: 0.7, ease: [0.2, 0.8, 0.25, 1] }
               }
             />
-          ) : null}
+          ) : (
+            /* Standby-lys: måleren er "klar" frem for tom — inviterer i
+               stedet for at ligne en fejl (forside-hook 2026-07-07). */
+            <motion.circle
+              cx={CX - R}
+              cy={CY}
+              r={4.5}
+              fill="currentColor"
+              className="glow-reading text-lume"
+              initial={false}
+              animate={reduceMotion ? { opacity: 0.85 } : { opacity: [0.45, 0.95, 0.45] }}
+              transition={
+                reduceMotion
+                  ? { duration: 0 }
+                  : { duration: 2.4, repeat: Infinity, ease: "easeInOut" }
+              }
+            />
+          )}
         </svg>
         <div className="absolute inset-x-0 -bottom-1 flex flex-col items-center">
           <span className="font-mono text-reading tabular-nums text-panel-ink">

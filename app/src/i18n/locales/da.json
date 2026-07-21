@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Madro",
+    "appName": "OmniBite",
     "logout": "Log ud",
     "language": "Sprog",
     "loading": "Indlæser…",
@@ -9,7 +9,7 @@
     "retry": "Prøv igen"
   },
   "auth": {
-    "title": "Velkommen til Madro",
+    "title": "Velkommen til OmniBite",
     "subtitle": "Forstå kvaliteten af det, du spiser",
     "emailLabel": "E-mail",
     "emailPlaceholder": "dig@eksempel.dk",
@@ -20,10 +20,41 @@
     "signIn": "Log ind",
     "error": "Det virkede ikke. Tjek dine oplysninger og prøv igen.",
     "rateLimited": "For mange forsøg lige nu — vent et par minutter og prøv igen.",
+    "value1": "Scan en stregkode — se kvaliteten med det samme",
+    "value2": "Makroer og mikronæring ét sted",
+    "value3": "Bygget på NOVA, Nutri-Score og verificerede kilder",
     "tagline": "Forstå din mad — uden skyld og løftede pegefingre."
   },
   "home": {
     "designLink": "Designsystem"
+  },
+  "activity": {
+    "addButton": "Tilføj aktivitet",
+    "sheetTitle": "Tilføj aktivitet",
+    "typeLabel": "Aktivitet",
+    "durationLabel": "Varighed",
+    "estimateLabel": "Estimat ud fra din vægt",
+    "weightHint": "Udfyld din vægt i profilen, så bliver estimatet mere præcist — lige nu regner vi med 70 kg.",
+    "add": "Læg til dagens aktivitet",
+    "added": "Aktivitet tilføjet — +{{kcal}} kcal"
+  },
+  "nova": {
+    "open": "Hvad er NOVA?",
+    "title": "Hvad er NOVA?",
+    "intro": "NOVA er et internationalt klassifikationssystem, der inddeler fødevarer efter, hvor forarbejdede de er — ikke efter deres næringsindhold. Skalaen går fra 1 til 4.",
+    "thisProduct": "dette produkt",
+    "group1Title": "1 · Uforarbejdet eller minimalt forarbejdet",
+    "group1Body": "Frugt, grønt, kød, mælk, æg og gryn — råt eller fx frosset, tørret eller pasteuriseret.",
+    "group2Title": "2 · Forarbejdede køkkeningredienser",
+    "group2Body": "Olie, smør, sukker og salt — ingredienserne man laver mad med.",
+    "group3Title": "3 · Forarbejdede fødevarer",
+    "group3Body": "Fx brød, ost og konserves — typisk få ingredienser og genkendelig mad.",
+    "group4Title": "4 · Ultraforarbejdede fødevarer",
+    "group4Body": "Industrielt fremstillede produkter med ingredienser, man sjældent har i et køkken: modificerede stivelser, smagsstoffer, farvestoffer og emulgatorer. Forskningen forbinder en kost med meget fra gruppe 4 med lavere næringstæthed — derfor viser måleren andelen uden om gruppe 4.",
+    "additivesTitle": "Hvad med tilsætningsstoffer?",
+    "additivesBody": "E-numre er tilsætningsstoffer, der er godkendt og løbende vurderet af EFSA, EU's fødevaresikkerhedsagentur. Mange af dem er helt almindelige — fx citronsyre (E330). NOVA dømmer ikke det enkelte stof; antallet og typen af tilsætningsstoffer er i stedet en praktisk markør for, hvor industrielt forarbejdet et produkt er.",
+    "inThisProduct": "I dette produkt",
+    "sourceNote": "Kilder: NOVA (Monteiro m.fl., FAO) og EFSA."
   },
   "profile": {
     "title": "Profil",
@@ -33,6 +64,13 @@
     "sexFemale": "Kvinde",
     "sexMale": "Mand",
     "sexUnspecified": "Vil ikke oplyse",
+    "sexShort": "Ikke oplyst",
+    "activityShortSedentary": "Lav",
+    "activityShortModerate": "Moderat",
+    "activityShortActive": "Høj",
+    "goalShortMaintain": "Vedligehold",
+    "goalShortDeficit": "Lidt mindre",
+    "goalShortSurplus": "Lidt mere",
     "birthYear": "Fødselsår",
     "heightCm": "Højde (cm)",
     "weightKg": "Vægt (kg)",
@@ -46,6 +84,16 @@
     "goalDeficit": "Lidt mindre energi",
     "goalSurplus": "Lidt mere energi",
     "goalNote": "Referencen er et neutralt pejlemærke — ikke en karakter. Justeringerne er bevidst blide.",
+    "dietProfile": "Kostprofil",
+    "dietStandard": "Standard",
+    "dietHighProtein": "Højt protein",
+    "dietLowCarb": "Lav-kulhydrat",
+    "dietKeto": "Keto",
+    "dietNote": "Kostprofilen styrer kun fordelingen mellem protein, kulhydrat og fedt — den er et valg, ikke en anbefaling.",
+    "kcalGoal": "Dagligt kalorietal",
+    "useComputed": "Brug beregnet reference i stedet",
+    "customGoalLabel": "Dit daglige mål",
+    "macroSplit": "{{protein}} P · {{carbs}} K · {{fat}} F (gram)",
     "reference": "Din daglige reference",
     "referenceProtein": "{{grams}} g protein",
     "referenceHint": "Udfyld fødselsår, højde og vægt, hvis du vil have en reference beregnet ud fra din profil.",
@@ -74,7 +122,7 @@
     "deleteConfirm": "Slet min konto permanent"
   },
   "design": {
-    "title": "Madro designsystem",
+    "title": "OmniBite designsystem",
     "subtitle": "byggeplan §3 · tokens er eneste kilde til styling",
     "footer": "Midlertidig side — erstattes når den rigtige app-skal tager over.",
     "theme": {
@@ -230,7 +278,8 @@
       "verifiedDismiss": "Nej tak",
       "verifiedApplied": "Manglende tal hentet fra '{{name}}' — dine egne tal bevares.",
       "supplementToggle": "Kosttilskud — tal pr. tablet",
-      "perTablet": "Pr. tablet — som deklareret"
+      "perTablet": "Pr. tablet — som deklareret",
+      "manualFallback": "Etiketten kunne ikke aflæses automatisk — udfyld navn og tal selv. Er det et kosttilskud, så slå 'tal pr. tablet' til."
     },
     "photo": {
       "openButton": "Fotografér måltidet i stedet",
@@ -254,6 +303,7 @@
       "bad": "Meget ringe kvalitet"
     },
     "novaChip": "NOVA {{group}}",
+    "unbiased": "Vurderingen bygger kun på navngivne systemer (Nutri-Score, NOVA, EFSA) — ingen betaler for den.",
     "ultraProcessed": "ultraforarbejdet",
     "additivesChip_one": "{{count}} additiv",
     "additivesChip_other": "{{count}} additiver",
@@ -296,6 +346,7 @@
     "logged": "Logget i din dagbog",
     "error": "Kunne ikke gemme — prøv igen.",
     "gramsLabel": "Gram",
+    "useGrams": "Angiv i gram i stedet",
     "tabletsLabel": "Antal tabletter",
     "tabletWord_one": "tablet",
     "tabletWord_other": "tabletter"
@@ -324,12 +375,28 @@
     "yesterday": "I går",
     "prevDay": "Forrige dag",
     "nextDay": "Næste dag",
+    "prevWeek": "Forrige uge",
+    "nextWeek": "Næste uge",
+    "weekLabel": "Vælg dag i ugen",
+    "summary": {
+      "title": "Dagens overblik",
+      "microHint": "Mikronæring",
+      "lowest": "Mest at hente:"
+    },
     "empty": "Ingen måltider logget denne dag.",
     "emptyHint": "Scan en vare eller tilføj et måltid med plus-knappen.",
     "updated": "Ændringen er gemt",
     "removed": "Posten er fjernet",
     "enriched": "Næringstal hentet fra verificeret kilde",
     "swapped": "Skiftet til andet opslag",
+    "insight": {
+      "title": "Dagens indsigt",
+      "generate": "Generér dagens indsigt",
+      "generating": "Skriver dagens indsigt…",
+      "regenerate": "Generér ny",
+      "gateBody": "Få en kort daglig fortælling om, hvordan dagen så ud — gemt under dine måltider."
+    },
+    "addToMeal": "Tilføj til {{meal}}",
     "swap": {
       "button": "Skift til andet opslag",
       "label": "Søg i biblioteket",
@@ -411,7 +478,7 @@
       "clean": "En ren dag indtil videre",
       "mixed": "Blandet dag — helt okay",
       "processed": "Dagen er tung på forarbejdet",
-      "empty": "Ingen kvalitetsdata for dagens måltider endnu"
+      "empty": "Måleren vågner, når du logger dagens første"
     },
     "caloriesHidden": "kalorier skjult",
     "hideCalories": "Skjul kalorietal",
@@ -426,12 +493,25 @@
     "logTitle": "Dagens måltider",
     "empty": "Ingen måltider logget endnu i dag.",
     "activityIncluded": "inkl. +{{active}} kcal fra dagens aktivitet (reference {{base}})",
-    "premiumChip": "Premium"
+    "premiumChip": "Premium",
+    "hook": {
+      "morningTitle": "Godmorgen — hvad står den på?",
+      "morningBody": "Scan din morgenmad, så tegner dagen sig.",
+      "lunchTitle": "Frokosttid?",
+      "lunchBody": "Scan eller log på ti sekunder.",
+      "dinnerTitle": "Aftensmad?",
+      "dinnerBody": "Log den, mens den er varm.",
+      "quietTitle": "Dagen er blank — klar når du er",
+      "quietBody": "Scan en vare eller tilføj et måltid, når det passer dig.",
+      "scan": "Scan",
+      "add": "Log måltid",
+      "yesterday": "I går landede du på <pct>{{pct}} %</pct> ren — kan du matche det?"
+    }
   },
   "insights": {
     "title": "Indsigt",
     "trendTitle": "Kvalitet denne uge",
-    "trendNote": "Andel ikke-ultraforarbejdet pr. dag (NOVA 1-3).",
+    "trendNote": "Så stor en del af dagens mad var IKKE ultraforarbejdet — NOVA-gruppe 1-3 på skalaen, hvor gruppe 4 er ultraforarbejdet. Tryk på en dag for at åbne den i dagbogen.",
     "daysLogged": "dage logget",
     "avgQuality": "gns. kvalitet",
     "avgKcal": "gns. kcal",
@@ -447,14 +527,14 @@
     "seePremium": "Se Premium"
   },
   "onboarding": {
-    "welcomeTitle": "Velkommen til Madro",
+    "welcomeTitle": "Velkommen til OmniBite",
     "welcomeBody": "Forstå kvaliteten af det, du spiser — forarbejdning, næring og balance samlet ét sted. Uden skyld.",
     "start": "Kom i gang",
     "next": "Videre",
     "ageTitle": "Først: hvornår er du født?",
     "ageBody": "Vi bruger kun årstallet til aldersgrænsen og din energireference.",
-    "tooYoungTitle": "Madro er ikke til dig endnu",
-    "tooYoungBody": "Man skal være mindst 13 år for at bruge Madro. Det er ikke noget med dig — apps om mad og krop kræver bare en vis alder. Du er velkommen tilbage senere.",
+    "tooYoungTitle": "OmniBite er ikke til dig endnu",
+    "tooYoungBody": "Man skal være mindst 13 år for at bruge OmniBite. Det er ikke noget med dig — apps om mad og krop kræver bare en vis alder. Du er velkommen tilbage senere.",
     "consentTitle": "Dine data, dine regler",
     "consentData": "Det, du logger om din mad, er følsomme helbredsdata. De opbevares i EU og bruges KUN til at vise dig dine egne overblik og indsigter — aldrig til reklamer, og de sælges aldrig.",
     "consentRights": "Du kan til enhver tid downloade alle dine data eller slette din konto helt — begge dele direkte fra din profil.",
@@ -472,6 +552,16 @@
   "premium": {
     "title": "Premium",
     "back": "Tilbage",
+    "timelineLabel": "Sådan forløber prøven",
+    "timelineNowTitle": "I dag",
+    "timelineNowBody": "Fuld adgang til alt i Premium med det samme.",
+    "timelineRemindTitle": "Dag {{day}}",
+    "timelineRemindBody": "Vi minder dig om, at prøven snart udløber.",
+    "timelineEndTitle": "Dag {{day}}",
+    "timelineEndBody": "Prøven udløber. Du fortsætter kun, hvis du selv vælger det.",
+    "gateTitle": "En del af Premium",
+    "gatePhoto": "Tag et billede af måltidet, og lad AI'en genkende retterne og portionerne for dig.",
+    "gateWrite": "Skriv dit måltid med dine egne ord — 'havregrød med banan' — og få det sat på tal.",
     "glimpseHint": "Mikronæring i dag",
     "glimpseLabel": "Den fulde mikronæringsdybde",
     "featuresLabel": "Premium-funktioner",
@@ -486,6 +576,11 @@
     "trialNote": "Vi siger til, inden prøven udløber — ingen skjulte fornyelser.",
     "cta": "Start {{days}} dages gratis prøve",
     "betaNote": "Betaling åbner ved lancering — alt andet virker allerede.",
+    "activated": "Prøven er aktiv — god fornøjelse",
+    "deactivated": "Beta-premium er slået fra",
+    "deactivateBeta": "Slå beta-premium fra",
+    "haveTitle": "Det har du nu",
+    "featDailyInsight": "Daglige og ugentlige AI-indsigter om din kost",
     "continueFree": "Fortsæt gratis",
     "freeStays": "Gratis-udgaven forbliver fuldt brugbar",
     "alreadyTitle": "Du har Premium",

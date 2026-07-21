@@ -234,6 +234,7 @@
   "scan": {
     "hint": "Ret kameraet mod stregkoden",
     "cameraError": "Kameraet er ikke tilgængeligt — indtast stregkoden nedenfor i stedet",
+    "cameraPrompt": "Tillad kameraadgang for at scanne — eller afvis og indtast stregkoden nedenfor",
     "close": "Luk kamera",
     "manualLabel": "Indtast stregkode",
     "manualPlaceholder": "fx 5701979011107",

@@ -234,6 +234,7 @@
   "scan": {
     "hint": "Point the camera at the barcode",
     "cameraError": "Camera unavailable — enter the barcode below instead",
+    "cameraPrompt": "Allow camera access to scan — or dismiss the request and enter the barcode below",
     "close": "Close camera",
     "manualLabel": "Enter barcode",
     "manualPlaceholder": "e.g. 5701979011107",

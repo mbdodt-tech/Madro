@@ -41,6 +41,13 @@ export function ScanPage() {
   const handledRef = useRef(false);
 
   const [phase, setPhase] = useState<Phase>({ kind: "scanning", cameraError: false });
+  // Kamera-tilladelsens tre tilstande (BUG-2, regression 2026-07-21). Mens
+  // den er "prompt", står browserens native tilladelsesdialog åben og stjæler
+  // tastaturfokus — så fallback-feltet er dødt, og "Kameraet er utilgængeligt"
+  // ville være faktuelt forkert. Vi beder i stedet brugeren besvare/afvise
+  // forespørgslen. "unknown" = browser uden camera-permission-API (Safari/FF):
+  // uændret adfærd.
+  const [camState, setCamState] = useState<PermissionState | "unknown">("unknown");
   const [manualCode, setManualCode] = useState("");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<FoodHit[] | null>(null);
@@ -91,6 +98,32 @@ export function ScanPage() {
     },
     [handleBarcode],
   );
+
+  // Overvåg kamera-tilladelsen, så beskeden matcher den faktiske tilstand.
+  useEffect(() => {
+    let cancelled = false;
+    let status: PermissionStatus | null = null;
+    const onChange = () => {
+      if (status) setCamState(status.state);
+    };
+    (async () => {
+      try {
+        // "camera" er endnu ikke i PermissionName-typen, men understøttes i Chromium.
+        status = await navigator.permissions.query({
+          name: "camera" as PermissionName,
+        });
+        if (cancelled) return;
+        setCamState(status.state);
+        status.addEventListener("change", onChange);
+      } catch {
+        if (!cancelled) setCamState("unknown");
+      }
+    })();
+    return () => {
+      cancelled = true;
+      status?.removeEventListener("change", onChange);
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -229,7 +262,11 @@ export function ScanPage() {
         </div>
 
         <p className="pointer-events-none absolute inset-x-0 bottom-6 text-center text-small text-bg/75">
-          {scanning && phase.cameraError ? t("scan.cameraError") : t("scan.hint")}
+          {camState === "prompt"
+            ? t("scan.cameraPrompt")
+            : scanning && phase.cameraError
+              ? t("scan.cameraError")
+              : t("scan.hint")}
         </p>
       </div>
 

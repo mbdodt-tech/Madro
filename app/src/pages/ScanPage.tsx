@@ -1,4 +1,4 @@
-import { Button, Chip, Input, Sheet, Skeleton, useToast } from "@madro/ui";
+import { Button, Chip, Input, Sheet, Skeleton, cn, useToast } from "@madro/ui";
 import { motion, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -48,6 +48,8 @@ export function ScanPage() {
   // forespørgslen. "unknown" = browser uden camera-permission-API (Safari/FF):
   // uændret adfærd.
   const [camState, setCamState] = useState<PermissionState | "unknown">("unknown");
+  // Genstarter kamera-opsætningen, når man vender tilbage fra måltidstilstand.
+  const [scanNonce, setScanNonce] = useState(0);
   const [manualCode, setManualCode] = useState("");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<FoodHit[] | null>(null);
@@ -152,7 +154,21 @@ export function ScanPage() {
       cancelled = true;
       scannerRef.current?.stop();
     };
-  }, [handleBarcode, runNativeScan]);
+  }, [handleBarcode, runNativeScan, scanNonce]);
+
+  /** Skift til måltidstilstand: stop stregkode-kameraet og åbn fotoflowet. */
+  const openMealMode = () => {
+    handledRef.current = true;
+    scannerRef.current?.stop();
+    setPhase({ kind: "photo" });
+  };
+
+  /** Tilbage til stregkode: nulstil og start kameraet igen (scanNonce). */
+  const backToBarcodeMode = () => {
+    handledRef.current = false;
+    setPhase({ kind: "scanning", cameraError: false });
+    setScanNonce((n) => n + 1);
+  };
 
   // Sekvensnummer dropper forsinkede svar fra ældre søgninger (stale-race).
   const searchSeq = useRef(0);
@@ -220,6 +236,43 @@ export function ScanPage() {
             <path d="M18 6 6 18M6 6l12 12" />
           </svg>
         </button>
+
+        {/* Tilstandsvælger (2026-07-21): scanneren har to ligeværdige veje —
+            stregkode og måltidsfoto. Før startede den altid i stregkode, og
+            måltid lå som et overset tekstlink under det manuelle felt, så
+            "scan et måltid" føltes som om det ikke fandtes. */}
+        <div className="absolute inset-x-0 top-5 z-10 flex justify-center">
+          <div
+            role="group"
+            aria-label={t("scan.mode.label")}
+            className="flex gap-0.5 rounded-pill bg-ink/60 p-0.5 backdrop-blur-sm"
+          >
+            <button
+              type="button"
+              onClick={() => {
+                if (phase.kind === "photo") backToBarcodeMode();
+              }}
+              aria-pressed={phase.kind !== "photo"}
+              className={cn(
+                "rounded-pill px-4 py-1.5 text-small font-medium transition-colors focus-visible:outline-2 focus-visible:outline-bg",
+                phase.kind !== "photo" ? "bg-bg text-ink" : "text-bg/80 hover:text-bg",
+              )}
+            >
+              {t("scan.mode.barcode")}
+            </button>
+            <button
+              type="button"
+              onClick={openMealMode}
+              aria-pressed={phase.kind === "photo"}
+              className={cn(
+                "rounded-pill px-4 py-1.5 text-small font-medium transition-colors focus-visible:outline-2 focus-visible:outline-bg",
+                phase.kind === "photo" ? "bg-bg text-ink" : "text-bg/80 hover:text-bg",
+              )}
+            >
+              {t("scan.mode.meal")}
+            </button>
+          </div>
+        </div>
 
         {/* Native tilstand: MLKit-UI'et er lukket igen — genåbn med knappen */}
         {nativeScanOnce ? (
@@ -295,18 +348,6 @@ export function ScanPage() {
           </Button>
         </form>
 
-        {/* Anden indfangningsvej (2.2): måltid uden stregkode */}
-        <button
-          type="button"
-          onClick={() => {
-            handledRef.current = true;
-            scannerRef.current?.stop();
-            setPhase({ kind: "photo" });
-          }}
-          className="w-full text-center text-small font-medium text-bg/80 underline-offset-4 hover:text-bg hover:underline focus-visible:outline-2 focus-visible:outline-bg"
-        >
-          {t("scan.photo.openButton")}
-        </button>
       </div>
 
       {/* ÉT Sheet for alle scan-faser — se kommentaren ved sheetHeader.
@@ -317,6 +358,13 @@ export function ScanPage() {
           if (open) return;
           // Under selve opslaget kan arket ikke afvises (uændret adfærd).
           if (phase.kind === "looking-up") return;
+          // Måltidstilstand er et TILSTANDSSKIFT, ikke en blindgyde: at lukke
+          // arket fører tilbage til stregkode-scanneren i stedet for at
+          // forlade siden.
+          if (phase.kind === "photo") {
+            backToBarcodeMode();
+            return;
+          }
           close();
         }}
         title={sheetHeader.title}

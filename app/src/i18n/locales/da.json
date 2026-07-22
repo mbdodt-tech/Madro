@@ -235,6 +235,11 @@
     "hint": "Ret kameraet mod stregkoden",
     "cameraError": "Kameraet er ikke tilgængeligt — indtast stregkoden nedenfor i stedet",
     "cameraPrompt": "Tillad kameraadgang for at scanne — eller afvis og indtast stregkoden nedenfor",
+    "mode": {
+      "label": "Hvad vil du scanne?",
+      "barcode": "Stregkode",
+      "meal": "Måltid"
+    },
     "close": "Luk kamera",
     "manualLabel": "Indtast stregkode",
     "manualPlaceholder": "fx 5701979011107",
@@ -283,7 +288,6 @@
       "manualFallback": "Etiketten kunne ikke aflæses automatisk — udfyld navn og tal selv. Er det et kosttilskud, så slå 'tal pr. tablet' til."
     },
     "photo": {
-      "openButton": "Fotografér måltidet i stedet",
       "title": "Fotografér måltidet",
       "intro": "Tag et billede af tallerkenen — vi genkender maden og skønner portionerne. Du kan rette alt bagefter.",
       "takePhoto": "Tag billede",

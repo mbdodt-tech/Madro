@@ -235,6 +235,11 @@
     "hint": "Point the camera at the barcode",
     "cameraError": "Camera unavailable — enter the barcode below instead",
     "cameraPrompt": "Allow camera access to scan — or dismiss the request and enter the barcode below",
+    "mode": {
+      "label": "What do you want to scan?",
+      "barcode": "Barcode",
+      "meal": "Meal"
+    },
     "close": "Close camera",
     "manualLabel": "Enter barcode",
     "manualPlaceholder": "e.g. 5701979011107",
@@ -283,7 +288,6 @@
       "manualFallback": "The label couldn't be read automatically — fill in the name and numbers yourself. For a supplement, switch on 'values per tablet'."
     },
     "photo": {
-      "openButton": "Photograph the meal instead",
       "title": "Photograph the meal",
       "intro": "Take a photo of the plate — we'll recognise the food and estimate portions. You can adjust everything afterwards.",
       "takePhoto": "Take photo",
